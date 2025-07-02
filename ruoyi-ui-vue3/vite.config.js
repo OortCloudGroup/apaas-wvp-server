@@ -8,7 +8,7 @@ export default defineConfig(({ mode, command }) => {
   const { VITE_APP_ENV } = env
 
   return {
-    base: VITE_APP_ENV === 'production' ? './' : './',
+    base: './',
     plugins: createVitePlugins(env, command === 'build'),
 
     resolve: {
