@@ -396,7 +396,7 @@ public interface DeviceChannelMapper {
             "DELETE FROM wvp_device_channel WHERE id=#{item.id}" +
             "</foreach>" +
             "</script>"})
-    int batchDel(List<DeviceChannel> deleteChannelList);
+    int batchDel(@Param("deleteChannelList") List<DeviceChannel> deleteChannelList);
 
     @Update({"<script>" +
             "<foreach collection='channels' item='item' separator=';'>" +

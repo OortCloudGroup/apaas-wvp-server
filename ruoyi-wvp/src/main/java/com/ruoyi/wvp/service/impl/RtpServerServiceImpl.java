@@ -114,6 +114,7 @@ public class RtpServerServiceImpl implements IReceiveRtpServerService {
             return null;
         }
 
+        log.info("[openRTPServer] 创建RTPServer成功，端口：{}，ssrc：{}，app：{}，stream：{}", rtpServerPort, ssrc, "rtp", streamId);
         // 设置流超时的定时任务
         String timeOutTaskKey = UUID.randomUUID().toString();
 

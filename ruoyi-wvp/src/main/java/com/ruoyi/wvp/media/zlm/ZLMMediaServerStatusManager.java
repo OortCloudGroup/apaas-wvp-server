@@ -264,7 +264,7 @@ public class ZLMMediaServerStatusManager {
         if (mediaServerItem.getRtspPort() != 0) {
             param.put("ffmpeg.snap", "%s -rtsp_transport tcp -i %s -y -f mjpeg -frames:v 1 %s");
         }
-        param.put("hook.enable","1");
+        param.put("hook.enable","0");
         param.put("hook.on_flow_report","");
         param.put("hook.on_play",String.format("%s/on_play", hookPrefix));
         param.put("hook.on_http_access","");
