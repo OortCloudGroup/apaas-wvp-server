@@ -47,5 +47,4 @@ node_modules/
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
-
-*.yml
+/opencode
