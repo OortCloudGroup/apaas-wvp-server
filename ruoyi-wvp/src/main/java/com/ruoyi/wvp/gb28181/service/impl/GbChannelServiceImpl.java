@@ -30,6 +30,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class GbChannelServiceImpl implements IGbChannelService {
 
     @Autowired
@@ -130,6 +131,9 @@ public class GbChannelServiceImpl implements IGbChannelService {
 
     @Override
     public int offline(CommonGBChannel commonGBChannel) {
+        if(commonGBChannel == null){
+            return 0;
+        }
         if (commonGBChannel.getGbId() <= 0) {
             log.warn("[通道离线] 未找到数据库ID，更新失败， {}({})", commonGBChannel.getGbName(), commonGBChannel.getGbDeviceId());
             return 0;
@@ -184,6 +188,9 @@ public class GbChannelServiceImpl implements IGbChannelService {
 
     @Override
     public int online(CommonGBChannel commonGBChannel) {
+        if(commonGBChannel == null){
+            return 0;
+        }
         if (commonGBChannel.getGbId() <= 0) {
             log.warn("[通道上线] 未找到数据库ID，更新失败， {}({})", commonGBChannel.getGbName(), commonGBChannel.getGbDeviceId());
             return 0;

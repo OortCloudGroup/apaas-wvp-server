@@ -14,6 +14,7 @@ import com.ruoyi.wvp.utils.DateUtil;
 import com.ruoyi.common.enums.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,7 @@ public class AlarmController {
      * @param time 结束时间(这个时间之前的报警会被删除)
      * @return
      */
+    @PreAuthorize("@ss.hasPermi('wvp:alarm:delete')")
     @DeleteMapping("/delete")
     public Integer delete(
             @RequestParam(required = false) Integer id,
@@ -126,8 +128,8 @@ public class AlarmController {
      *  分页查询报警
      *
      * @param deviceId 设备id
-     * @param page 当前页
-     * @param count 每页查询数量
+     * @param pageNum 当前页
+     * @param pageSize 每页查询数量
      * @param alarmPriority  报警级别
      * @param alarmMethod 报警方式
      * @param alarmType  报警类型
@@ -135,10 +137,11 @@ public class AlarmController {
      * @param endTime 结束时间
      * @return
      */
+    @PreAuthorize("@ss.hasPermi('wvp:alarm:list')")
     @GetMapping("/all")
     public PageInfo<DeviceAlarm> getAll(
-            @RequestParam int page,
-            @RequestParam int count,
+            @RequestParam int pageNum,
+            @RequestParam int pageSize,
             @RequestParam(required = false)  String deviceId,
             @RequestParam(required = false) String alarmPriority,
             @RequestParam(required = false) String alarmMethod,
@@ -168,7 +171,7 @@ public class AlarmController {
             throw new ControllerException(ErrorCode.ERROR400.getCode(), "endTime格式为" + DateUtil.PATTERN);
         }
 
-        return deviceAlarmService.getAllAlarm(page, count, deviceId, alarmPriority, alarmMethod,
+        return deviceAlarmService.getAllAlarm(pageNum, pageSize, deviceId, alarmPriority, alarmMethod,
                 alarmType, startTime, endTime);
     }
 }

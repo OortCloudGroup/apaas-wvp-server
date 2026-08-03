@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.onvif.domain.FetchMainAndSubStreamUris;
 import com.ruoyi.onvif.domain.bo.AbsoluteMoveBo;
 import com.ruoyi.onvif.domain.bo.FetchMainAndSubStreamUrisBo;
+import com.ruoyi.onvif.domain.bo.OnvifPZT;
 import com.ruoyi.onvif.domain.bo.PresetsBo;
 
 import java.util.List;
@@ -72,4 +73,18 @@ public interface IOnvifService {
      * @param bo
      */
     void addPreset(PresetsBo bo);
+
+    /**
+     * 云台开始
+     *
+     * @param onvifPZT
+     */
+    void onvifPZTStart(OnvifPZT onvifPZT);
+
+    /**
+     * 云台结束
+     *
+     * @param onvifPZT
+     */
+    void onvifPZTEnd(OnvifPZT onvifPZT);
 }

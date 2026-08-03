@@ -54,6 +54,7 @@ import static com.ruoyi.wvp.gb28181.utils.XmlUtil.getText;
 @Slf4j
 @Service
 @DS("master")
+@Transactional(rollbackFor = Exception.class)
 public class DeviceChannelServiceImpl implements IDeviceChannelService {
 
     @Autowired

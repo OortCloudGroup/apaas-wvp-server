@@ -1,26 +1,21 @@
 package com.ruoyi.web.controller.onvif;
 
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ruoyi.onvif.domain.bo.WSDeviceBo;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.onvif.domain.OnvifDevice;
 import com.ruoyi.onvif.service.IOnvifDeviceService;
-import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * onvif 设备Controller
@@ -33,6 +28,16 @@ import com.ruoyi.common.core.page.TableDataInfo;
 public class OnvifDeviceController extends BaseController {
     @Autowired
     private IOnvifDeviceService onvifDeviceService;
+
+    /**
+     * Web Services Dynamic Discovery
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('onvif:device:WSDiscovery')")
+    @GetMapping("/WSDiscovery")
+    public AjaxResult WSDiscovery() throws Exception {
+        return success(onvifDeviceService.WSDiscovery());
+    }
 
     /**
      * 查询onvif 设备列表
@@ -50,8 +55,13 @@ public class OnvifDeviceController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('onvif:device:list')")
     @GetMapping("/deviceList")
-    public AjaxResult deviceList(OnvifDevice onvifDevice) {
-        List<OnvifDevice> list = onvifDeviceService.selectOnvifDeviceList(onvifDevice);
+    public AjaxResult deviceList(OnvifDevice onvifDevice, String mapType) {
+        List<OnvifDevice> list = new ArrayList<>();
+        if ("map".equals(mapType)) {
+            list = onvifDeviceService.selectOnvifDeviceListMap(onvifDevice);
+        } else {
+            list = onvifDeviceService.selectOnvifDeviceList(onvifDevice);
+        }
         return success(list);
     }
 
@@ -84,6 +94,21 @@ public class OnvifDeviceController extends BaseController {
     @PostMapping
     public AjaxResult add(@RequestBody OnvifDevice onvifDevice) {
         return toAjax(onvifDeviceService.insertOnvifDevice(onvifDevice));
+    }
+
+//    @PreAuthorize("@ss.hasPermi('onvif:device:auth')")
+//    @Log(title = "onvif 设备", businessType = BusinessType.INSERT)
+//    @PostMapping
+//    public AjaxResult auth(@RequestBody OnvifDevice onvifDevice) {
+//        return success(onvifDeviceService.auth(onvifDevice));
+//    }
+
+
+    @PreAuthorize("@ss.hasPermi('onvif:device:add')")
+    @Log(title = "onvif 设备", businessType = BusinessType.INSERT)
+    @PostMapping("/addOnvif")
+    public AjaxResult addOnvif(@RequestBody WSDeviceBo bo) {
+        return success(onvifDeviceService.addOnvif(bo));
     }
 
     /**

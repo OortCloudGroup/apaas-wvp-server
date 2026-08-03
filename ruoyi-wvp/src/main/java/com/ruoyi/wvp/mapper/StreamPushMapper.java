@@ -157,4 +157,7 @@ public interface StreamPushMapper {
             "</foreach>" +
             "</script>"})
     int batchUpdate(List<StreamPush> streamPushItemForUpdate);
+
+    @Select("SELECT st.*, st.id as data_device_id, wdc.*, wdc.id as gb_id FROM wvp_stream_push st LEFT join wvp_device_channel wdc on wdc.data_type = 2 and st.id = wdc.data_device_id WHERE st.stream=#{stream}")
+    StreamPush selectByStream(String stream);
 }

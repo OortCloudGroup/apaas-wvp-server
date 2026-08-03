@@ -37,9 +37,10 @@ onMounted(()=>{
             radius: '50%',
             data: [
               { value: res.data.totalGbNum, name: '国标设备数' },
-              { value: res.data.totalIsupNum, name: 'iusp设备数' },
+              { value: res.data.totalIsupNum, name: '海康设备数' },
               { value: res.data.totalOnvifNum, name: 'onvif设备数' },
               { value: res.data.totalRtspNum, name: 'rtsp设备数' },
+              { value: res.data.totalDahuaNum, name: '大华设备数' },
             ],
             emphasis: {
               itemStyle: {

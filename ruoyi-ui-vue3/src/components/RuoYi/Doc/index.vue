@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-const url = ref('http://doc.ry-wvp.xyz');
+const url = ref('http://doc.ruoyi-wvp.top:85');
 
 function goto() {
   window.open(url.value)

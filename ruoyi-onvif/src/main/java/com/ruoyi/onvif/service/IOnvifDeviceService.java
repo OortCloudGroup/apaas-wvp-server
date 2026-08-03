@@ -3,6 +3,8 @@ package com.ruoyi.onvif.service;
 import java.util.List;
 
 import com.ruoyi.onvif.domain.OnvifDevice;
+import com.ruoyi.onvif.domain.bo.WSDeviceBo;
+import com.ruoyi.onvif.domain.dto.WSDiscoveryDeviceDTO;
 
 /**
  * onvif 设备Service接口
@@ -58,4 +60,27 @@ public interface IOnvifDeviceService {
      * @return 结果
      */
     public int deleteOnvifDeviceById(Long id);
+
+    /**
+     * 查询地图onvif 设备列表
+     *
+     * @param onvifDevice
+     * @return
+     */
+    List<OnvifDevice> selectOnvifDeviceListMap(OnvifDevice onvifDevice);
+
+    /**
+     * Web Services Dynamic Discovery
+     * @return
+     */
+    List<WSDiscoveryDeviceDTO> WSDiscovery() throws Exception;
+
+    /**
+     * onvif新增方法
+     * @param bo
+     * @return
+     */
+    OnvifDevice addOnvif(WSDeviceBo bo);
+
+    OnvifDevice auth(OnvifDevice onvifDevice);
 }

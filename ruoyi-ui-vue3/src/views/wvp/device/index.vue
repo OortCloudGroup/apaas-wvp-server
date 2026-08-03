@@ -55,10 +55,22 @@
         >平台信息
         </el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+            type="danger"
+            plain
+            icon="Delete"
+            :disabled="multiple"
+            @click="handleBatchDelete"
+            v-hasPermi="['wvp:device:remove']"
+        >删除
+        </el-button>
+      </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="deviceList" border>
+    <el-table v-loading="loading" :data="deviceList" border @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column type="index" label="编号" width="80" align="center"/>
       <el-table-column label="所属部门" align="center" prop="deptName"/>
       <el-table-column prop="name" label="名称" width="100" align="center"/>
@@ -280,6 +292,7 @@
 import {checkPermi} from "@/utils/permission";
 import MapGaoDe from "@/components/MapGaoDe/index.vue";
 import {
+  batchDeleteDevice,
   deleteDevice,
   devicesSync,
   getDeviceById,
@@ -314,6 +327,9 @@ const showProgress = ref(false);
 
 const deptOptions = ref(undefined);
 const enabledDeptOptions = ref(undefined);
+
+const ids = ref([]);
+const multiple = ref(true);
 
 const colors = [
   {color: '#f56c6c', percentage: 20},
@@ -650,6 +666,23 @@ function syncBasicParam(row) {
       type: 'success',
     })
   })
+}
+
+// 多选框选中数据
+function handleSelectionChange(selection) {
+  ids.value = selection.map(item => item.deviceId);
+  multiple.value = !selection.length;
+}
+
+const handleBatchDelete = () => {
+  const _ids = ids.value;
+  proxy.$modal.confirm('是否确认删除国标设备编号为"' + _ids + '"的数据项？').then(function () {
+    return batchDeleteDevice(_ids);
+  }).then(() => {
+    getList();
+    proxy.$modal.msgSuccess("删除成功");
+  }).catch(() => {
+  });
 }
 
 getDeptTree();

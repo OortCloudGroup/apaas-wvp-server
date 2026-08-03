@@ -39,7 +39,7 @@ public class IsupDeviceServiceImpl implements IIsupDeviceService {
      * @return isup设备
      */
     @Override
-//    @DataScope(deptAlias = "d")
+    @DataScope(deptAlias = "d")
     public List<IsupDevice> selectIsupDeviceList(IsupDevice isupDevice) {
         return isupDeviceMapper.selectIsupDeviceList(isupDevice);
     }
@@ -145,5 +145,16 @@ public class IsupDeviceServiceImpl implements IIsupDeviceService {
     @Override
     public List<IsupDevice> selectAllIsupDeviceList() {
        return isupDeviceMapper.selectAllIsupDeviceList();
+    }
+
+    /**
+     * 查询地图isup设备列表
+     *
+     * @param isupDevice
+     * @return
+     */
+    @Override
+    public List<IsupDevice> selectIsupDeviceListMap(IsupDevice isupDevice) {
+        return isupDeviceMapper.selectIsupDeviceListMap(isupDevice);
     }
 }

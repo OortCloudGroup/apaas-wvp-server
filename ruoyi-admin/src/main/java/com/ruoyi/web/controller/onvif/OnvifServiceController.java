@@ -5,6 +5,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.onvif.domain.FetchMainAndSubStreamUris;
 import com.ruoyi.onvif.domain.bo.AbsoluteMoveBo;
 import com.ruoyi.onvif.domain.bo.FetchMainAndSubStreamUrisBo;
+import com.ruoyi.onvif.domain.bo.OnvifPZT;
 import com.ruoyi.onvif.domain.bo.PresetsBo;
 import com.ruoyi.onvif.service.IOnvifService;
 import com.ruoyi.onvif.utils.OnvifUtil;
@@ -26,6 +27,8 @@ public class OnvifServiceController extends BaseController {
 
     @Autowired
     private IOnvifService service;
+
+
 
     /**
      * 获取数字通道
@@ -58,40 +61,42 @@ public class OnvifServiceController extends BaseController {
         return success(service.getChannelToken(bo));
     }
 
-    /**
-     * 绝对位置移动
-     *
-     * @param bo
-     * @return
-     */
-    @PreAuthorize("@ss.hasPermi('onvif:service:absoluteMove')")
-    @GetMapping("/absoluteMove")
-    public AjaxResult absoluteMove(AbsoluteMoveBo bo) {
-        return success(service.generateAbsoluteMove(bo));
-    }
+//    /**
+//     * 绝对位置移动
+//     *
+//     * @param bo
+//     * @return
+//     */
+//    @PreAuthorize("@ss.hasPermi('onvif:service:absoluteMove')")
+//    @GetMapping("/absoluteMove")
+//    public AjaxResult absoluteMove(AbsoluteMoveBo bo) {
+//        return success(service.generateAbsoluteMove(bo));
+//    }
 
     /**
-     * 连续移动
+     * 云台开始
      *
-     * @param bo
+     * @param onvifPZT
      * @return
      */
     @PreAuthorize("@ss.hasPermi('onvif:service:continuousMove')")
-    @GetMapping("/continuousMove")
-    public AjaxResult continuousMove(AbsoluteMoveBo bo) {
-        return success(service.generateContinuousMove(bo));
+    @GetMapping("/onvifPZTStart")
+    public AjaxResult onvifPZTStart(OnvifPZT onvifPZT) {
+        service.onvifPZTStart(onvifPZT);
+        return success();
     }
 
     /**
-     * 连续移动停止
+     * 云台结束
      *
-     * @param bo
+     * @param onvifPZT
      * @return
      */
     @PreAuthorize("@ss.hasPermi('onvif:service:continuousMoveStop')")
-    @GetMapping("/continuousMoveStop")
-    public AjaxResult continuousMoveStop(AbsoluteMoveBo bo) {
-        return success(service.continuousMoveStop(bo));
+    @GetMapping("/onvifPZTEnd")
+    public AjaxResult onvifPZTEnd(OnvifPZT onvifPZT) {
+        service.onvifPZTEnd(onvifPZT);
+        return success();
     }
 
     /**

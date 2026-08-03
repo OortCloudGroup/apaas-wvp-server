@@ -1,5 +1,6 @@
 package com.ruoyi.isup.service.streamService;
 
+import com.ruoyi.isup.service.cmsService.HIKSDKStructure;
 import com.sun.jna.*;
 import com.sun.jna.examples.win32.W32API;
 import com.sun.jna.examples.win32.W32API.HWND;
@@ -530,8 +531,8 @@ public interface HCNetSDK extends Library {
     public static final int NET_DVR_SET_PTZPOS = 292;    //云台设置PTZ位置
     public static final int NET_DVR_GET_PTZPOS = 293;        //云台获取PTZ位置
     public static final int NET_DVR_GET_PTZSCOPE = 294;//云台获取PTZ范围
-    public static final int NET_DVR_GET_PTZLOCKCFG = 3287;//获取云台锁定信息
-    public static final int NET_DVR_SET_PTZLOCKCFG = 3288;//设置云台锁定信息
+    public static final int NET_DVR_GET_PTZLOCKCFG=3287;//获取云台锁定信息
+    public static final int  NET_DVR_SET_PTZLOCKCFG=3288;//设置云台锁定信息
 
     public static final int NET_DVR_COMPLETE_RESTORE_CTRL = 3420;    //设置完全恢复出厂值
     /***************************
@@ -1133,7 +1134,7 @@ public interface HCNetSDK extends Library {
 
     /////////////////////////////////////////////////////////////////////////
     //校时结构参数
-    public static class NET_DVR_TIME extends Structure {//校时结构参数
+    public static class NET_DVR_TIME extends HIKSDKStructure {//校时结构参数
         public int dwYear;        //年
         public int dwMonth;        //月
         public int dwDay;        //日
@@ -1156,7 +1157,7 @@ public interface HCNetSDK extends Library {
         }
     }
 
-    public static class NET_DVR_SCHEDTIME extends Structure {
+    public static class NET_DVR_SCHEDTIME extends HIKSDKStructure {
         public byte byStartHour;    //开始时间
         public byte byStartMin;
         public byte byStopHour;            //结束时间
@@ -1165,21 +1166,21 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_HANDLEEXCEPTION_V30 extends Structure {
+    public static class NET_DVR_HANDLEEXCEPTION_V30 extends HIKSDKStructure {
         public int dwHandleType;    /*处理方式,处理方式的"或"结果*//*0x00: 无响应*//*0x01: 布防器上警告*//*0x02: 声音警告*//*0x04: 上传中心*/    /*0x08: 触发报警输出*//*0x20: 触发抓图*/  //(JPEG定制)
         public byte[] byRelAlarmOut = new byte[MAX_ALARMOUT_V30];  //报警触发的输出通道,报警触发的输出,为1表示触发该输出
 
     }
 
     //报警和异常处理结构(子结构)(多处使用)
-    public static class NET_DVR_HANDLEEXCEPTION extends Structure {
+    public static class NET_DVR_HANDLEEXCEPTION extends HIKSDKStructure {
         public int dwHandleType;            /*处理方式,处理方式的"或"结果*//*0x00: 无响应*//*0x01: 布防器上警告*//*0x02: 声音警告*//*0x04: 上传中心*/    /*0x08: 触发报警输出*//*0x20: 触发抓图*/  //(JPEG定制)
         public byte[] byRelAlarmOut = new byte[MAX_ALARMOUT];  //报警触发的输出通道,报警触发的输出,为1表示触发该输出
 
     }
 
     //DVR设备参数
-    public static class NET_DVR_DEVICECFG extends Structure {
+    public static class NET_DVR_DEVICECFG extends HIKSDKStructure {
         public int dwSize;
         public byte[] sDVRName = new byte[NAME_LEN];     //DVR名称
         public int dwDVRID;                 //DVR ID,用于遥控器 //V1.4(0-99), V1.5(0-255)
@@ -1213,7 +1214,7 @@ public interface HCNetSDK extends Library {
     }
 
     //DVR设备参数
-    public static class NET_DVR_DEVICECFG_V40 extends Structure {
+    public static class NET_DVR_DEVICECFG_V40 extends HIKSDKStructure {
         public int dwSize;
         public byte[] sDVRName = new byte[NAME_LEN];     //DVR名称
         public int dwDVRID;                //DVR ID,用于遥控器 //V1.4(0-99), V1.5(0-255)
@@ -1265,7 +1266,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_IPADDR extends Structure {
+    public static class NET_DVR_IPADDR extends HIKSDKStructure {
         public byte[] sIpV4 = new byte[16];
         public byte[] byRes = new byte[128];
 
@@ -1278,7 +1279,7 @@ public interface HCNetSDK extends Library {
 
 
     //网络数据结构(子结构)(9000扩展)
-    public static class NET_DVR_ETHERNET_V30 extends Structure {
+    public static class NET_DVR_ETHERNET_V30 extends HIKSDKStructure {
         public NET_DVR_IPADDR struDVRIP;
         public NET_DVR_IPADDR struDVRIPMask;
         public int dwNetInterface;
@@ -1293,7 +1294,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_ETHERNET extends Structure {//网络数据结构(子结构)
+    public static class NET_DVR_ETHERNET extends HIKSDKStructure {//网络数据结构(子结构)
         public byte[] sDVRIP = new byte[16];                    //DVR IP地址
         public byte[] sDVRIPMask = new byte[16];                //DVR IP地址掩码
         public int dwNetInterface;               //网络接口 1-10MBase-T 2-10MBase-T全双工 3-100MBase-TX 4-100M全双工 5-10M/100M自适应
@@ -1303,7 +1304,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_PPPOECFG extends Structure {//PPPoe
+    public static class NET_DVR_PPPOECFG extends HIKSDKStructure {//PPPoe
         public int dwPPPoE;
         public byte[] sPPPoEUser = new byte[32];
         public byte[] sPPPoEPassword = new byte[16];
@@ -1312,7 +1313,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_NETCFG_V30 extends Structure {
+    public static class NET_DVR_NETCFG_V30 extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_ETHERNET_V30[] struEtherNet = new NET_DVR_ETHERNET_V30[2];
         public NET_DVR_IPADDR[] struRes1 = new NET_DVR_IPADDR[2];
@@ -1339,7 +1340,7 @@ public interface HCNetSDK extends Library {
     }
 
 
-    public static class NET_DVR_NETCFG extends Structure {//网络配置结构
+    public static class NET_DVR_NETCFG extends HIKSDKStructure {//网络配置结构
         public int dwSize;
         public NET_DVR_ETHERNET[] struEtherNet = new NET_DVR_ETHERNET[MAX_ETHERNET];        /* 以太网口 */
         public byte[] sManageHostIP = new byte[16];            //远程管理主机地址
@@ -1358,19 +1359,19 @@ public interface HCNetSDK extends Library {
     }
 
     //通道图象结构
-    public static class NET_DVR_SCHEDTIMEWEEK extends Structure {
+    public static class NET_DVR_SCHEDTIMEWEEK extends HIKSDKStructure {
         public NET_DVR_SCHEDTIME[] struAlarmTime = new NET_DVR_SCHEDTIME[8];
 
 
     }
 
-    public static class byte96 extends Structure {
+    public static class byte96 extends HIKSDKStructure {
         public byte[] byMotionScope = new byte[96];
 
 
     }
 
-    public static class NET_DVR_MOTION_V30 extends Structure {//移动侦测(子结构)(9000扩展)
+    public static class NET_DVR_MOTION_V30 extends HIKSDKStructure {//移动侦测(子结构)(9000扩展)
         public byte96[] byMotionScope = new byte96[64];                        /*侦测区域,0-96位,表示64行,共有96*64个小宏块,为1表示是移动侦测区域,0-表示不是*/
         public byte byMotionSensitive;                            /*移动侦测灵敏度, 0 - 5,越高越灵敏,oxff关闭*/
         public byte byEnableHandleMotion;                        /* 是否处理移动侦测 0－否 1－是*/
@@ -1383,7 +1384,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_MOTION extends Structure {//移动侦测(子结构)
+    public static class NET_DVR_MOTION extends HIKSDKStructure {//移动侦测(子结构)
         public byte[] byMotionScope = new byte[18 * 22];    /*侦测区域,共有22*18个小宏块,为1表示改宏块是移动侦测区域,0-表示不是*/
         public byte byMotionSensitive;        /*移动侦测灵敏度, 0 - 5,越高越灵敏,0xff关闭*/
         public byte byEnableHandleMotion;    /* 是否处理移动侦测 */
@@ -1394,7 +1395,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_HIDEALARM_V30 extends Structure {//遮挡报警
+    public static class NET_DVR_HIDEALARM_V30 extends HIKSDKStructure {//遮挡报警
         public int dwEnableHideAlarm;                /* 是否启动遮挡报警 ,0-否,1-低灵敏度 2-中灵敏度 3-高灵敏度*/
         public short wHideAlarmAreaTopLeftX;            /* 遮挡区域的x坐标 */
         public short wHideAlarmAreaTopLeftY;            /* 遮挡区域的y坐标 */
@@ -1406,7 +1407,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_HIDEALARM extends Structure {//遮挡报警(子结构)  区域大小704*576
+    public static class NET_DVR_HIDEALARM extends HIKSDKStructure {//遮挡报警(子结构)  区域大小704*576
         public int dwEnableHideAlarm;                /* 是否启动遮挡报警 ,0-否,1-低灵敏度 2-中灵敏度 3-高灵敏度*/
         public short wHideAlarmAreaTopLeftX;            /* 遮挡区域的x坐标 */
         public short wHideAlarmAreaTopLeftY;            /* 遮挡区域的y坐标 */
@@ -1417,20 +1418,20 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_VILOST_V30 extends Structure {    //信号丢失报警(子结构)(9000扩展)
+    public static class NET_DVR_VILOST_V30 extends HIKSDKStructure {    //信号丢失报警(子结构)(9000扩展)
         public byte byEnableHandleVILost;                         /* 是否处理信号丢失报警 */
         public NET_DVR_HANDLEEXCEPTION_V30 strVILostHandleType;         /* 处理方式 */
         public NET_DVR_SCHEDTIMEWEEK[] struAlarmTime = new NET_DVR_SCHEDTIMEWEEK[MAX_DAYS];//布防时间
 
     }
 
-    public static class NET_DVR_VILOST extends Structure {    //信号丢失报警(子结构)
+    public static class NET_DVR_VILOST extends HIKSDKStructure {    //信号丢失报警(子结构)
         public byte byEnableHandleVILost;    /* 是否处理信号丢失报警 */
         public NET_DVR_HANDLEEXCEPTION strVILostHandleType;    /* 处理方式 */
 
     }
 
-    public static class NET_DVR_SHELTER extends Structure {  //遮挡区域(子结构)
+    public static class NET_DVR_SHELTER extends HIKSDKStructure {  //遮挡区域(子结构)
         public short wHideAreaTopLeftX;                /* 遮挡区域的x坐标 */
         public short wHideAreaTopLeftY;                /* 遮挡区域的y坐标 */
         public short wHideAreaWidth;                /* 遮挡区域的宽 */
@@ -1439,7 +1440,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_COLOR extends Structure {
+    public static class NET_DVR_COLOR extends HIKSDKStructure {
         public byte byBrightness;    /*亮度,0-255*/
         public byte byContrast;        /*对比度,0-255*/
         public byte bySaturation;    /*饱和度,0-255*/
@@ -1448,7 +1449,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_VICOLOR extends Structure {
+    public static class NET_DVR_VICOLOR extends HIKSDKStructure {
         public NET_DVR_COLOR[] struColor = new NET_DVR_COLOR[MAX_TIMESEGMENT_V30];/*图象参数(第一个有效，其他三个保留)*/
         public NET_DVR_SCHEDTIME[] struHandleTime = new NET_DVR_SCHEDTIME[MAX_TIMESEGMENT_V30];/*处理时间段(保留)*/
 
@@ -1456,7 +1457,7 @@ public interface HCNetSDK extends Library {
     }
 
     //信号丢失
-    public static class NET_DVR_VILOST_V40 extends Structure {
+    public static class NET_DVR_VILOST_V40 extends HIKSDKStructure {
         public int dwEnableVILostAlarm;                /* 是否启动信号丢失报警 ,0-否,1-是*/
         /* 信号丢失触发报警输出 */
         public int dwHandleType;        //异常处理,异常处理方式的"或"结果
@@ -1479,7 +1480,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_DNMODE extends Structure {
+    public static class NET_DVR_DNMODE extends HIKSDKStructure {
         public byte byObjectSize;//占比参数(0~100)
         public byte byMotionSensitive; /*移动侦测灵敏度, 0 - 5,越高越灵敏,0xff关闭*/
         public byte[] byRes = new byte[6];
@@ -1487,7 +1488,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_MOTION_MULTI_AREAPARAM extends Structure {
+    public static class NET_DVR_MOTION_MULTI_AREAPARAM extends HIKSDKStructure {
         public byte byAreaNo;//区域编号(IPC- 1~8)
         public byte[] byRes = new byte[3];
         public NET_VCA_RECT struRect = new NET_VCA_RECT();//单个区域的坐标信息(矩形) size = 16;
@@ -1501,7 +1502,7 @@ public interface HCNetSDK extends Library {
 
     public static final int MAX_MULTI_AREA_NUM = 24;
 
-    public static class NET_DVR_MOTION_MULTI_AREA extends Structure {
+    public static class NET_DVR_MOTION_MULTI_AREA extends HIKSDKStructure {
         public byte byDayNightCtrl;//日夜控制 0~关闭,1~自动切换,2~定时切换(默认关闭)
         public byte byAllMotionSensitive; /*移动侦测灵敏度, 0 - 5,越高越灵敏,0xff关闭，全部区域的灵敏度范围*/
         public byte[] byRes = new byte[2];//
@@ -1512,7 +1513,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_MOTION_SINGLE_AREA extends Structure {
+    public static class NET_DVR_MOTION_SINGLE_AREA extends HIKSDKStructure {
         public byte[] byMotionScope = new byte[64 * 96];        /*侦测区域,0-96位,表示64行,共有96*64个小宏块,目前有效的是22*18,为1表示是移动侦测区域,0-表示不是*/
         public byte byMotionSensitive;            /*移动侦测灵敏度, 0 - 5,越高越灵敏,0xff关闭*/
         public byte[] byRes = new byte[3];
@@ -1520,14 +1521,14 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_MOTION_MODE_PARAM extends Structure {
+    public static class NET_DVR_MOTION_MODE_PARAM extends HIKSDKStructure {
         public NET_DVR_MOTION_SINGLE_AREA struMotionSingleArea = new NET_DVR_MOTION_SINGLE_AREA(); //普通模式下的单区域设
         public NET_DVR_MOTION_MULTI_AREA struMotionMultiArea = new NET_DVR_MOTION_MULTI_AREA(); //专家模式下的多区域设置
 
 
     }
 
-    public static class NET_DVR_MOTION_V40 extends Structure {
+    public static class NET_DVR_MOTION_V40 extends HIKSDKStructure {
         public NET_DVR_MOTION_MODE_PARAM struMotionMode = new NET_DVR_MOTION_MODE_PARAM(); //(5.1.0新增)
         public byte byEnableHandleMotion;        /* 是否处理移动侦测 0－否 1－是*/
         public byte byEnableDisplay;    /*启用移动侦测高亮显示，0-否，1-是*/
@@ -1557,7 +1558,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_RGB_COLOR extends Structure {
+    public static class NET_DVR_RGB_COLOR extends HIKSDKStructure {
         public byte byRed;      //RGB颜色三分量中的红色
         public byte byGreen;    //RGB颜色三分量中的绿色
         public byte byBlue;     //RGB颜色三分量中的蓝色
@@ -1566,7 +1567,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_HIDEALARM_V40 extends Structure {
+    public static class NET_DVR_HIDEALARM_V40 extends HIKSDKStructure {
         public int dwEnableHideAlarm;                /* 是否启动遮挡报警，0-否，1-低灵敏度，2-中灵敏度，3-高灵敏度*/
         public short wHideAlarmAreaTopLeftX;            /* 遮挡区域的x坐标 */
         public short wHideAlarmAreaTopLeftY;            /* 遮挡区域的y坐标 */
@@ -1592,7 +1593,7 @@ public interface HCNetSDK extends Library {
 
     }//遮挡报警
 
-    public static class NET_DVR_PICCFG_V40 extends Structure {
+    public static class NET_DVR_PICCFG_V40 extends HIKSDKStructure {
         public int dwSize;
         public byte[] sChanName = new byte[NAME_LEN];
         public int dwVideoFormat;    /* 只读 视频制式 1-NTSC 2-PAL  */
@@ -1645,7 +1646,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_PICCFG_V30 extends Structure {
+    public static class NET_DVR_PICCFG_V30 extends HIKSDKStructure {
         public int dwSize;
         public byte[] sChanName = new byte[NAME_LEN];
         public int dwVideoFormat;                /* 只读 视频制式 1-NTSC 2-PAL*/
@@ -1671,7 +1672,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_PICCFG_EX extends Structure {//通道图象结构SDK_V14扩展
+    public static class NET_DVR_PICCFG_EX extends HIKSDKStructure {//通道图象结构SDK_V14扩展
         public int dwSize;
         public byte[] sChanName = new byte[NAME_LEN];
         public int dwVideoFormat;    /* 只读 视频制式 1-NTSC 2-PAL*/
@@ -1716,7 +1717,7 @@ public interface HCNetSDK extends Library {
     }
 
 
-    public static class NET_DVR_PICCFG extends Structure { //通道图象结构(SDK_V13及之前版本)
+    public static class NET_DVR_PICCFG extends HIKSDKStructure { //通道图象结构(SDK_V13及之前版本)
         public int dwSize;
         public byte[] sChanName = new byte[NAME_LEN];
         public int dwVideoFormat;    /* 只读 视频制式 1-NTSC 2-PAL*/
@@ -1763,14 +1764,14 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND extends Structure {
+    public static class NET_DVR_MULTI_STREAM_COMPRESSIONCFG_COND extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_STREAM_INFO struStreamInfo = new NET_DVR_STREAM_INFO();
         public int dwStreamType;
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_MULTI_STREAM_COMPRESSIONCFG extends Structure {
+    public static class NET_DVR_MULTI_STREAM_COMPRESSIONCFG extends HIKSDKStructure {
         public int dwSize;
         public int dwStreamType;
         public NET_DVR_COMPRESSION_INFO_V30 struStreamPara = new NET_DVR_COMPRESSION_INFO_V30();
@@ -1778,7 +1779,7 @@ public interface HCNetSDK extends Library {
     }
 
     //码流压缩参数(子结构)(9000扩展)
-    public static class NET_DVR_COMPRESSION_INFO_V30 extends Structure {
+    public static class NET_DVR_COMPRESSION_INFO_V30 extends HIKSDKStructure {
         public byte byStreamType;        //码流类型 0-视频流, 1-复合流
         public byte byResolution;    //分辨率0-DCIF 1-CIF, 2-QCIF, 3-4CIF, 4-2CIF 5（保留）16-VGA（640*480） 17-UXGA（1600*1200） 18-SVGA （800*600）19-HD720p（1280*720）20-XVGA  21-HD900p
         public byte byBitrateType;        //码率类型 0:定码率，1:变码率
@@ -1796,7 +1797,7 @@ public interface HCNetSDK extends Library {
     }
 
     //通道压缩参数(9000扩展)
-    public static class NET_DVR_COMPRESSIONCFG_V30 extends Structure {
+    public static class NET_DVR_COMPRESSIONCFG_V30 extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_COMPRESSION_INFO_V30 struNormHighRecordPara;    //录像 对应8000的普通
         public NET_DVR_COMPRESSION_INFO_V30 struRes;   //保留 String[28];
@@ -1807,7 +1808,7 @@ public interface HCNetSDK extends Library {
     }
 
 
-    public static class NET_DVR_COMPRESSION_INFO extends Structure {//码流压缩参数(子结构)
+    public static class NET_DVR_COMPRESSION_INFO extends HIKSDKStructure {//码流压缩参数(子结构)
         public byte byStreamType;        //码流类型0-视频流,1-复合流,表示压缩参数时最高位表示是否启用压缩参数
         public byte byResolution;    //分辨率0-DCIF 1-CIF, 2-QCIF, 3-4CIF, 4-2CIF, 5-2QCIF(352X144)(车载专用)
         public byte byBitrateType;        //码率类型0:变码率，1:定码率
@@ -1820,7 +1821,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_COMPRESSIONCFG extends Structure {//通道压缩参数
+    public static class NET_DVR_COMPRESSIONCFG extends HIKSDKStructure {//通道压缩参数
         public int dwSize;
         public NET_DVR_COMPRESSION_INFO struRecordPara; //录像/事件触发录像
         public NET_DVR_COMPRESSION_INFO struNetPara;    //网传/保留
@@ -1829,7 +1830,7 @@ public interface HCNetSDK extends Library {
     }
 
 
-    public static class NET_DVR_COMPRESSION_INFO_EX extends Structure {//码流压缩参数(子结构)(扩展) 增加I帧间隔
+    public static class NET_DVR_COMPRESSION_INFO_EX extends HIKSDKStructure {//码流压缩参数(子结构)(扩展) 增加I帧间隔
         public byte byStreamType;        //码流类型0-视频流, 1-复合流
         public byte byResolution;    //分辨率0-DCIF 1-CIF, 2-QCIF, 3-4CIF, 4-2CIF, 5-2QCIF(352X144)(车载专用)
         public byte byBitrateType;        //码率类型0:变码率，1:定码率
@@ -1846,7 +1847,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_RECORDSCHED extends Structure //时间段录像参数配置(子结构)
+    public static class NET_DVR_RECORDSCHED extends HIKSDKStructure //时间段录像参数配置(子结构)
     {
         public NET_DVR_SCHEDTIME struRecordTime = new NET_DVR_SCHEDTIME();
         public byte byRecordType;    //0:定时录像，1:移动侦测，2:报警录像，3:动测|报警，4:动测&报警, 5:命令触发, 6: 智能录像
@@ -1855,7 +1856,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_RECORDDAY extends Structure //全天录像参数配置(子结构)
+    public static class NET_DVR_RECORDDAY extends HIKSDKStructure //全天录像参数配置(子结构)
     {
         public short wAllDayRecord;                /* 是否全天录像 0-否 1-是*/
         public byte byRecordType;                /* 录象类型 0:定时录像，1:移动侦测，2:报警录像，3:动测|报警，4:动测&报警 5:命令触发, 6: 智能录像*/
@@ -1864,13 +1865,13 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_RECORDSCHEDWEEK extends Structure {
+    public static class NET_DVR_RECORDSCHEDWEEK extends HIKSDKStructure {
         public NET_DVR_RECORDSCHED[] struRecordSched = new NET_DVR_RECORDSCHED[MAX_TIMESEGMENT_V30];
 
 
     }
 
-    public static class NET_DVR_RECORD_V30 extends Structure {    //通道录像参数配置(9000扩展)
+    public static class NET_DVR_RECORD_V30 extends HIKSDKStructure {    //通道录像参数配置(9000扩展)
         public int dwSize;
         public int dwRecord;                        /*是否录像 0-否 1-是*/
         public NET_DVR_RECORDDAY[] struRecAllDay = new NET_DVR_RECORDDAY[MAX_DAYS];
@@ -1885,7 +1886,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_RECORD extends Structure { //通道录像参数配置
+    public static class NET_DVR_RECORD extends HIKSDKStructure { //通道录像参数配置
         public int dwSize;
         public int dwRecord;  /*是否录像 0-否 1-是*/
         public NET_DVR_RECORDDAY[] struRecAllDay = new NET_DVR_RECORDDAY[MAX_DAYS];
@@ -1896,7 +1897,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_STATFRAME extends Structure { //单帧统计参数
+    public static class NET_DVR_STATFRAME extends HIKSDKStructure { //单帧统计参数
         public int dwRelativeTime;
         public int dwAbsTime;  /*统计绝对时标*/
         public byte[] byRes = new byte[92];
@@ -1904,7 +1905,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_STATTIME extends Structure { //单帧统计参数
+    public static class NET_DVR_STATTIME extends HIKSDKStructure { //单帧统计参数
         public NET_DVR_TIME tmStart;  //统计开始时间
         public NET_DVR_TIME tmEnd;    //统计结束时间
         public byte[] byRes = new byte[92];
@@ -1920,7 +1921,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_PDC_ALRAM_INFO extends Structure { //通道录像参数配置
+    public static class NET_DVR_PDC_ALRAM_INFO extends HIKSDKStructure { //通道录像参数配置
         public int dwSize;
         public byte byMode;  /*0-单帧统计结果，1-最小时间段统计结果*/
         public byte byChannel;
@@ -1940,7 +1941,6 @@ public interface HCNetSDK extends Library {
         public int dwXmlLen;//XML透传数据长度, 即EventNotificationAlert XML Block的数据长度
         public Pointer pXmlBuf; // XML报警信息指针,其XML对应到EventNotificationAlert XML Block
         public byte[] byRes2 = new byte[8];
-
         public void read() {
             super.read();
             switch (byMode) {
@@ -1965,14 +1965,14 @@ public interface HCNetSDK extends Library {
     }
 
     //云台协议表结构配置
-    public static class NET_DVR_PTZ_PROTOCOL extends Structure {
+    public static class NET_DVR_PTZ_PROTOCOL extends HIKSDKStructure {
         public int dwType;               /*解码器类型值，从1开始连续递增*/
         public byte[] byDescribe = new byte[DESC_LEN]; /*解码器的描述符，和8000中的一致*/
 
 
     }
 
-    public static class NET_DVR_PTZCFG extends Structure {
+    public static class NET_DVR_PTZCFG extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_PTZ_PROTOCOL[] struPtz = new NET_DVR_PTZ_PROTOCOL[PTZ_PROTOCOL_NUM];/*最大200中PTZ协议*/
         public int dwPtzNum;           /*有效的ptz协议数目，从0开始(即计算时加1)*/
@@ -1984,7 +1984,7 @@ public interface HCNetSDK extends Library {
     /***************************
      * 云台类型(end)
      ******************************/
-    public static class NET_DVR_DECODERCFG_V30 extends Structure {//通道解码器(云台)参数配置(9000扩展)
+    public static class NET_DVR_DECODERCFG_V30 extends HIKSDKStructure {//通道解码器(云台)参数配置(9000扩展)
         public int dwSize;
         public int dwBaudRate;       //波特率(bps)，0－50，1－75，2－110，3－150，4－300，5－600，6－1200，7－2400，8－4800，9－9600，10－19200， 11－38400，12－57600，13－76800，14－115.2k;
         public byte byDataBit;         // 数据有几位 0－5位，1－6位，2－7位，3－8位;
@@ -2000,7 +2000,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_DECODERCFG extends Structure {//通道解码器(云台)参数配置
+    public static class NET_DVR_DECODERCFG extends HIKSDKStructure {//通道解码器(云台)参数配置
         public int dwSize;
         public int dwBaudRate;       //波特率(bps)，0－50，1－75，2－110，3－150，4－300，5－600，6－1200，7－2400，8－4800，9－9600，10－19200， 11－38400，12－57600，13－76800，14－115.2k;
         public byte byDataBit;         // 数据有几位 0－5位，1－6位，2－7位，3－8位;
@@ -2016,7 +2016,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_PPPCFG_V30 extends Structure {//ppp参数配置(子结构)
+    public static class NET_DVR_PPPCFG_V30 extends HIKSDKStructure {//ppp参数配置(子结构)
         public NET_DVR_IPADDR struRemoteIP;    //远端IP地址
         public NET_DVR_IPADDR struLocalIP;        //本地IP地址
         public byte[] sLocalIPMask = new byte[16];            //本地IP地址掩码
@@ -2032,7 +2032,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_PPPCFG extends Structure {//ppp参数配置(子结构)
+    public static class NET_DVR_PPPCFG extends HIKSDKStructure {//ppp参数配置(子结构)
         public byte[] sRemoteIP = new byte[16];                //远端IP地址
         public byte[] sLocalIP = new byte[16];                //本地IP地址
         public byte[] sLocalIPMask = new byte[16];            //本地IP地址掩码
@@ -2049,7 +2049,7 @@ public interface HCNetSDK extends Library {
     }
 
 
-    public static class NET_DVR_SINGLE_RS232 extends Structure {//RS232串口参数配置(9000扩展)
+    public static class NET_DVR_SINGLE_RS232 extends HIKSDKStructure {//RS232串口参数配置(9000扩展)
         public int dwBaudRate;   /*波特率(bps)，0－50，1－75，2－110，3－150，4－300，5－600，6－1200，7－2400，8－4800，9－9600，10－19200， 11－38400，12－57600，13－76800，14－115.2k;*/
         public byte byDataBit;     /* 数据有几位 0－5位，1－6位，2－7位，3－8位 */
         public byte byStopBit;     /* 停止位 0－1位，1－2位 */
@@ -2060,7 +2060,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_RS232CFG_V30 extends Structure {//RS232串口参数配置(9000扩展)
+    public static class NET_DVR_RS232CFG_V30 extends HIKSDKStructure {//RS232串口参数配置(9000扩展)
         public int dwSize;
         public NET_DVR_SINGLE_RS232 struRs232;/*目前只有第一个串口设置有效，所有设备都只支持一个串口，其他七个保留*/
         public byte[] byRes = new byte[84];
@@ -2069,7 +2069,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_RS232CFG extends Structure {//RS232串口参数配置
+    public static class NET_DVR_RS232CFG extends HIKSDKStructure {//RS232串口参数配置
         public int dwSize;
         public int dwBaudRate;//波特率(bps)，0－50，1－75，2－110，3－150，4－300，5－600，6－1200，7－2400，8－4800，9－9600，10－19200， 11－38400，12－57600，13－76800，14－115.2k;
         public byte byDataBit;// 数据有几位 0－5位，1－6位，2－7位，3－8位;
@@ -2082,7 +2082,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_ALARMINCFG_V30 extends Structure {//报警输入参数配置(9000扩展)
+    public static class NET_DVR_ALARMINCFG_V30 extends HIKSDKStructure {//报警输入参数配置(9000扩展)
         public int dwSize;
         public byte[] sAlarmInName = new byte[NAME_LEN];    /* 名称 */
         public byte byAlarmType;                //报警器类型,0：常开,1：常闭
@@ -2104,7 +2104,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_ALARMINCFG extends Structure {//报警输入参数配置
+    public static class NET_DVR_ALARMINCFG extends HIKSDKStructure {//报警输入参数配置
         public int dwSize;
         public byte[] sAlarmInName = new byte[NAME_LEN];    /* 名称 */
         public byte byAlarmType;    //报警器类型,0：常开,1：常闭
@@ -2122,7 +2122,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_ADDIT_POSITION extends Structure {//车载GPS信息结构(2007-12-27)
+    public static class NET_DVR_ADDIT_POSITION extends HIKSDKStructure {//车载GPS信息结构(2007-12-27)
         public byte[] sDevName = new byte[32];        /* 设备名称 */
         public int dwSpeed;            /*速度*/
         public int dwLongitude;        /* 经度*/
@@ -2133,19 +2133,19 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class struRecordingHost extends Structure {
+    public static class struRecordingHost extends HIKSDKStructure {
         public byte bySubAlarmType;
         public byte[] byRes1 = new byte[3];
         public NET_DVR_TIME_EX struRecordEndTime = new NET_DVR_TIME_EX();
     }
 
-    public static class struAlarmHardDisk extends Structure {
+    public static class struAlarmHardDisk extends HIKSDKStructure {
         public int dwAlarmHardDiskNum;
 
 
     }
 
-    public static class struAlarmChannel extends Structure {
+    public static class struAlarmChannel extends HIKSDKStructure {
         public int dwAlarmChanNum;
         public int dwPicLen;//Jpeg图片长度
         public byte byPicURL; //图片数据采用URL方式 0-二进制图片数据，1-图片数据走URL方式
@@ -2154,7 +2154,7 @@ public interface HCNetSDK extends Library {
         public Pointer pDataBuff; //报警图片或者图片URL
     }
 
-    public static class struIOAlarm extends Structure {
+    public static class struIOAlarm extends HIKSDKStructure {
         public int dwAlarmInputNo;
         public int dwTrigerAlarmOutNum;
         public int dwTrigerRecordChanNum;
@@ -2162,7 +2162,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_TIME_EX extends Structure {
+    public static class NET_DVR_TIME_EX extends HIKSDKStructure {
         public short wYear;
         public byte byMonth;
         public byte byDay;
@@ -2182,7 +2182,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_ALRAM_FIXED_HEADER extends Structure {
+    public static class NET_DVR_ALRAM_FIXED_HEADER extends HIKSDKStructure {
         public int dwAlarmType;
         public NET_DVR_TIME_EX struAlarmTime = new NET_DVR_TIME_EX();
         public uStruAlarm ustruAlarm = new uStruAlarm();
@@ -2195,14 +2195,14 @@ public interface HCNetSDK extends Library {
         public byte[] byRes2 = new byte[2]; //保留
     }
 
-    public static class NET_DVR_ALARMINFO_V40 extends Structure {
+    public static class NET_DVR_ALARMINFO_V40 extends HIKSDKStructure {
         public NET_DVR_ALRAM_FIXED_HEADER struAlarmFixedHeader = new NET_DVR_ALRAM_FIXED_HEADER();
         public Pointer pAlarmData;
 
 
     }
 
-    public static class NET_DVR_ALARMINFO_V30 extends Structure {//上传报警信息(9000扩展)
+    public static class NET_DVR_ALARMINFO_V30 extends HIKSDKStructure {//上传报警信息(9000扩展)
         public int dwAlarmType;/*0-信号量报警,1-硬盘满,2-信号丢失,3－移动侦测,4－硬盘未格式化,5-读写硬盘出错,6-遮挡报警,7-制式不匹配, 8-非法访问, 0xa-GPS定位信息(车载定制)*/
         public int dwAlarmInputNumber;/*报警输入端口*/
         public byte[] byAlarmOutputNumber = new byte[MAX_ALARMOUT_V30];/*触发的输出端口，为1表示对应输出*/
@@ -2213,7 +2213,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_ALARMINFO extends Structure {
+    public static class NET_DVR_ALARMINFO extends HIKSDKStructure {
         public int dwAlarmType;/*0-信号量报警,1-硬盘满,2-信号丢失,3－移动侦测,4－硬盘未格式化,5-读写硬盘出错,6-遮挡报警,7-制式不匹配, 8-非法访问, 9-串口状态, 0xa-GPS定位信息(车载定制)*/
         public int dwAlarmInputNumber;/*报警输入端口, 当报警类型为9时该变量表示串口状态0表示正常， -1表示错误*/
         public int[] dwAlarmOutputNumber = new int[MAX_ALARMOUT];/*触发的输出端口，为1表示对应哪一个输出*/
@@ -2224,7 +2224,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_ALARMINFO_EX extends Structure {//上传报警信息(杭州竞天定制 2006-07-28)
+    public static class NET_DVR_ALARMINFO_EX extends HIKSDKStructure {//上传报警信息(杭州竞天定制 2006-07-28)
         public int dwAlarmType;/*0-信号量报警,1-硬盘满,2-信号丢失,3－移动侦测,4－硬盘未格式化,5-读写硬盘出错,6-遮挡报警,7-制式不匹配, 8-非法访问*/
         public int dwAlarmInputNumber;/*报警输入端口*/
         public int[] dwAlarmOutputNumber = new int[MAX_ALARMOUT];/*报警输入端口对应的输出端口，哪一位为1表示对应哪一个输出*/
@@ -2239,7 +2239,7 @@ public interface HCNetSDK extends Library {
 
     //////////////////////////////////////////////////////////////////////////////////////
 //IPC接入参数配置
-    public static class NET_DVR_IPDEVINFO extends Structure {/* IP设备结构 */
+    public static class NET_DVR_IPDEVINFO extends HIKSDKStructure {/* IP设备结构 */
         public int dwEnable;                    /* 该IP设备是否启用 */
         public byte[] sUserName = new byte[NAME_LEN];        /* 用户名 */
         public byte[] sPassword = new byte[PASSWD_LEN];        /* 密码 */
@@ -2249,9 +2249,8 @@ public interface HCNetSDK extends Library {
 
 
     }
-
     /* IP通道匹配参数 */
-    public static class NET_DVR_IPCHANINFO extends Structure {/* IP通道匹配参数 */
+    public static class NET_DVR_IPCHANINFO extends HIKSDKStructure {/* IP通道匹配参数 */
 
         public byte byEnable;                    /* 该通道是否在线 */
         public byte byIPID;                    //IP设备ID低8位，当设备ID为0时表示通道不可用
@@ -2259,12 +2258,12 @@ public interface HCNetSDK extends Library {
         public byte byIPIDHigh;                // IP设备ID的高8位
         public byte byTransProtocol;            //传输协议类型0-TCP/auto(具体有设备决定)，1-UDP 2-多播 3-仅TCP 4-auto
         public byte byGetStream;         /* 是否对该通道取流，0-是，1-否*/
-        public byte[] byres = new byte[30];                    /* 保留 */
+        public byte[] byres=new byte[30];                    /* 保留 */
 
 
     }
 
-    public static class NET_DVR_IPPARACFG extends Structure {/* IP接入配置结构 */
+    public static class NET_DVR_IPPARACFG extends HIKSDKStructure {/* IP接入配置结构 */
         public int dwSize;                                        /* 结构大小 */
         public NET_DVR_IPDEVINFO[] struIPDevInfo = new NET_DVR_IPDEVINFO[MAX_IP_DEVICE];    /* IP设备 */
         public byte[] byAnalogChanEnable = new byte[MAX_ANALOG_CHANNUM];        /* 模拟通道是否启用，从低到高表示1-32通道，0表示无效 1有效 */
@@ -2273,7 +2272,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public class NET_DVR_IPDEVINFO_V31 extends Structure {
+    public class NET_DVR_IPDEVINFO_V31 extends HIKSDKStructure {
         public byte byEnable;/* 该通道是否启用 */
         public byte byProType;//协议类型(默认为私有协议)，0- 私有协议，1- 松下协议，2- 索尼，更多协议通过NET_DVR_GetIPCProtoList获取。
         public byte byEnableQuickAdd;//0-不支持快速添加；1-使用快速添加
@@ -2285,9 +2284,11 @@ public interface HCNetSDK extends Library {
         public short wDVRPort;//端口号
         public byte[] szDeviceID = new byte[32];
         public byte[] byRes2 = new byte[2];//保留，置为0
+
+
     }
 
-    public class NET_DVR_STREAM_MODE extends Structure {
+    public class NET_DVR_STREAM_MODE extends HIKSDKStructure {
 
         public byte byGetStreamType;//取流方式：0- 直接从设备取流；1- 从流媒体取流；2- 通过IPServer获得IP地址后取流；
         //3- 通过IPServer找到设备，再通过流媒体取设备的流； 4- 通过流媒体由URL去取流；5- 通过hiDDNS域名连接设备然后从设备取流
@@ -2311,7 +2312,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public class NET_DVR_IPSERVER_STREAM extends Structure {
+    public class NET_DVR_IPSERVER_STREAM extends HIKSDKStructure {
         public byte byEnable;
         public byte[] byRes = new byte[3];
         public NET_DVR_IPADDR struIPServer = new NET_DVR_IPADDR();
@@ -2329,7 +2330,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public class NET_DVR_STREAM_MEDIA_SERVER_CFG extends Structure {
+    public class NET_DVR_STREAM_MEDIA_SERVER_CFG extends HIKSDKStructure {
 
         public byte byValid;//是否启用流媒体服务器取流：0-不启用，非0-启用
         public byte[] byRes1 = new byte[3];//保留，置为0
@@ -2341,7 +2342,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public class NET_DVR_DEV_CHAN_INFO extends Structure {
+    public class NET_DVR_DEV_CHAN_INFO extends HIKSDKStructure {
         public NET_DVR_IPADDR struIP = new NET_DVR_IPADDR();//设备IP地址
         public short wDVRPort;//设备端口号
         public byte byChannel;//通道号,目前设备的模拟通道号是从1开始的，对于9000等设备的IPC接入，数字通道号从33开始
@@ -2358,13 +2359,13 @@ public interface HCNetSDK extends Library {
         public byte[] sPassword = new byte[HCNetSDK.PASSWD_LEN];//设备密码
     }
 
-    public class NET_DVR_PU_STREAM_CFG extends Structure {
+    public class NET_DVR_PU_STREAM_CFG extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public NET_DVR_STREAM_MEDIA_SERVER_CFG struStreamMediaSvrCfg = new NET_DVR_STREAM_MEDIA_SERVER_CFG();
         public NET_DVR_DEV_CHAN_INFO struDevChanInfo = new NET_DVR_DEV_CHAN_INFO();
     }
 
-    public class NET_DVR_PU_STREAM_CFG_V41 extends Structure {
+    public class NET_DVR_PU_STREAM_CFG_V41 extends HIKSDKStructure {
         public int dwSize;
         public byte byStreamMode;/*取流模式，0-无效，1-通过IP或域名取流，2-通过URL取流,3-通过动态域名解析向设备取流*/
         public byte byStreamEncrypt;  //是否进行码流加密处理,0-不支持,1-支持
@@ -2376,7 +2377,7 @@ public interface HCNetSDK extends Library {
     }
 
 
-    public class NET_DVR_DDNS_STREAM_CFG extends Structure {
+    public class NET_DVR_DDNS_STREAM_CFG extends HIKSDKStructure {
         public byte byEnable;
         public byte[] byRes1 = new byte[3];
         public NET_DVR_IPADDR struStreamServer = new NET_DVR_IPADDR();
@@ -2402,7 +2403,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public class NET_DVR_PU_STREAM_URL extends Structure {
+    public class NET_DVR_PU_STREAM_URL extends HIKSDKStructure {
         public byte byEnable;//是否启用：0- 禁用，1- 启用
         public byte[] strURL = new byte[240];//取流URL路径
         public byte byTransPortocol;//传输协议类型：0-TCP，1-UDP
@@ -2413,7 +2414,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public class NET_DVR_HKDDNS_STREAM extends Structure {
+    public class NET_DVR_HKDDNS_STREAM extends HIKSDKStructure {
         public byte byEnable;//是否启用
         public byte[] byRes = new byte[3];//保留
         public byte[] byDDNSDomain = new byte[64];//hiDDNS服务器地址
@@ -2431,7 +2432,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public class NET_DVR_IPCHANINFO_V40 extends Structure {
+    public class NET_DVR_IPCHANINFO_V40 extends HIKSDKStructure {
 
         public byte byEnable;//IP通道在线状态，是一个只读的属性；
         //0表示HDVR或者NVR设备的数字通道连接对应的IP设备失败，该通道不在线；1表示连接成功，该通道在线
@@ -2455,7 +2456,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_IPPARACFG_V40 extends Structure {/* IP接入配置结构V40 */
+    public static class NET_DVR_IPPARACFG_V40 extends HIKSDKStructure {/* IP接入配置结构V40 */
         public int dwSize;   /* 结构大小 */
         public int dwGroupNum;//设备支持的总组数（只读）。
         public int dwAChanNum;//最大模拟通道个数（只读）
@@ -2469,7 +2470,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_IPALARMOUTINFO extends Structure {/* 报警输出参数 */
+    public static class NET_DVR_IPALARMOUTINFO extends HIKSDKStructure {/* 报警输出参数 */
         public byte byIPID;                    /* IP设备ID取值1- MAX_IP_DEVICE */
         public byte byAlarmOut;                /* 报警输出号 */
         public byte[] byRes = new byte[18];                    /* 保留 */
@@ -2477,14 +2478,14 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_IPALARMOUTCFG extends Structure {/* IP报警输出配置结构 */
+    public static class NET_DVR_IPALARMOUTCFG extends HIKSDKStructure {/* IP报警输出配置结构 */
         public int dwSize;                                    /* 结构大小 */
         public NET_DVR_IPALARMOUTINFO[] struIPAlarmOutInfo = new NET_DVR_IPALARMOUTINFO[MAX_IP_ALARMOUT];/* IP报警输出 */
 
 
     }
 
-    public static class NET_DVR_IPALARMININFO extends Structure {/* 报警输入参数 */
+    public static class NET_DVR_IPALARMININFO extends HIKSDKStructure {/* 报警输入参数 */
         public byte byIPID;                    /* IP设备ID取值1- MAX_IP_DEVICE */
         public byte byAlarmIn;                    /* 报警输入号 */
         public byte[] byRes = new byte[18];                    /* 保留 */
@@ -2492,14 +2493,14 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_IPALARMINCFG extends Structure {/* IP报警输入配置结构 */
+    public static class NET_DVR_IPALARMINCFG extends HIKSDKStructure {/* IP报警输入配置结构 */
         public int dwSize;                                    /* 结构大小 */
         public NET_DVR_IPALARMININFO[] struIPAlarmInInfo = new NET_DVR_IPALARMININFO[MAX_IP_ALARMIN];/* IP报警输入 */
 
 
     }
 
-    public static class NET_DVR_IPALARMINFO extends Structure {//ipc alarm info
+    public static class NET_DVR_IPALARMINFO extends HIKSDKStructure {//ipc alarm info
         public NET_DVR_IPDEVINFO[] struIPDevInfo = new NET_DVR_IPDEVINFO[MAX_IP_DEVICE];            /* IP设备 */
         public byte[] byAnalogChanEnable = new byte[MAX_ANALOG_CHANNUM];                /* 模拟通道是否启用，0-未启用 1-启用 */
         public NET_DVR_IPCHANINFO[] struIPChanInfo = new NET_DVR_IPCHANINFO[MAX_IP_CHANNEL];            /* IP通道 */
@@ -2509,7 +2510,7 @@ public interface HCNetSDK extends Library {
 
     }
 
-    public static class NET_DVR_SINGLE_HD extends Structure {//本地硬盘信息配置
+    public static class NET_DVR_SINGLE_HD extends HIKSDKStructure {//本地硬盘信息配置
         public int dwHDNo;         /*硬盘号, 取值0~MAX_DISKNUM_V30-1*/
         public int dwCapacity;     /*硬盘容量(不可设置)*/
         public int dwFreeSpace;    /*硬盘剩余空间(不可设置)*/
@@ -2520,32 +2521,32 @@ public interface HCNetSDK extends Library {
         public byte[] byRes2 = new byte[120];
     }
 
-    public static class NET_DVR_HDCFG extends Structure {
+    public static class NET_DVR_HDCFG extends HIKSDKStructure {
         public int dwSize;
         public int dwHDCount;          /*硬盘数(不可设置)*/
         public NET_DVR_SINGLE_HD[] struHDInfo = new NET_DVR_SINGLE_HD[MAX_DISKNUM_V30];//硬盘相关操作都需要重启才能生效；
     }
 
-    public static class NET_DVR_SINGLE_HDGROUP extends Structure {//本地盘组信息配置
+    public static class NET_DVR_SINGLE_HDGROUP extends HIKSDKStructure {//本地盘组信息配置
         public int dwHDGroupNo;       /*盘组号(不可设置) 1-MAX_HD_GROUP*/
         public byte[] byHDGroupChans = new byte[64]; /*盘组对应的录像通道, 0-表示该通道不录象到该盘组，1-表示录象到该盘组*/
         public byte[] byRes = new byte[8];
     }
 
-    public static class NET_DVR_HDGROUP_CFG extends Structure {
+    public static class NET_DVR_HDGROUP_CFG extends HIKSDKStructure {
         public int dwSize;
         public int dwHDGroupCount;        /*盘组总数(不可设置)*/
         public NET_DVR_SINGLE_HDGROUP[] struHDGroupAttr = new NET_DVR_SINGLE_HDGROUP[MAX_HD_GROUP];//硬盘相关操作都需要重启才能生效；
     }
 
-    public static class NET_DVR_SCALECFG extends Structure {//配置缩放参数的结构
+    public static class NET_DVR_SCALECFG extends HIKSDKStructure {//配置缩放参数的结构
         public int dwSize;
         public int dwMajorScale;    /* 主显示 0-不缩放，1-缩放*/
         public int dwMinorScale;    /* 辅显示 0-不缩放，1-缩放*/
         public int[] dwRes = new int[2];
     }
 
-    public static class NET_DVR_ALARMOUTCFG_V30 extends Structure {//DVR报警输出(9000扩展)
+    public static class NET_DVR_ALARMOUTCFG_V30 extends HIKSDKStructure {//DVR报警输出(9000扩展)
         public int dwSize;
         public byte[] sAlarmOutName = new byte[NAME_LEN];    /* 名称 */
         public int dwAlarmOutDelay;    /* 输出保持时间(-1为无限，手动关闭) */
@@ -2554,7 +2555,7 @@ public interface HCNetSDK extends Library {
         public byte[] byRes = new byte[16];
     }
 
-    public static class NET_DVR_ALARMOUTCFG extends Structure {//DVR报警输出
+    public static class NET_DVR_ALARMOUTCFG extends HIKSDKStructure {//DVR报警输出
         public int dwSize;
         public byte[] sAlarmOutName = new byte[NAME_LEN];    /* 名称 */
         public int dwAlarmOutDelay;    /* 输出保持时间(-1为无限，手动关闭) */
@@ -2562,7 +2563,7 @@ public interface HCNetSDK extends Library {
         public NET_DVR_SCHEDTIMEWEEK[] struAlarmOutTime = new NET_DVR_SCHEDTIMEWEEK[MAX_DAYS];/* 报警输出激活时间段 */
     }
 
-    public static class NET_DVR_PREVIEWCFG_V30 extends Structure {//DVR本地预览参数(9000扩展)
+    public static class NET_DVR_PREVIEWCFG_V30 extends HIKSDKStructure {//DVR本地预览参数(9000扩展)
         public int dwSize;
         public byte byPreviewNumber;//预览数目,0-1画面,1-4画面,2-9画面,3-16画面, 4-6画面, 5-8画面, 0xff:最大画面
         public byte byEnableAudio;//是否声音预览,0-不预览,1-预览
@@ -2571,7 +2572,7 @@ public interface HCNetSDK extends Library {
         public byte[] byRes = new byte[24];
     }
 
-    public static class NET_DVR_PREVIEWCFG extends Structure {//DVR本地预览参数
+    public static class NET_DVR_PREVIEWCFG extends HIKSDKStructure {//DVR本地预览参数
         public int dwSize;
         public byte byPreviewNumber;//预览数目,0-1画面,1-4画面,2-9画面,3-16画面,0xff:最大画面
         public byte byEnableAudio;//是否声音预览,0-不预览,1-预览
@@ -2579,7 +2580,7 @@ public interface HCNetSDK extends Library {
         public byte[] bySwitchSeq = new byte[MAX_WINDOW];//切换顺序,如果lSwitchSeq[i]为 0xff表示不用
     }
 
-    public static class NET_DVR_VGAPARA extends Structure {//DVR视频输出
+    public static class NET_DVR_VGAPARA extends HIKSDKStructure {//DVR视频输出
         public short wResolution;                            /* 分辨率 */
         public short wFreq;                                    /* 刷新频率 */
         public int dwBrightness;                            /* 亮度 */
@@ -2588,18 +2589,18 @@ public interface HCNetSDK extends Library {
     /*
      * MATRIX输出参数结构
      */
-    public static class NET_DVR_MATRIXPARA_V30 extends Structure {
+    public static class NET_DVR_MATRIXPARA_V30 extends HIKSDKStructure {
         public short[] wOrder = new short[MAX_ANALOG_CHANNUM];        /* 预览顺序, 0xff表示相应的窗口不预览 */
         public short wSwitchTime;                    /* 预览切换时间 */
         public byte[] res = new byte[14];
     }
 
-    public static class NET_DVR_MATRIXPARA extends Structure {
+    public static class NET_DVR_MATRIXPARA extends HIKSDKStructure {
         public short wDisplayLogo;                        /* 显示视频通道号(保留) */
         public short wDisplayOsd;                        /* 显示时间(保留) */
     }
 
-    public static class NET_DVR_VOOUT extends Structure {
+    public static class NET_DVR_VOOUT extends HIKSDKStructure {
         public byte byVideoFormat;                        /* 输出制式,0-PAL,1-NTSC */
         public byte byMenuAlphaValue;                    /* 菜单与背景图象对比度 */
         public short wScreenSaveTime;                    /* 屏幕保护时间 0-从不,1-1分钟,2-2分钟,3-5分钟,4-10分钟,5-20分钟,6-30分钟 */
@@ -2609,7 +2610,7 @@ public interface HCNetSDK extends Library {
         public byte byEnableScaler;                    /* 是否启动缩放 (0-不启动, 1-启动)*/
     }
 
-    public static class NET_DVR_VIDEOOUT_V30 extends Structure {//DVR视频输出(9000扩展)
+    public static class NET_DVR_VIDEOOUT_V30 extends HIKSDKStructure {//DVR视频输出(9000扩展)
         public int dwSize;
         public NET_DVR_VOOUT[] struVOOut = new NET_DVR_VOOUT[MAX_VIDEOOUT_V30];
         public NET_DVR_VGAPARA[] struVGAPara = new NET_DVR_VGAPARA[MAX_VGA_V30];    /* VGA参数 */
@@ -2617,14 +2618,14 @@ public interface HCNetSDK extends Library {
         public byte[] byRes = new byte[16];
     }
 
-    public static class NET_DVR_VIDEOOUT extends Structure {//DVR视频输出
+    public static class NET_DVR_VIDEOOUT extends HIKSDKStructure {//DVR视频输出
         public int dwSize;
         public NET_DVR_VOOUT[] struVOOut = new NET_DVR_VOOUT[MAX_VIDEOOUT];
         public NET_DVR_VGAPARA[] struVGAPara = new NET_DVR_VGAPARA[MAX_VGA];    /* VGA参数 */
         public NET_DVR_MATRIXPARA struMatrixPara;        /* MATRIX参数 */
     }
 
-    public static class NET_DVR_USER_INFO_V30 extends Structure {//单用户参数(子结构)(9000扩展)
+    public static class NET_DVR_USER_INFO_V30 extends HIKSDKStructure {//单用户参数(子结构)(9000扩展)
         public byte[] sUserName = new byte[NAME_LEN];        /* 用户名 */
         public byte[] sPassword = new byte[PASSWD_LEN];        /* 密码 */
         public byte[] byLocalRight = new byte[MAX_RIGHT];    /* 本地权限 */
@@ -2674,7 +2675,7 @@ public interface HCNetSDK extends Library {
         public byte[] byRes = new byte[17];
     }
 
-    public static class NET_DVR_USER_INFO_EX extends Structure {//单用户参数(SDK_V15扩展)(子结构)
+    public static class NET_DVR_USER_INFO_EX extends HIKSDKStructure {//单用户参数(SDK_V15扩展)(子结构)
         public byte[] sUserName = new byte[NAME_LEN];        /* 用户名 */
         public byte[] sPassword = new byte[PASSWD_LEN];        /* 密码 */
         public int[] dwLocalRight = new int[MAX_RIGHT];    /* 权限 */
@@ -2703,7 +2704,7 @@ public interface HCNetSDK extends Library {
         public byte[] byMACAddr = new byte[MACADDR_LEN];    /* 物理地址 */
     }
 
-    public static class NET_DVR_USER_INFO extends Structure {//单用户参数(子结构)
+    public static class NET_DVR_USER_INFO extends HIKSDKStructure {//单用户参数(子结构)
         public byte[] sUserName = new byte[NAME_LEN];        /* 用户名 */
         public byte[] sPassword = new byte[PASSWD_LEN];        /* 密码 */
         public int[] dwLocalRight = new int[MAX_RIGHT];    /* 权限 */
@@ -2729,34 +2730,34 @@ public interface HCNetSDK extends Library {
         public byte[] byMACAddr = new byte[MACADDR_LEN];    /* 物理地址 */
     }
 
-    public static class NET_DVR_USER_V30 extends Structure {//DVR用户参数(9000扩展)
+    public static class NET_DVR_USER_V30 extends HIKSDKStructure {//DVR用户参数(9000扩展)
         public int dwSize;
         public NET_DVR_USER_INFO_V30[] struUser = new NET_DVR_USER_INFO_V30[MAX_USERNUM_V30];
     }
 
-    public static class NET_DVR_USER_EX extends Structure {//DVR用户参数(SDK_V15扩展)
+    public static class NET_DVR_USER_EX extends HIKSDKStructure {//DVR用户参数(SDK_V15扩展)
         public int dwSize;
         public NET_DVR_USER_INFO_EX[] struUser = new NET_DVR_USER_INFO_EX[MAX_USERNUM];
     }
 
-    public static class NET_DVR_USER extends Structure {//DVR用户参数
+    public static class NET_DVR_USER extends HIKSDKStructure {//DVR用户参数
         public int dwSize;
         public NET_DVR_USER_INFO[] struUser = new NET_DVR_USER_INFO[MAX_USERNUM];
     }
 
-    public static class NET_DVR_EXCEPTION_V30 extends Structure {//DVR异常参数(9000扩展)
+    public static class NET_DVR_EXCEPTION_V30 extends HIKSDKStructure {//DVR异常参数(9000扩展)
         public int dwSize;
         public NET_DVR_HANDLEEXCEPTION_V30[] struExceptionHandleType = new NET_DVR_HANDLEEXCEPTION_V30[MAX_EXCEPTIONNUM_V30];
         /*数组0-盘满,1- 硬盘出错,2-网线断,3-局域网内IP 地址冲突,4-非法访问, 5-输入/输出视频制式不匹配, 6-行车超速(车载专用), 7-视频信号异常(9000)*/
     }
 
-    public static class NET_DVR_EXCEPTION extends Structure {//DVR异常参数
+    public static class NET_DVR_EXCEPTION extends HIKSDKStructure {//DVR异常参数
         public int dwSize;
         public NET_DVR_HANDLEEXCEPTION[] struExceptionHandleType = new NET_DVR_HANDLEEXCEPTION[MAX_EXCEPTIONNUM];
         /*数组0-盘满,1- 硬盘出错,2-网线断,3-局域网内IP 地址冲突,4-非法访问, 5-输入/输出视频制式不匹配, 6-行车超速(车载专用)*/
     }
 
-    public static class NET_DVR_CHANNELSTATE_V30 extends Structure {//通道状态(9000扩展)
+    public static class NET_DVR_CHANNELSTATE_V30 extends HIKSDKStructure {//通道状态(9000扩展)
         public byte byRecordStatic; //通道是否在录像,0-不录像,1-录像
         public byte bySignalStatic; //连接的信号状态,0-正常,1-信号丢失
         public byte byHardwareStatic;//通道硬件状态,0-正常,1-异常,例如DSP死掉
@@ -2771,7 +2772,7 @@ public interface HCNetSDK extends Library {
         public int dwChannelNo;    //当前的通道号，0xffffffff表示无效
     }
 
-    public static class NET_DVR_CHANNELSTATE extends Structure {//通道状态
+    public static class NET_DVR_CHANNELSTATE extends HIKSDKStructure {//通道状态
         public byte byRecordStatic; //通道是否在录像,0-不录像,1-录像
         public byte bySignalStatic; //连接的信号状态,0-正常,1-信号丢失
         public byte byHardwareStatic;//通道硬件状态,0-正常,1-异常,例如DSP死掉
@@ -2781,13 +2782,13 @@ public interface HCNetSDK extends Library {
         public int[] dwClientIP = new int[MAX_LINK];//客户端的IP地址
     }
 
-    public static class NET_DVR_DISKSTATE extends Structure {//硬盘状态
+    public static class NET_DVR_DISKSTATE extends HIKSDKStructure {//硬盘状态
         public int dwVolume;//硬盘的容量
         public int dwFreeSpace;//硬盘的剩余空间
         public int dwHardDiskStatic; //硬盘的状态,按位:1-休眠,2-不正常,3-休眠硬盘出错
     }
 
-    public static class NET_DVR_WORKSTATE_V30 extends Structure {//DVR工作状态(9000扩展)
+    public static class NET_DVR_WORKSTATE_V30 extends HIKSDKStructure {//DVR工作状态(9000扩展)
         public int dwDeviceStatic;    //设备的状态,0-正常,1-CPU占用率太高,超过85%,2-硬件错误,例如串口死掉
         public NET_DVR_DISKSTATE[] struHardDiskStatic = new NET_DVR_DISKSTATE[MAX_DISKNUM_V30];
         public NET_DVR_CHANNELSTATE_V30[] struChanStatic = new NET_DVR_CHANNELSTATE_V30[MAX_CHANNUM_V30];//通道的状态
@@ -2798,7 +2799,7 @@ public interface HCNetSDK extends Library {
         public byte[] byRes = new byte[10];
     }
 
-    public static class NET_DVR_WORKSTATE extends Structure {//DVR工作状态
+    public static class NET_DVR_WORKSTATE extends HIKSDKStructure {//DVR工作状态
         public int dwDeviceStatic;    //设备的状态,0-正常,1-CPU占用率太高,超过85%,2-硬件错误,例如串口死掉
         public NET_DVR_DISKSTATE[] struHardDiskStatic = new NET_DVR_DISKSTATE[MAX_DISKNUM];
         public NET_DVR_CHANNELSTATE[] struChanStatic = new NET_DVR_CHANNELSTATE[MAX_CHANNUM];//通道的状态
@@ -2807,7 +2808,7 @@ public interface HCNetSDK extends Library {
         public int dwLocalDisplay;//本地显示状态,0-正常,1-不正常
     }
 
-    public static class NET_DVR_LOG_V30 extends Structure {//日志信息(9000扩展)
+    public static class NET_DVR_LOG_V30 extends HIKSDKStructure {//日志信息(9000扩展)
         public NET_DVR_TIME strLogTime;
         public int dwMajorType;    //主类型 1-报警; 2-异常; 3-操作; 0xff-全部
         public int dwMinorType;//次类型 0-全部;
@@ -2824,7 +2825,7 @@ public interface HCNetSDK extends Library {
     }
 
     //日志信息
-    public static class NET_DVR_LOG extends Structure {
+    public static class NET_DVR_LOG extends HIKSDKStructure {
         public NET_DVR_TIME strLogTime;
         public int dwMajorType;    //主类型 1-报警; 2-异常; 3-操作; 0xff-全部
         public int dwMinorType;//次类型 0-全部;
@@ -2841,15 +2842,15 @@ public interface HCNetSDK extends Library {
     /************************
      * DVR日志 end
      ***************************/
-    public static class NET_DVR_ALARMOUTSTATUS_V30 extends Structure {//报警输出状态(9000扩展)
+    public static class NET_DVR_ALARMOUTSTATUS_V30 extends HIKSDKStructure {//报警输出状态(9000扩展)
         public byte[] Output = new byte[MAX_ALARMOUT_V30];
     }
 
-    public static class NET_DVR_ALARMOUTSTATUS extends Structure {//报警输出状态
+    public static class NET_DVR_ALARMOUTSTATUS extends HIKSDKStructure {//报警输出状态
         public byte[] Output = new byte[MAX_ALARMOUT];
     }
 
-    public static class NET_DVR_TRADEINFO extends Structure {//交易信息
+    public static class NET_DVR_TRADEINFO extends HIKSDKStructure {//交易信息
         public short m_Year;
         public short m_Month;
         public short m_Day;
@@ -2863,11 +2864,11 @@ public interface HCNetSDK extends Library {
         public int dwCash;            //交易金额
     }
 
-    public static class NET_DVR_FRAMETYPECODE extends Structure {/*帧格式*/
+    public static class NET_DVR_FRAMETYPECODE extends HIKSDKStructure {/*帧格式*/
         public byte[] code = new byte[12];        /* 代码 */
     }
 
-    public static class NET_DVR_FRAMEFORMAT_V30 extends Structure {//ATM参数(9000扩展)
+    public static class NET_DVR_FRAMEFORMAT_V30 extends HIKSDKStructure {//ATM参数(9000扩展)
         public int dwSize;
         public NET_DVR_IPADDR struATMIP;                /* ATM IP地址 */
         public int dwATMType;                            /* ATM类型 */
@@ -2887,7 +2888,7 @@ public interface HCNetSDK extends Library {
         public byte[] byRes = new byte[24];
     }
 
-    public static class NET_DVR_FRAMEFORMAT extends Structure {//ATM参数
+    public static class NET_DVR_FRAMEFORMAT extends HIKSDKStructure {//ATM参数
         public int dwSize;
         public byte[] sATMIP = new byte[16];                        /* ATM IP地址 */
         public int dwATMType;                        /* ATM类型 */
@@ -2904,12 +2905,12 @@ public interface HCNetSDK extends Library {
         public NET_DVR_FRAMETYPECODE[] frameTypeCode = new NET_DVR_FRAMETYPECODE[10];/* 类型 */
     }
 
-    public static class NET_DVR_FTPTYPECODE extends Structure {
+    public static class NET_DVR_FTPTYPECODE extends HIKSDKStructure {
         public byte[] sFtpType = new byte[32];     /*客户定义的操作类型*/
         public byte[] sFtpCode = new byte[8];      /*客户定义的操作类型的对应的码*/
     }
 
-    public static class NET_DVR_FRAMEFORMAT_EX extends Structure {//ATM参数添加FTP上传参数, 银行定制, 2006-11-17
+    public static class NET_DVR_FRAMEFORMAT_EX extends HIKSDKStructure {//ATM参数添加FTP上传参数, 银行定制, 2006-11-17
         public int dwSize;
         public byte[] sATMIP = new byte[16];                        /* ATM IP地址 */
         public int dwATMType;                        /* ATM类型 */
@@ -2940,7 +2941,7 @@ public interface HCNetSDK extends Library {
      * DS-6001D/F(begin)
      ***************************/
 //DS-6001D Decoder
-    public static class NET_DVR_DECODERINFO extends Structure {
+    public static class NET_DVR_DECODERINFO extends HIKSDKStructure {
         public byte[] byEncoderIP = new byte[16];        //解码设备连接的服务器IP
         public byte[] byEncoderUser = new byte[16];        //解码设备连接的服务器的用户名
         public byte[] byEncoderPasswd = new byte[16];    //解码设备连接的服务器的密码
@@ -2950,7 +2951,7 @@ public interface HCNetSDK extends Library {
         public byte[] reservedData = new byte[4];        //保留
     }
 
-    public static class NET_DVR_DECODERSTATE extends Structure {
+    public static class NET_DVR_DECODERSTATE extends HIKSDKStructure {
         public byte[] byEncoderIP = new byte[16];        //解码设备连接的服务器IP
         public byte[] byEncoderUser = new byte[16];        //解码设备连接的服务器的用户名
         public byte[] byEncoderPasswd = new byte[16];    //解码设备连接的服务器的密码
@@ -2961,7 +2962,7 @@ public interface HCNetSDK extends Library {
         public byte[] reservedData = new byte[4];        //保留
     }
 
-    public static class NET_DVR_DECCHANINFO extends Structure {
+    public static class NET_DVR_DECCHANINFO extends HIKSDKStructure {
         public byte[] sDVRIP = new byte[16];                /* DVR IP地址 */
         public short wDVRPort;                    /* 端口号 */
         public byte[] sUserName = new byte[NAME_LEN];        /* 用户名 */
@@ -2971,21 +2972,21 @@ public interface HCNetSDK extends Library {
         public byte byLinkType;                /* 连接类型 0－主码流 1－子码流 */
     }
 
-    public static class NET_DVR_DECINFO extends Structure {/*每个解码通道的配置*/
+    public static class NET_DVR_DECINFO extends HIKSDKStructure {/*每个解码通道的配置*/
         public byte byPoolChans;            /*每路解码通道上的循环通道数量, 最多4通道 0表示没有解码*/
         public NET_DVR_DECCHANINFO[] struchanConInfo = new NET_DVR_DECCHANINFO[MAX_DECPOOLNUM];
         public byte byEnablePoll;            /*是否轮巡 0-否 1-是*/
         public byte byPoolTime;                /*轮巡时间 0-保留 1-10秒 2-15秒 3-20秒 4-30秒 5-45秒 6-1分钟 7-2分钟 8-5分钟 */
     }
 
-    public static class NET_DVR_DECCFG extends Structure {/*整个设备解码配置*/
+    public static class NET_DVR_DECCFG extends HIKSDKStructure {/*整个设备解码配置*/
         public int dwSize;
         public int dwDecChanNum;        /*解码通道的数量*/
         public NET_DVR_DECINFO[] struDecInfo = new NET_DVR_DECINFO[MAX_DECNUM];
     }
 
     //2005-08-01
-    public static class NET_DVR_PORTINFO extends Structure {/* 解码设备透明通道设置 */
+    public static class NET_DVR_PORTINFO extends HIKSDKStructure {/* 解码设备透明通道设置 */
         public int dwEnableTransPort;    /* 是否启动透明通道 0－不启用 1－启用*/
         public byte[] sDecoderIP = new byte[16];        /* DVR IP地址 */
         public short wDecoderPort;            /* 端口号 */
@@ -2993,13 +2994,13 @@ public interface HCNetSDK extends Library {
         public byte[] cReserve = new byte[4];
     }
 
-    public static class NET_DVR_PORTCFG extends Structure {
+    public static class NET_DVR_PORTCFG extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_PORTINFO[] struTransPortInfo = new NET_DVR_PORTINFO[MAX_TRANSPARENTNUM]; /* 数组0表示232 数组1表示485 */
     }
 
     /*https://jna.dev.java.net/javadoc/com/sun/jna/Union.html#setType(java.lang.Class)  see how to use the JNA Union*/
-    public static class NET_DVR_PLAYREMOTEFILE extends Structure {/* 控制网络文件回放 */
+    public static class NET_DVR_PLAYREMOTEFILE extends HIKSDKStructure {/* 控制网络文件回放 */
         public int dwSize;
         public byte[] sDecoderIP = new byte[16];        /* DVR IP地址 */
         public short wDecoderPort;            /* 端口号 */
@@ -3009,7 +3010,7 @@ public interface HCNetSDK extends Library {
         public static class mode_size extends Union {
             public byte[] byFile = new byte[100];        // 回放的文件名
 
-            public static class bytime extends Structure {
+            public static class bytime extends HIKSDKStructure {
                 public int dwChannel;
                 public byte[] sUserName = new byte[NAME_LEN];    //请求视频用户名
                 public byte[] sPassword = new byte[PASSWD_LEN];    // 密码
@@ -3019,7 +3020,7 @@ public interface HCNetSDK extends Library {
         }
     }
 
-    public static class NET_DVR_DECCHANSTATUS extends Structure {/*当前设备解码连接状态*/
+    public static class NET_DVR_DECCHANSTATUS extends HIKSDKStructure {/*当前设备解码连接状态*/
         public int dwWorkType;        /*工作方式：1：轮巡、2：动态连接解码、3：文件回放下载 4：按时间回放下载*/
         public byte[] sDVRIP = new byte[16];        /*连接的设备ip*/
         public short wDVRPort;            /*连接端口号*/
@@ -3031,17 +3032,17 @@ public interface HCNetSDK extends Library {
         public byte[] cReserve = new byte[52];
 
         public static class objectInfo extends Union {
-            public static class userInfo extends Structure {
+            public static class userInfo extends HIKSDKStructure {
                 public byte[] sUserName = new byte[NAME_LEN];    //请求视频用户名
                 public byte[] sPassword = new byte[PASSWD_LEN];    // 密码
                 public byte[] cReserve = new byte[52];
             }
 
-            public static class fileInfo extends Structure {
+            public static class fileInfo extends HIKSDKStructure {
                 public byte[] fileName = new byte[100];
             }
 
-            public static class timeInfo extends Structure {
+            public static class timeInfo extends HIKSDKStructure {
                 public int dwChannel;
                 public byte[] sUserName = new byte[NAME_LEN];    //请求视频用户名
                 public byte[] sPassword = new byte[PASSWD_LEN];    // 密码
@@ -3051,7 +3052,7 @@ public interface HCNetSDK extends Library {
         }
     }
 
-    public static class NET_DVR_DECSTATUS extends Structure {
+    public static class NET_DVR_DECSTATUS extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_DECCHANSTATUS[] struDecState = new NET_DVR_DECCHANSTATUS[MAX_DECNUM];
     }
@@ -3060,7 +3061,7 @@ public interface HCNetSDK extends Library {
      * DS-6001D/F(end)
      ***************************/
 
-    public static class NET_DVR_SHOWSTRINGINFO extends Structure {//单字符参数(子结构)
+    public static class NET_DVR_SHOWSTRINGINFO extends HIKSDKStructure {//单字符参数(子结构)
         public short wShowString;                // 预览的图象上是否显示字符,0-不显示,1-显示 区域大小704*576,单个字符的大小为32*32
         public short wStringSize;                /* 该行字符的长度，不能大于44个字符 */
         public short wShowStringTopLeftX;        /* 字符显示位置的x坐标 */
@@ -3069,19 +3070,19 @@ public interface HCNetSDK extends Library {
     }
 
     //叠加字符(9000扩展)
-    public static class NET_DVR_SHOWSTRING_V30 extends Structure {
+    public static class NET_DVR_SHOWSTRING_V30 extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_SHOWSTRINGINFO[] struStringInfo = new NET_DVR_SHOWSTRINGINFO[MAX_STRINGNUM_V30];                /* 要显示的字符内容 */
     }
 
     //叠加字符扩展(8条字符)
-    public static class NET_DVR_SHOWSTRING_EX extends Structure {
+    public static class NET_DVR_SHOWSTRING_EX extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_SHOWSTRINGINFO[] struStringInfo = new NET_DVR_SHOWSTRINGINFO[MAX_STRINGNUM_EX];                /* 要显示的字符内容 */
     }
 
     //叠加字符
-    public static class NET_DVR_SHOWSTRING extends Structure {
+    public static class NET_DVR_SHOWSTRING extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_SHOWSTRINGINFO[] struStringInfo = new NET_DVR_SHOWSTRINGINFO[MAX_STRINGNUM];                /* 要显示的字符内容 */
     }
@@ -3093,17 +3094,17 @@ public interface HCNetSDK extends Library {
 /*
 EMAIL参数结构
 */
-    public static class NET_DVR_SENDER extends Structure {
+    public static class NET_DVR_SENDER extends HIKSDKStructure {
         public byte[] sName = new byte[NAME_LEN];                /* 发件人姓名 */
         public byte[] sAddress = new byte[MAX_EMAIL_ADDR_LEN];        /* 发件人地址 */
     }
 
-    public static class NET_DVRRECEIVER extends Structure {
+    public static class NET_DVRRECEIVER extends HIKSDKStructure {
         public byte[] sName = new byte[NAME_LEN];                /* 收件人姓名 */
         public byte[] sAddress = new byte[MAX_EMAIL_ADDR_LEN];        /* 收件人地址 */
     }
 
-    public static class NET_DVR_EMAILCFG_V30 extends Structure {
+    public static class NET_DVR_EMAILCFG_V30 extends HIKSDKStructure {
         public int dwSize;
         public byte[] sAccount = new byte[NAME_LEN];                /* 账号*/
         public byte[] sPassword = new byte[MAX_EMAIL_PWD_LEN];            /*密码 */
@@ -3120,7 +3121,7 @@ EMAIL参数结构
     /*
 DVR实现巡航数据结构
 */
-    public static class NET_DVR_CRUISE_PARA extends Structure {
+    public static class NET_DVR_CRUISE_PARA extends HIKSDKStructure {
         public int dwSize;
         public byte[] byPresetNo = new byte[CRUISE_MAX_PRESET_NUMS];        /* 预置点号 */
         public byte[] byCruiseSpeed = new byte[CRUISE_MAX_PRESET_NUMS];    /* 巡航速度 */
@@ -3134,7 +3135,7 @@ DVR实现巡航数据结构
      ******************************/
 
 //时间点
-    public static class NET_DVR_TIMEPOINT extends Structure {
+    public static class NET_DVR_TIMEPOINT extends HIKSDKStructure {
         public int dwMonth;        //月 0-11表示1-12个月
         public int dwWeekNo;        //第几周 0－第1周 1－第2周 2－第3周 3－第4周 4－最后一周
         public int dwWeekDate;    //星期几 0－星期日 1－星期一 2－星期二 3－星期三 4－星期四 5－星期五 6－星期六
@@ -3143,7 +3144,7 @@ DVR实现巡航数据结构
     }
 
     //夏令时参数
-    public static class NET_DVR_ZONEANDDST extends Structure {
+    public static class NET_DVR_ZONEANDDST extends HIKSDKStructure {
         public int dwSize;
         public byte[] byRes1 = new byte[16];            //保留
         public int dwEnableDST;        //是否启用夏时制 0－不启用 1－启用
@@ -3154,7 +3155,7 @@ DVR实现巡航数据结构
     }
 
     //图片质量
-    public static class NET_DVR_JPEGPARA extends Structure {
+    public static class NET_DVR_JPEGPARA extends HIKSDKStructure {
         /*注意：当图像压缩分辨率为VGA时，支持0=CIF, 1=QCIF, 2=D1抓图，
 	当分辨率为3=UXGA(1600x1200), 4=SVGA(800x600), 5=HD720p(1280x720),6=VGA,7=XVGA, 8=HD900p
 	仅支持当前分辨率的抓图*/
@@ -3164,7 +3165,7 @@ DVR实现巡航数据结构
 
     /* aux video out parameter */
 //辅助输出参数配置
-    public static class NET_DVR_AUXOUTCFG extends Structure {
+    public static class NET_DVR_AUXOUTCFG extends HIKSDKStructure {
         public int dwSize;
         public int dwAlarmOutChan;                       /* 选择报警弹出大报警通道切换时间：1画面的输出通道: 0:主输出/1:辅1/2:辅2/3:辅3/4:辅4 */
         public int dwAlarmChanSwitchTime;                /* :1秒 - 10:10秒 */
@@ -3173,7 +3174,7 @@ DVR实现巡航数据结构
     }
 
     //ntp
-    public static class NET_DVR_NTPPARA extends Structure {
+    public static class NET_DVR_NTPPARA extends HIKSDKStructure {
         public byte[] sNTPServer = new byte[64];   /* Domain Name or IP addr of NTP server */
         public short wInterval;         /* adjust time interval(hours) */
         public byte byEnableNTP;    /* enable NPT client 0-no，1-yes*/
@@ -3185,7 +3186,7 @@ DVR实现巡航数据结构
     }
 
     //ddns
-    public static class NET_DVR_DDNSPARA extends Structure {
+    public static class NET_DVR_DDNSPARA extends HIKSDKStructure {
         public byte[] sUsername = new byte[NAME_LEN];  /* DDNS账号用户名/密码 */
         public byte[] sPassword = new byte[PASSWD_LEN];
         public byte[] sDomainName = new byte[64];       /* 域名 */
@@ -3193,7 +3194,7 @@ DVR实现巡航数据结构
         public byte[] res = new byte[15];
     }
 
-    public static class NET_DVR_DDNSPARA_EX extends Structure {
+    public static class NET_DVR_DDNSPARA_EX extends HIKSDKStructure {
         public byte byHostIndex;                    /* 0-Hikvision DNS 1－Dyndns 2－PeanutHull(花生壳), 3-希网3322*/
         public byte byEnableDDNS;                    /*是否应用DDNS 0-否，1-是*/
         public short wDDNSPort;                        /* DDNS端口号 */
@@ -3204,7 +3205,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[16];
     }
 
-    public static class NET_DVR_DDNS extends Structure {
+    public static class NET_DVR_DDNS extends HIKSDKStructure {
         public byte[] sUsername = new byte[NAME_LEN];            /* DDNS账号用户名*/
         public byte[] sPassword = new byte[PASSWD_LEN];            /* 密码 */
         public byte[] sDomainName = new byte[MAX_DOMAIN_NAME];    /* 设备配备的域名地址 */
@@ -3214,7 +3215,7 @@ DVR实现巡航数据结构
     }
 
     //9000扩展
-    public static class NET_DVR_DDNSPARA_V30 extends Structure {
+    public static class NET_DVR_DDNSPARA_V30 extends HIKSDKStructure {
         public byte byEnableDDNS;
         public byte byHostIndex;/* 0-Hikvision DNS(保留) 1－Dyndns 2－PeanutHull(花生壳) 3－希网3322 */
         public byte[] byRes1 = new byte[2];
@@ -3223,7 +3224,7 @@ DVR实现巡航数据结构
     }
 
     //email
-    public static class NET_DVR_EMAILPARA extends Structure {
+    public static class NET_DVR_EMAILPARA extends HIKSDKStructure {
         public byte[] sUsername = new byte[64];  /* 邮件账号/密码 */
         public byte[] sPassword = new byte[64];
         public byte[] sSmtpServer = new byte[64];
@@ -3234,7 +3235,7 @@ DVR实现巡航数据结构
         public byte[] res = new byte[16];
     }
 
-    public static class NET_DVR_NETAPPCFG extends Structure {//网络参数配置
+    public static class NET_DVR_NETAPPCFG extends HIKSDKStructure {//网络参数配置
         public int dwSize;
         public byte[] sDNSIp = new byte[16];                /* DNS服务器地址 */
         public NET_DVR_NTPPARA struNtpClientParam;      /* NTP参数 */
@@ -3243,25 +3244,25 @@ DVR实现巡航数据结构
         public byte[] res = new byte[464];            /* 保留 */
     }
 
-    public static class NET_DVR_SINGLE_NFS extends Structure {//nfs结构配置
+    public static class NET_DVR_SINGLE_NFS extends HIKSDKStructure {//nfs结构配置
         public byte[] sNfsHostIPAddr = new byte[16];
         public byte[] sNfsDirectory = new byte[PATHNAME_LEN];        // PATHNAME_LEN = 128
     }
 
-    public static class NET_DVR_NFSCFG extends Structure {
+    public static class NET_DVR_NFSCFG extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_SINGLE_NFS[] struNfsDiskParam = new NET_DVR_SINGLE_NFS[MAX_NFS_DISK];
     }
 
     //巡航点配置(HIK IP快球专用)
-    public static class NET_DVR_CRUISE_POINT extends Structure {
+    public static class NET_DVR_CRUISE_POINT extends HIKSDKStructure {
         public byte PresetNum;    //预置点
         public byte Dwell;        //停留时间
         public byte Speed;        //速度
         public byte Reserve;    //保留
     }
 
-    public static class NET_DVR_CRUISE_RET extends Structure {
+    public static class NET_DVR_CRUISE_RET extends HIKSDKStructure {
         public NET_DVR_CRUISE_POINT[] struCruisePoint = new NET_DVR_CRUISE_POINT[32];            //最大支持32个巡航点
     }
 
@@ -3269,14 +3270,14 @@ DVR实现巡航数据结构
      * 多路解码器(begin)
      ***************************************/
 //多路解码器扩展 added by zxy 2007-05-23
-    public static class NET_DVR_NETCFG_OTHER extends Structure {
+    public static class NET_DVR_NETCFG_OTHER extends HIKSDKStructure {
         public int dwSize;
         public byte[] sFirstDNSIP = new byte[16];
         public byte[] sSecondDNSIP = new byte[16];
         public byte[] sRes = new byte[32];
     }
 
-    public static class NET_DVR_MATRIX_DECINFO extends Structure {
+    public static class NET_DVR_MATRIX_DECINFO extends HIKSDKStructure {
         public byte[] sDVRIP = new byte[16];                /* DVR IP地址 */
         public short wDVRPort;                /* 端口号 */
         public byte byChannel;                /* 通道号 */
@@ -3287,12 +3288,12 @@ DVR实现巡航数据结构
         public byte[] sPassword = new byte[PASSWD_LEN];            /* 布防主机密码 */
     }
 
-    public static class NET_DVR_MATRIX_DYNAMIC_DEC extends Structure {//启动/停止动态解码
+    public static class NET_DVR_MATRIX_DYNAMIC_DEC extends HIKSDKStructure {//启动/停止动态解码
         public int dwSize;
         public NET_DVR_MATRIX_DECINFO struDecChanInfo;        /* 动态解码通道信息 */
     }
 
-    public static class NET_DVR_MATRIX_DEC_CHAN_STATUS extends Structure {//2007-12-13 modified by zxy 修改多路解码器的NET_DVR_MATRIX_DEC_CHAN_STATUS结构
+    public static class NET_DVR_MATRIX_DEC_CHAN_STATUS extends HIKSDKStructure {//2007-12-13 modified by zxy 修改多路解码器的NET_DVR_MATRIX_DEC_CHAN_STATUS结构
         public int dwSize;//2008-1-16 modified by zxy dwIsLinked的状态由原来的0－未链接 1－连接修改成以下三种状态。
         public int dwIsLinked;         /* 解码通道状态 0－休眠 1－正在连接 2－已连接 3-正在解码 */
         public int dwStreamCpRate;     /* Stream copy rate, X kbits/second */
@@ -3300,7 +3301,7 @@ DVR实现巡航数据结构
     }
 //end 2007-12-13 modified by zxy
 
-    public static class NET_DVR_MATRIX_DEC_CHAN_INFO extends Structure {
+    public static class NET_DVR_MATRIX_DEC_CHAN_INFO extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_MATRIX_DECINFO struDecChanInfo;        /* 解码通道信息 */
         public int dwDecState;    /* 0-动态解码 1－循环解码 2－按时间回放 3－按文件回放 */
@@ -3310,13 +3311,13 @@ DVR实现巡航数据结构
     }
 
     //连接的通道配置 2007-11-05
-    public static class NET_DVR_MATRIX_DECCHANINFO extends Structure {
+    public static class NET_DVR_MATRIX_DECCHANINFO extends HIKSDKStructure {
         public int dwEnable;                    /* 是否启用 0－否 1－启用*/
         public NET_DVR_MATRIX_DECINFO struDecChanInfo;        /* 轮循解码通道信息 */
     }
 
     //2007-11-05 新增每个解码通道的配置
-    public static class NET_DVR_MATRIX_LOOP_DECINFO extends Structure {
+    public static class NET_DVR_MATRIX_LOOP_DECINFO extends HIKSDKStructure {
         public int dwSize;
         public int dwPoolTime;            /*轮巡时间 */
         public NET_DVR_MATRIX_DECCHANINFO[] struchanConInfo = new NET_DVR_MATRIX_DECCHANINFO[MAX_CYCLE_CHAN];
@@ -3324,32 +3325,32 @@ DVR实现巡航数据结构
 
     //2007-05-25  多路解码器数字矩阵配置
 //矩阵行信息 2007-12-28
-    public static class NET_DVR_MATRIX_ROW_ELEMENT extends Structure {
+    public static class NET_DVR_MATRIX_ROW_ELEMENT extends HIKSDKStructure {
         public byte[] sSurvChanName = new byte[128];            /* 布防通道名称，支持中文 */
         public int dwRowNum;                /* 行号 */
         public NET_DVR_MATRIX_DECINFO struDecChanInfo;        /* 矩阵行信息 */
     }
 
-    public static class NET_DVR_MATRIX_ROW_INDEX extends Structure {
+    public static class NET_DVR_MATRIX_ROW_INDEX extends HIKSDKStructure {
         public byte[] sSurvChanName = new byte[128];            /* 布防通道名称，支持中文 */
         public int dwRowNum;                /* 行号 */
     }
 
     //矩阵列信息 2007-12-28
-    public static class NET_DVR_MATRIX_COLUMN_ELEMENT extends Structure {
+    public static class NET_DVR_MATRIX_COLUMN_ELEMENT extends HIKSDKStructure {
         public int dwLocalDispChanNum;    /* 本地显示通道号 */
         public int dwGlobalDispChanNum;    /* 全局显示通道号 */
         public int dwRes;            /* 保留 */
     }
 
-    public static class NET_DVR_MATRIX_GLOBAL_COLUMN_ELEMENT extends Structure {
+    public static class NET_DVR_MATRIX_GLOBAL_COLUMN_ELEMENT extends HIKSDKStructure {
         public int dwConflictTag;        /* 冲突标记，0：无冲突，1：冲突 */
         public int dwConflictGloDispChan;    /* 与之冲突的全局通道号 */
         public NET_DVR_MATRIX_COLUMN_ELEMENT struColumnInfo;/* 矩阵列元素结构体 */
     }
 
     //手动查看 2007-12-28
-    public static class NET_DVR_MATRIX_ROW_COLUMN_LINK extends Structure {
+    public static class NET_DVR_MATRIX_ROW_COLUMN_LINK extends HIKSDKStructure {
         public int dwSize;
         /*
          *	以下三个参数只需要指定其中一个便可指定数字矩阵里的某一行
@@ -3375,13 +3376,13 @@ DVR实现巡航数据结构
         public byte[] sFileName = new byte[128];
     }
 
-    public static class NET_DVR_MATRIX_PREVIEW_DISP_CHAN extends Structure {
+    public static class NET_DVR_MATRIX_PREVIEW_DISP_CHAN extends HIKSDKStructure {
         public int dwSize;
         public int dwGlobalDispChanNum;        /* 电视墙上的电视机编号 */
         public int dwLocalDispChanNum;        /* 解码通道 */
     }
 
-    public static class NET_DVR_MATRIX_LOOP_PLAY_SET extends Structure {//轮循功能 2007-12-28
+    public static class NET_DVR_MATRIX_LOOP_PLAY_SET extends HIKSDKStructure {//轮循功能 2007-12-28
         public int dwSize;
         /* 任意指定一个,-1为无效,如果都指定则以LocalDispChanNum为准 */
         public int dwLocalDispChanNum;    /* 解码通道 */
@@ -3389,7 +3390,7 @@ DVR实现巡航数据结构
         public int dwCycTimeInterval;    /* 轮循时间间隔 */
     }
 
-    public static class NET_DVR_MATRIX_LOCAL_HOST_INFO extends Structure {//矩阵中心配置 2007-12-28
+    public static class NET_DVR_MATRIX_LOCAL_HOST_INFO extends HIKSDKStructure {//矩阵中心配置 2007-12-28
         public int dwSize;
         public int dwLocalHostProperty;    /* 本地主机类型 0－服务器 1－客户端*/
         public int dwIsIsolated;        /* 本地主机是否独立于系统，0：联网，1：独立 */
@@ -3404,7 +3405,7 @@ DVR实现巡航数据结构
     }
 
     //2007-12-22
-    public static class TTY_CONFIG extends Structure {
+    public static class TTY_CONFIG extends HIKSDKStructure {
         public byte baudrate;    /* 波特率 */
         public byte databits;        /* 数据位 */
         public byte stopbits;        /* 停止位 */
@@ -3413,7 +3414,7 @@ DVR实现巡航数据结构
         public byte[] res = new byte[3];
     }
 
-    public static class NET_DVR_MATRIX_TRAN_CHAN_INFO extends Structure {
+    public static class NET_DVR_MATRIX_TRAN_CHAN_INFO extends HIKSDKStructure {
         public byte byTranChanEnable;    /* 当前透明通道是否打开 0：关闭 1：打开 */
         /*
          *	多路解码器本地有1个485串口，1个232串口都可以作为透明通道,设备号分配如下：
@@ -3434,7 +3435,7 @@ DVR实现巡航数据结构
         public TTY_CONFIG RemoteSerialDevCfg;
     }
 
-    public static class NET_DVR_MATRIX_TRAN_CHAN_CONFIG extends Structure {
+    public static class NET_DVR_MATRIX_TRAN_CHAN_CONFIG extends HIKSDKStructure {
         public int dwSize;
         public byte by232IsDualChan; /* 设置哪路232透明通道是全双工的 取值1到MAX_SERIAL_NUM */
         public byte by485IsDualChan; /* 设置哪路485透明通道是全双工的 取值1到MAX_SERIAL_NUM */
@@ -3443,7 +3444,7 @@ DVR实现巡航数据结构
     }
 
     //2007-12-24 Merry Christmas Eve...
-    public static class NET_DVR_MATRIX_DEC_REMOTE_PLAY extends Structure {
+    public static class NET_DVR_MATRIX_DEC_REMOTE_PLAY extends HIKSDKStructure {
         public int dwSize;
         public byte[] sDVRIP = new byte[16];        /* DVR IP地址 */
         public short wDVRPort;            /* 端口号 */
@@ -3458,13 +3459,13 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_MATRIX_DEC_REMOTE_PLAY_CONTROL extends Structure {
+    public static class NET_DVR_MATRIX_DEC_REMOTE_PLAY_CONTROL extends HIKSDKStructure {
         public int dwSize;
         public int dwPlayCmd;        /* 播放命令 见文件播放命令*/
         public int dwCmdParam;        /* 播放命令参数 */
     }
 
-    public static class NET_DVR_MATRIX_DEC_REMOTE_PLAY_STATUS extends Structure {
+    public static class NET_DVR_MATRIX_DEC_REMOTE_PLAY_STATUS extends HIKSDKStructure {
         public int dwSize;
         public int dwCurMediaFileLen; /* 当前播放的媒体文件长度 */
         public int dwCurMediaFilePosition; /* 当前播放文件的播放位置 */
@@ -3475,7 +3476,7 @@ DVR实现巡航数据结构
         public byte[] res = new byte[72];
     }
 
-    public static class NET_DVR_MATRIX_PASSIVEMODE extends Structure {
+    public static class NET_DVR_MATRIX_PASSIVEMODE extends HIKSDKStructure {
         public short wTransProtol;        //传输协议，0-TCP, 1-UDP, 2-MCAST
         public short wPassivePort;        //TCP,UDP时为TCP,UDP端口, MCAST时为MCAST端口
         public NET_DVR_IPADDR struMcastIP;        //TCP,UDP时无效, MCAST时为多播地址
@@ -3507,7 +3508,7 @@ DVR实现巡航数据结构
     public static final int MAX_CYCLE_CHAN_V30 = 64;      //最大轮巡通道数（扩展）
     public static final int STREAM_PASSWD_LEN = 12;      //码流加密密钥最大长度
 
-    public static class NET_DVR_VIDEO_WALL_INFO extends Structure {
+    public static class NET_DVR_VIDEO_WALL_INFO extends HIKSDKStructure {
         public int dwSize;
         //窗口号：1字节墙号+1字节保留+2字节窗口号
         public int dwWindowNo;
@@ -3517,32 +3518,32 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[12];
     }
 
-    public static class NET_DVR_SCENE_CONTROL_INFO extends Structure {
+    public static class NET_DVR_SCENE_CONTROL_INFO extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_VIDEO_WALL_INFO struVideoWallInfo; //电视墙信息
         public int dwCmd; //场景控制命令，1-场景模式切换（如果要切换的是当前场景，则不进行切换），2-初始化场景（将此场景的配置清空，如果是当前场景，则同时对当前场景进行清屏操作），3-强制切换（无论是否是当前场景，强制切换），4-保存当前模式到某场景 5-删除场景 ,6-场景复制
         public byte[] byRes = new byte[4];
     }
 
-    public static class NET_DVR_BUF_INFO extends Structure {
+    public static class NET_DVR_BUF_INFO extends HIKSDKStructure {
         public Pointer pBuf;
         public int nLen;
     }
 
-    public static class NET_DVR_IN_PARAM extends Structure {
+    public static class NET_DVR_IN_PARAM extends HIKSDKStructure {
         public NET_DVR_BUF_INFO struCondBuf;
         public NET_DVR_BUF_INFO struInParamBuf;
         public int dwRecvTimeout;      //接收数据超时时间，单位：ms,置0采用接口默认超时
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_OUT_PARAM extends Structure {
+    public static class NET_DVR_OUT_PARAM extends HIKSDKStructure {
         public NET_DVR_BUF_INFO struOutBuf;
         public Pointer lpStatusList;
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_RECTCFG_EX extends Structure {
+    public static class NET_DVR_RECTCFG_EX extends HIKSDKStructure {
         public int dwXCoordinate; /*矩形左上角起始点X坐标*/
         public int dwYCoordinate; /*矩形左上角Y坐标*/
         public int dwWidth;       /*矩形宽度*/
@@ -3551,7 +3552,7 @@ DVR实现巡航数据结构
 
     }
 
-    public static class NET_DVR_VIDEOWALLWINDOWPOSITION extends Structure {
+    public static class NET_DVR_VIDEOWALLWINDOWPOSITION extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable;  //窗口使能,0-不使能，1-使能
         public byte byWndOperateMode;  //窗口操作模式，0-统一坐标，1-分辨率坐标
@@ -3565,7 +3566,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[36];
     }
 
-    public static class VIDEOWALLWINDOWPOSITION_ARRAY extends Structure {
+    public static class VIDEOWALLWINDOWPOSITION_ARRAY extends HIKSDKStructure {
         public NET_DVR_VIDEOWALLWINDOWPOSITION[] strVideoWinPostion;
 
         public VIDEOWALLWINDOWPOSITION_ARRAY(int iLen) {
@@ -3576,7 +3577,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_WALLWINPARAM extends Structure {
+    public static class NET_DVR_WALLWINPARAM extends HIKSDKStructure {
         public int dwSize;
         public byte byTransparency; //使能透明度，0-关，非0-开
         public byte byWinMode;//窗口分屏模式，能力集获取
@@ -3593,7 +3594,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[22];
     }
 
-    public static class NET_DVR_PLAN_LIST extends Structure {
+    public static class NET_DVR_PLAN_LIST extends HIKSDKStructure {
         public int dwSize;
         public int dwPlanNums;            //设备输入信号源数量
         public Pointer pBuffer;            //指向dwInputSignalNums个NET_DVR_PLAN_CFG结构大小的缓冲区
@@ -3604,7 +3605,7 @@ DVR实现巡航数据结构
     }
 
     /*预案项信息*/
-    public static class NET_DVR_PLAN_INFO extends Structure {
+    public static class NET_DVR_PLAN_INFO extends HIKSDKStructure {
         public byte byValid;          // 该项是否有效
         public byte byType;           // 见定义NET_DVR_PLAN_OPERATE_TYPE
         public short wLayoutNo;      // 布局号
@@ -3618,14 +3619,14 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[20];
     }
 
-    public static class NET_DVR_CYCLE_TIME extends Structure {
+    public static class NET_DVR_CYCLE_TIME extends HIKSDKStructure {
         public byte byValid;
         public byte[] byRes = new byte[3];
         public NET_DVR_TIME_EX struTime = new NET_DVR_TIME_EX();
     }
 
     /*预案管理*/
-    public static class NET_DVR_PLAN_CFG extends Structure {
+    public static class NET_DVR_PLAN_CFG extends HIKSDKStructure {
         public int dwSize;
         public byte byValid;          // 该预案是否有效
         public byte byWorkMode;      // 预案工作模式 1表示手动，2自动，3预案循环
@@ -3640,7 +3641,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[60];
     }
 
-    public static class NET_DVR_WALLSCENECFG extends Structure {
+    public static class NET_DVR_WALLSCENECFG extends HIKSDKStructure {
         public int dwSize;
         public byte[] sSceneName = new byte[NAME_LEN];    //场景名称
         public byte byEnable;                //场景是否有效，0-无效，1-有效
@@ -3648,7 +3649,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[78];
     }
 
-    public static class NET_DVR_SUBWND_DECODE_OSD extends Structure {
+    public static class NET_DVR_SUBWND_DECODE_OSD extends HIKSDKStructure {
         public int dwSize = 0;
         public int dwSubWndNo = 0; //子窗口号（4字节组合方式）
         public int dwOSDNums = 0;  //该子窗口配置的OSD信息的个数
@@ -3656,7 +3657,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_OSD_INFO extends Structure {
+    public static class NET_DVR_OSD_INFO extends HIKSDKStructure {
         public byte byEnabled = 1;  //是否使能，零-不使能，非零-使能
         public byte byEnabledFlash = 0;  //是否闪烁，零-不闪烁，非零-闪烁
         public byte byFontSize = 1;  //字体大小，1-大，2-中，3-小
@@ -3668,7 +3669,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_DEV_CHAN_INFO_EX extends Structure {
+    public static class NET_DVR_DEV_CHAN_INFO_EX extends HIKSDKStructure {
         public byte byChanType;              //通道类型，0-普通通道,1-零通道,2-流ID，3-本地输入源，4-虚拟屏服务器通道，5-拼接通道，6-屏幕服务器，7-分布式网络源，8-多相机融合通道，9-网络输入源
         public byte[] byStreamId = new byte[STREAM_ID_LEN]; //流ID，当byChanType=2、9时，该字段用于指定流或者网络ipc的ID号
         public byte[] byRes1 = new byte[3];
@@ -3689,7 +3690,7 @@ DVR实现巡航数据结构
         public byte[] sPassword = new byte[PASSWD_LEN];    //布防主机密码
     }
 
-    public static class NET_DVR_STREAM_MEDIA_SERVER extends Structure {
+    public static class NET_DVR_STREAM_MEDIA_SERVER extends HIKSDKStructure {
         public byte byValid; //是否启用，0-否，1-是
         public byte[] byRes1 = new byte[3];
         public byte[] byAddress = new byte[MAX_DOMAIN_NAME];   //IP或者域名
@@ -3698,7 +3699,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[5];
     }
 
-    public static class NET_DVR_DEV_DDNS_INFO extends Structure {
+    public static class NET_DVR_DEV_DDNS_INFO extends HIKSDKStructure {
         public byte[] byDevAddress = new byte[MAX_DOMAIN_NAME];    //域名(IPServer或hiDDNS时可填序列号或者别名)
         public byte byTransProtocol;        //传输协议类型0-TCP，1-UDP, 2-MCAST
         public byte byTransMode;            //传输码流模式 0－主码流 1－子码流
@@ -3716,13 +3717,13 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[2];
     }
 
-    public static class NET_DVR_DEC_STREAM_DEV_EX extends Structure {
+    public static class NET_DVR_DEC_STREAM_DEV_EX extends HIKSDKStructure {
         public NET_DVR_STREAM_MEDIA_SERVER struStreamMediaSvrCfg = new NET_DVR_STREAM_MEDIA_SERVER();
         public NET_DVR_DEV_CHAN_INFO_EX struDevChanInfo = new NET_DVR_DEV_CHAN_INFO_EX();
     }
 
     //DDNS方式取流
-    public static class NET_DVR_DEC_DDNS_DEV extends Structure {
+    public static class NET_DVR_DEC_DDNS_DEV extends HIKSDKStructure {
         public NET_DVR_DEV_DDNS_INFO struDdnsInfo;
         public NET_DVR_STREAM_MEDIA_SERVER struMediaServer;
     }
@@ -3734,14 +3735,14 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[300];
     }
 
-    public static class NET_DVR_MATRIX_CHAN_INFO_V41 extends Structure {
+    public static class NET_DVR_MATRIX_CHAN_INFO_V41 extends HIKSDKStructure {
         public byte byEnable; //是否启用，0-否，1-是
         public byte byStreamMode;/*取流模式，0-无效，1-通过IP或域名取流，2-通过URL取流,3-通过动态域名解析向设备取流*/
         public byte[] byRes = new byte[2];
         public NET_DVR_DEC_STREAM_MODE uDecStreamMode = new NET_DVR_DEC_STREAM_MODE();//取流信息
     }
 
-    public static class NET_DVR_MATRIX_LOOP_DECINFO_V41 extends Structure {
+    public static class NET_DVR_MATRIX_LOOP_DECINFO_V41 extends HIKSDKStructure {
         public int dwSize;
         public int dwPoolTime;        /*轮巡间隔*/
         public NET_DVR_MATRIX_CHAN_INFO_V41[] struchanConInfo = new NET_DVR_MATRIX_CHAN_INFO_V41[MAX_CYCLE_CHAN_V30];
@@ -3754,7 +3755,7 @@ DVR实现巡航数据结构
      * 拼控(End)
      ***************************************/
 
-    public static class NET_DVR_EMAILCFG extends Structure {    /* 12 bytes */
+    public static class NET_DVR_EMAILCFG extends HIKSDKStructure {    /* 12 bytes */
         public int dwSize;
         public byte[] sUserName = new byte[32];
         public byte[] sPassWord = new byte[32];
@@ -3771,14 +3772,14 @@ DVR实现巡航数据结构
         public byte byMailinterval;            /* mail interval 0-2s, 1-3s, 2-4s. 3-5s*/
     }
 
-    public static class NET_DVR_COMPRESSIONCFG_NEW extends Structure {
+    public static class NET_DVR_COMPRESSIONCFG_NEW extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_COMPRESSION_INFO_EX struLowCompression;    //定时录像
         public NET_DVR_COMPRESSION_INFO_EX struEventCompression;    //事件触发录像
     }
 
     //球机位置信息
-    public static class NET_DVR_PTZPOS extends Structure {
+    public static class NET_DVR_PTZPOS extends HIKSDKStructure {
         public short wAction;//获取时该字段无效
         public short wPanPos;//水平参数
         public short wTiltPos;//垂直参数
@@ -3786,7 +3787,7 @@ DVR实现巡航数据结构
     }
 
     //球机范围信息
-    public static class NET_DVR_PTZSCOPE extends Structure {
+    public static class NET_DVR_PTZSCOPE extends HIKSDKStructure {
         public short wPanPosMin;//水平参数min
         public short wPanPosMax;//水平参数max
         public short wTiltPosMin;//垂直参数min
@@ -3795,7 +3796,7 @@ DVR实现巡航数据结构
         public short wZoomPosMax;//变倍参数max
     }
 
-    public static class NET_DVR_PTZABSOLUTEEX_CFG extends Structure {
+    public static class NET_DVR_PTZABSOLUTEEX_CFG extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public NET_PTZ_INFO struPTZCtrl = new NET_PTZ_INFO();//设备PTZF信息
         public int dwFocalLen;//焦距范围：0-100000MM
@@ -3807,7 +3808,7 @@ DVR实现巡航数据结构
     }
 
     //rtsp配置 ipcamera专用
-    public static class NET_DVR_RTSPCFG extends Structure {
+    public static class NET_DVR_RTSPCFG extends HIKSDKStructure {
         public int dwSize;         //长度
         public short wPort;          //rtsp服务器侦听端口
         public byte[] byReserve = new byte[54];  //预留
@@ -3818,7 +3819,7 @@ DVR实现巡航数据结构
      *********************************/
 
 //NET_DVR_Login()参数结构
-    public static class NET_DVR_DEVICEINFO extends Structure {
+    public static class NET_DVR_DEVICEINFO extends HIKSDKStructure {
         public byte[] sSerialNumber = new byte[SERIALNO_LEN];   //序列号
         public byte byAlarmInPortNum;                //DVR报警输入个数
         public byte byAlarmOutPortNum;                //DVR报警输出个数
@@ -3829,7 +3830,7 @@ DVR实现巡航数据结构
     }
 
     //NET_DVR_Login_V30()参数结构
-    public static class NET_DVR_DEVICEINFO_V30 extends Structure {
+    public static class NET_DVR_DEVICEINFO_V30 extends HIKSDKStructure {
         public byte[] sSerialNumber = new byte[SERIALNO_LEN];  //序列号
         public byte byAlarmInPortNum;    //报警输入个数
         public byte byAlarmOutPortNum;   //报警输出个数
@@ -3875,7 +3876,7 @@ DVR实现巡航数据结构
     }
 
     //NET_DVR_Login_V40()参数
-    public static class NET_DVR_USER_LOGIN_INFO extends Structure {
+    public static class NET_DVR_USER_LOGIN_INFO extends HIKSDKStructure {
         public byte[] sDeviceAddress = new byte[NET_DVR_DEV_ADDRESS_MAX_LEN];
         public byte byUseTransport;
         public short wPort;
@@ -3894,7 +3895,7 @@ DVR实现巡航数据结构
     }
 
     //NET_DVR_Login_V40()参数
-    public static class NET_DVR_DEVICEINFO_V40 extends Structure {
+    public static class NET_DVR_DEVICEINFO_V40 extends HIKSDKStructure {
         public NET_DVR_DEVICEINFO_V30 struDeviceV30 = new NET_DVR_DEVICEINFO_V30();
         public byte bySupportLock;
         public byte byRetryLoginTime;
@@ -3957,7 +3958,7 @@ DVR实现巡航数据结构
     ;
 
     //软解码预览参数
-    public static class NET_DVR_CLIENTINFO extends Structure {
+    public static class NET_DVR_CLIENTINFO extends HIKSDKStructure {
         public int lChannel;
         public int lLinkMode;
         public HWND hPlayWnd;
@@ -3965,7 +3966,7 @@ DVR实现巡航数据结构
     }
 
     //预览V40接口
-    public static class NET_DVR_PREVIEWINFO extends Structure {
+    public static class NET_DVR_PREVIEWINFO extends HIKSDKStructure {
         public int lChannel;//通道号
         public int dwStreamType;    // 码流类型，0-主码流，1-子码流，2-码流3，3-码流4, 4-码流5,5-码流6,7-码流7,8-码流8,9-码流9,10-码流10
         public int dwLinkMode;// 0：TCP方式,1：UDP方式,2：多播方式,3 - RTP方式，4-RTP/RTSP,5-RSTP/HTTP ,6- HRUDP（可靠传输） ,7-RTSP/HTTPS
@@ -3982,7 +3983,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[215];
     }
 
-    public static class NET_DVR_STREAM_INFO extends Structure {
+    public static class NET_DVR_STREAM_INFO extends HIKSDKStructure {
         public int dwSize;
         public byte[] byID = new byte[32];
         public int dwChannel;
@@ -3990,13 +3991,13 @@ DVR实现巡航数据结构
     }
 
     //配置条件
-    public static class NET_DVR_CLOUDSTORAGE_COND extends Structure {
+    public static class NET_DVR_CLOUDSTORAGE_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;
         public byte[] byRes1 = new byte[64];
     }
 
-    public static class NET_DVR_STREAM_RECORD_STATUS extends Structure {
+    public static class NET_DVR_STREAM_RECORD_STATUS extends HIKSDKStructure {
         public int dwSize;
         public byte byRecord;
         public byte byOffLineRecord;
@@ -4006,7 +4007,7 @@ DVR实现巡航数据结构
     }
 
     //SDK状态信息(9000新增)
-    public static class NET_DVR_SDKSTATE extends Structure {
+    public static class NET_DVR_SDKSTATE extends HIKSDKStructure {
         public int dwTotalLoginNum;        //当前login用户数
         public int dwTotalRealPlayNum;    //当前realplay路数
         public int dwTotalPlayBackNum;    //当前回放或下载路数
@@ -4022,7 +4023,7 @@ DVR实现巡航数据结构
     }
 
     //SDK功能支持信息(9000新增)
-    public static class NET_DVR_SDKABL extends Structure {
+    public static class NET_DVR_SDKABL extends HIKSDKStructure {
         public int dwMaxLoginNum;        //最大login用户数 MAX_LOGIN_USERS
         public int dwMaxRealPlayNum;        //最大realplay路数 WATCH_NUM
         public int dwMaxPlayBackNum;        //最大回放或下载路数 WATCH_NUM
@@ -4038,7 +4039,7 @@ DVR实现巡航数据结构
     }
 
     //报警设备信息
-    public static class NET_DVR_ALARMER extends Structure {
+    public static class NET_DVR_ALARMER extends HIKSDKStructure {
         public byte byUserIDValid;                 /* userid是否有效 0-无效，1-有效 */
         public byte bySerialValid;                 /* 序列号是否有效 0-无效，1-有效 */
         public byte byVersionValid;                /* 版本号是否有效 0-无效，1-有效 */
@@ -4062,7 +4063,7 @@ DVR实现巡航数据结构
     }
 
     //硬解码显示区域参数(子结构)
-    public static class NET_DVR_DISPLAY_PARA extends Structure {
+    public static class NET_DVR_DISPLAY_PARA extends HIKSDKStructure {
         public int bToScreen;
         public int bToVideoOut;
         public int nLeft;
@@ -4073,7 +4074,7 @@ DVR实现巡航数据结构
     }
 
     //硬解码预览参数
-    public static class NET_DVR_CARDINFO extends Structure {
+    public static class NET_DVR_CARDINFO extends HIKSDKStructure {
         public int lChannel;//通道号
         public int lLinkMode; //最高位(31)为0表示主码流，为1表示子，0－30位表示码流连接方式:0：TCP方式,1：UDP方式,2：多播方式,3 - RTP方式，4-电话线，5－128k宽带，6－256k宽带，7－384k宽带，8－512k宽带；
         public String sMultiCastIP;
@@ -4081,7 +4082,7 @@ DVR实现巡航数据结构
     }
 
     //录象文件参数
-    public static class NET_DVR_FIND_DATA extends Structure {
+    public static class NET_DVR_FIND_DATA extends HIKSDKStructure {
         public byte[] sFileName = new byte[100];//文件名
         public NET_DVR_TIME struStartTime;//文件的开始时间
         public NET_DVR_TIME struStopTime;//文件的结束时间
@@ -4089,7 +4090,7 @@ DVR实现巡航数据结构
     }
 
     //录象文件参数(9000)
-    public static class NET_DVR_FINDDATA_V30 extends Structure {
+    public static class NET_DVR_FINDDATA_V30 extends HIKSDKStructure {
         public byte[] sFileName = new byte[100];//文件名
         public NET_DVR_TIME struStartTime;//文件的开始时间
         public NET_DVR_TIME struStopTime;//文件的结束时间
@@ -4100,7 +4101,7 @@ DVR实现巡航数据结构
     }
 
     //录象文件参数(带卡号)
-    public static class NET_DVR_FINDDATA_CARD extends Structure {
+    public static class NET_DVR_FINDDATA_CARD extends HIKSDKStructure {
         public byte[] sFileName = new byte[100];//文件名
         public NET_DVR_TIME struStartTime;//文件的开始时间
         public NET_DVR_TIME struStopTime;//文件的结束时间
@@ -4108,7 +4109,7 @@ DVR实现巡航数据结构
         public byte[] sCardNum = new byte[32];
     }
 
-    public static class NET_DVR_FILECOND_V40 extends Structure {
+    public static class NET_DVR_FILECOND_V40 extends HIKSDKStructure {
         public int lChannel;
         public int dwFileType;
         public int dwIsLocked;
@@ -4133,14 +4134,14 @@ DVR实现巡航数据结构
         public NET_DVR_ATMFINDINFO struATMFindInfo = new NET_DVR_ATMFINDINFO();           //ATM查询
     }
 
-    public static class NET_DVR_ATMFINDINFO extends Structure {
+    public static class NET_DVR_ATMFINDINFO extends HIKSDKStructure {
         public byte byTransactionType;       //交易类型 0-全部，1-查询， 2-取款， 3-存款， 4-修改密码，5-转账， 6-无卡查询 7-无卡存款， 8-吞钞 9-吞卡 10-自定义
         public byte[] byRes = new byte[3];    //保留
         public int dwTransationAmount;     //交易金额 ;
     }
 
     //录像文件查找条件结构V50
-    public static class NET_DVR_FILECOND_V50 extends Structure {
+    public static class NET_DVR_FILECOND_V50 extends HIKSDKStructure {
         public NET_DVR_STREAM_INFO struStreamID; //流ID或通道号
         public NET_DVR_TIME_SEARCH_COND struStartTime = new NET_DVR_TIME_SEARCH_COND(); //开始时间
         public NET_DVR_TIME_SEARCH_COND struStopTime = new NET_DVR_TIME_SEARCH_COND(); //结束时间
@@ -4161,7 +4162,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[252];
     }
 
-    public static class NET_DVR_FINDDATA_V40 extends Structure {
+    public static class NET_DVR_FINDDATA_V40 extends HIKSDKStructure {
         public byte[] sFileName = new byte[100];//文件名
         public NET_DVR_TIME struStartTime = new NET_DVR_TIME();//文件的开始时间
         public NET_DVR_TIME struStopTime = new NET_DVR_TIME();//文件的结束时间
@@ -4177,7 +4178,7 @@ DVR实现巡航数据结构
         public byte[] byRes1 = new byte[127];
     }
 
-    public static class NET_DVR_TIME_SEARCH extends Structure {
+    public static class NET_DVR_TIME_SEARCH extends HIKSDKStructure {
         public short wYear;        //年，设备OSD时间
         public byte byMonth;        //月，设备OSD时间
         public byte byDay;        //日，设备OSD时间
@@ -4190,13 +4191,13 @@ DVR实现巡航数据结构
         public short wMillisecond;      //毫秒，精度不够，默认为0
     }
 
-    public static class NET_DVR_ADDRESS extends Structure {
+    public static class NET_DVR_ADDRESS extends HIKSDKStructure {
         public NET_DVR_IPADDR struIP = new NET_DVR_IPADDR(); //IP地址
         public short wPort;    //端口号
         public byte[] byRes = new byte[2];
     }
 
-    public static class NET_DVR_FINDDATA_V50 extends Structure {
+    public static class NET_DVR_FINDDATA_V50 extends HIKSDKStructure {
         public byte[] sFileName = new byte[100];
         public NET_DVR_TIME_SEARCH struStartTime = new NET_DVR_TIME_SEARCH();
         public NET_DVR_TIME_SEARCH struStopTime = new NET_DVR_TIME_SEARCH();
@@ -4214,7 +4215,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[247];
     }
 
-    public static class NET_DVR_FILECOND extends Structure //录象文件查找条件结构
+    public static class NET_DVR_FILECOND extends HIKSDKStructure //录象文件查找条件结构
     {
         public int lChannel;//通道号
         public int dwFileType;//录象文件类型0xff－全部，0－定时录像,1-移动侦测 ，2－报警触发，3-报警|移动侦测 4-报警&移动侦测 5-命令触发 6-手动录像
@@ -4225,7 +4226,7 @@ DVR实现巡航数据结构
         public NET_DVR_TIME struStopTime;//结束时间
     }
 
-    public static class NET_DVR_PLAYCOND extends Structure //回放或者下载信息结构体
+    public static class NET_DVR_PLAYCOND extends HIKSDKStructure //回放或者下载信息结构体
     {
         public int dwChannel;//通道号
         public NET_DVR_TIME struStartTime;
@@ -4236,7 +4237,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[30];//保留
     }
 
-    public static class NET_DVR_VOD_PARA extends Structure //回放或者下载信息结构体
+    public static class NET_DVR_VOD_PARA extends HIKSDKStructure //回放或者下载信息结构体
     {
         public int dwSize;
         public NET_DVR_STREAM_INFO struIDInfo;
@@ -4256,7 +4257,7 @@ DVR实现巡航数据结构
     }
 
     //图片查找条件
-    public static class NET_DVR_FIND_PICTURE_PARAM extends Structure {
+    public static class NET_DVR_FIND_PICTURE_PARAM extends HIKSDKStructure {
         public int dwSize;         // 结构体大小
         public int lChannel;       // 通道号
         public byte byFileType;   //图片查找类型
@@ -4292,7 +4293,7 @@ DVR实现巡航数据结构
         public byte cStopTimeDifferenceM;    //结束时间与UTC的时差（分钟），-30, 0, 30, 45，正数表示东时区
     }
 
-    public static class NET_DVR_FIND_PICTURE extends Structure {
+    public static class NET_DVR_FIND_PICTURE extends HIKSDKStructure {
         public byte[] sFileName = new byte[PICTURE_NAME_LEN];//图片名
         public NET_DVR_TIME struTime;//图片的时间
         public int dwFileSize;//图片的大小
@@ -4306,7 +4307,7 @@ DVR实现巡航数据结构
     }
 
 
-    public class NET_DVR_FIND_PICTURE_V50 extends Structure {
+    public class NET_DVR_FIND_PICTURE_V50 extends HIKSDKStructure {
         public byte[] sFileName = new byte[PICTURE_NAME_LEN];//图片名
         public NET_DVR_TIME struTime = new NET_DVR_TIME();//图片的时间
         public int dwFileSize;//图片的大小
@@ -4323,7 +4324,7 @@ DVR实现巡航数据结构
     }
 
 
-    public class NET_DVR_PIC_PARAM extends Structure {
+    public class NET_DVR_PIC_PARAM extends HIKSDKStructure {
         public Pointer pDVRFileName;
         public Pointer pSavedFileBuf;
         public int dwBufLen;
@@ -4334,7 +4335,7 @@ DVR实现巡航数据结构
 
 
     //查找结果结构体
-    public static class NET_DVR_FIND_PICTURE_V40 extends Structure {
+    public static class NET_DVR_FIND_PICTURE_V40 extends HIKSDKStructure {
         public byte[] sFileName = new byte[PICTURE_NAME_LEN];//图片名
         public NET_DVR_TIME struTime = new NET_DVR_TIME();//图片的时间
         public int dwFileSize;//图片的大小
@@ -4386,7 +4387,7 @@ DVR实现巡航数据结构
     }
 
     //云台区域选择放大缩小(HIK 快球专用)
-    public static class NET_DVR_POINT_FRAME extends Structure {
+    public static class NET_DVR_POINT_FRAME extends HIKSDKStructure {
         public int xTop;     //方框起始点的x坐标
         public int yTop;     //方框结束点的y坐标
         public int xBottom;  //方框结束点的x坐标
@@ -4395,15 +4396,15 @@ DVR实现巡航数据结构
     }
 
     //语音对讲参数
-    public static class NET_DVR_COMPRESSION_AUDIO extends Structure {
+    public static class NET_DVR_COMPRESSION_AUDIO extends HIKSDKStructure {
         public byte byAudioEncType;   //0- G722，1- G711_U，2- G711_A，5- MP2L2，6- G726，7- AAC，8- PCM，9-G722，10-G723，11-G729，12-AAC_LC，13-AAC_LD，14-Opus，15-MP3，16-ADPCM
-        public byte byAudioSamplingRate;//音频采样率 0-默认，1-16kHZ，2-32kHZ，3-48kHZ, 4- 44.1kHZ,5-8kHZ
-        public byte byAudioBitRate;// 音频码率 参考 BITRATE_ENCODE_INDEX
-        public byte[] byres = new byte[4];//这里保留音频的压缩参数
-        public byte bySupport;//bySupport Bit0表示 Mp2l2前4个字节的含义表示后面内容音频数据长度
+        public byte  byAudioSamplingRate;//音频采样率 0-默认，1-16kHZ，2-32kHZ，3-48kHZ, 4- 44.1kHZ,5-8kHZ
+        public byte  byAudioBitRate;// 音频码率 参考 BITRATE_ENCODE_INDEX
+        public byte[]  byres=new byte[4];//这里保留音频的压缩参数
+        public byte  bySupport;//bySupport Bit0表示 Mp2l2前4个字节的含义表示后面内容音频数据长度
     }
 
-    public static class NET_DVR_AUDIODEC_INFO extends Structure {
+    public static class NET_DVR_AUDIODEC_INFO extends HIKSDKStructure {
         public int nchans;                         /* 声道数 */
         public int sample_rate;                  /* 采样率 */
         public int aacdec_profile;               /* 编码用的框架 */
@@ -4411,7 +4412,7 @@ DVR实现巡航数据结构
     }
 
     //音频解码
-    public static class NET_DVR_AUDIODEC_PROCESS_PARAM extends Structure {
+    public static class NET_DVR_AUDIODEC_PROCESS_PARAM extends HIKSDKStructure {
         public Pointer in_buf;                      /* 输入数据buf */
         public Pointer out_buf;                     /* 输出数据buf */
         public int in_data_size;                 /* 输入in_buf内数据byte数 */
@@ -4423,13 +4424,13 @@ DVR实现巡航数据结构
         public int[] reserved = new int[16];                 /* 保留 */
     }
 
-    public static class NET_DVR_AUDIOENC_INFO extends Structure {
+    public static class NET_DVR_AUDIOENC_INFO extends HIKSDKStructure {
         public int in_frame_size;                /* 输入一帧数据大小(BYTES)，由GetInfoParam函数返回         */
         public int[] reserved = new int[16];                 /* 保留 */
     }
 
     //音频编码
-    public static class NET_DVR_AUDIOENC_PROCESS_PARAM extends Structure {
+    public static class NET_DVR_AUDIOENC_PROCESS_PARAM extends HIKSDKStructure {
         public Pointer in_buf;                      /* 输入buf */
         public Pointer out_buf;                     /* 输出buf */
         public int out_frame_size;               /* 编码一帧后的BYTE数 */
@@ -4440,12 +4441,12 @@ DVR实现巡航数据结构
     }
 
     //用于接收报警信息的缓存区
-    public static class RECV_ALARM extends Structure {
+    public static class RECV_ALARM extends HIKSDKStructure {
         public byte[] RecvBuffer = new byte[4000];//此处的400应不小于最大报警报文长度
     }
 
     //布防参数
-    public static class NET_DVR_SETUPALARM_PARAM extends Structure {
+    public static class NET_DVR_SETUPALARM_PARAM extends HIKSDKStructure {
         public int dwSize;
         public byte byLevel; //布防优先级，0-一等级（高），1-二等级（中），2-三等级（低）
         public byte byAlarmInfoType; //上传报警信息类型（抓拍机支持），0-老报警信息（NET_DVR_PLATE_RESULT），1-新报警信息(NET_ITS_PLATE_RESULT)2012-9-28
@@ -4464,7 +4465,7 @@ DVR实现巡航数据结构
 
     }
 
-    public static class NET_DVR_SETUPALARM_PARAM_V50 extends Structure {
+    public static class NET_DVR_SETUPALARM_PARAM_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte byLevel; //布防优先级，0-一等级（高），1-二等级（中），2-三等级（低）
         public byte byAlarmInfoType; //上传报警信息类型（抓拍机支持），0-老报警信息（NET_DVR_PLATE_RESULT），1-新报警信息(NET_ITS_PLATE_RESULT)2012-9-28
@@ -4502,7 +4503,7 @@ DVR实现巡航数据结构
 
 
     //区域框参数
-    public static class NET_VCA_RECT extends Structure {
+    public static class NET_VCA_RECT extends HIKSDKStructure {
         public float fX;
         public float fY;
         public float fWidth;
@@ -4510,14 +4511,14 @@ DVR实现巡航数据结构
     }
 
     //报警目标信息
-    public static class NET_VCA_TARGET_INFO extends Structure {
+    public static class NET_VCA_TARGET_INFO extends HIKSDKStructure {
         public int dwID;
         public NET_VCA_RECT struRect;
         public byte[] byRes = new byte[4];
     }
 
     //前端设备信息
-    public static class NET_VCA_DEV_INFO extends Structure {
+    public static class NET_VCA_DEV_INFO extends HIKSDKStructure {
         public NET_DVR_IPADDR struDevIP;
         public short wPort;
         public byte byChannel;
@@ -4525,7 +4526,7 @@ DVR实现巡航数据结构
     }
 
     //事件规则信息
-    public static class NET_VCA_RULE_INFO extends Structure {
+    public static class NET_VCA_RULE_INFO extends HIKSDKStructure {
         public byte byRuleID;
         public byte byRes;
         public short wEventTypeEx;
@@ -4570,12 +4571,12 @@ DVR实现巡航数据结构
         public NET_VCA_TRAVERSE_PLANE struTraversePlane;  //警戒参数
         public NET_VCA_AREA struArea; //进入/离开区域参数
         public NET_VCA_INTRUSION struIntrusion; //区域入侵参数
-        public NET_VCA_LEAVE_POSITION struLeavePos;        //参数
+        public NET_VCA_LEAVE_POSITION   struLeavePos;        //参数
 
     }
 
     //穿越警戒面参数
-    public static class NET_VCA_TRAVERSE_PLANE extends Structure {
+    public static class NET_VCA_TRAVERSE_PLANE extends HIKSDKStructure {
         public NET_VCA_LINE struPlaneBottom;
         public int dwCrossDirection;
         public byte bySensitivity;
@@ -4587,26 +4588,27 @@ DVR实现巡航数据结构
 
     //根据报警延迟时间来标识报警中带图片，报警间隔和IO报警一致，1秒发送一个。
 //入侵参数
-    public static class NET_VCA_INTRUSION extends Structure {
+    public static class NET_VCA_INTRUSION extends HIKSDKStructure
+    {
         public NET_VCA_POLYGON struRegion;//区域范围
         public short wDuration;            //行为事件触发时间阈值: 1-120秒，建议5秒，判断是有效报警的时间  在ATM系统中触发文件阈值为 1-1000秒
         public byte bySensitivity;        //灵敏度参数，范围[1-100]
         public byte byRate;               //占比：区域内所有未报警目标尺寸目标占区域面积的比重，归一化为－；
-        /*
-        检测目标，可支持多选，具体定义为：
-        0~所有目标（表示不锁定检测目标，所有目标都将进行检测）
-        0x01 ~ 人，
-        0x02 ~ 车，
-        0x04 ~ 其他，
-        该字段支持多选，按位取值，例如3表示1+2.
-        */
+    /*
+    检测目标，可支持多选，具体定义为：
+    0~所有目标（表示不锁定检测目标，所有目标都将进行检测）
+    0x01 ~ 人，
+    0x02 ~ 车，
+    0x04 ~ 其他，
+    该字段支持多选，按位取值，例如3表示1+2.
+    */
         public byte byDetectionTarget;
         public byte byPriority;//优先级,0~低,1~中,2~高
         public byte byAlarmConfidence;    //报警置信度, 0-低,1-较低,2-较高,3-高
         public byte byRecordConfidence;   //录像置信度, 0-低,1-较低,2-较高,3-高
     }
 
-    public static class NET_VCA_LEAVE_POSITION extends Structure {
+    public static class NET_VCA_LEAVE_POSITION extends HIKSDKStructure {
         public NET_VCA_POLYGON struRegion; //区域范围
         public short wLeaveDelay;  //无人报警时间，单位：s
         public short wStaticDelay; //睡觉报警时间，单位：s
@@ -4616,7 +4618,7 @@ DVR实现巡航数据结构
         public byte bySensitivity;     //灵敏度参数，范围[1,5]
     }
 
-    public static class NET_DVR_HANDLEEXCEPTION_V40 extends Structure {
+    public static class NET_DVR_HANDLEEXCEPTION_V40 extends HIKSDKStructure {
         public int dwHandleType;/*处理方式，各种异常处理方式的"或"结果，异常处理方式：
                                     0x00: 无响应    0x01: 布防器上警告  0x02: 声音警告  0x04: 上传中心
                                     0x08: 触发报警输出  0x10: Jpeg抓图并上传EMail
@@ -4634,7 +4636,7 @@ DVR实现巡航数据结构
 
     public static final int MAX_ALERTLINE_NUM = 8;
 
-    public static class NET_VCA_TRAVERSE_PLANE_DETECTION extends Structure {
+    public static class NET_VCA_TRAVERSE_PLANE_DETECTION extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable;//使能
         public byte byEnableDualVca;// 启用支持智能后检索 0-不启用，1-启用
@@ -4650,8 +4652,10 @@ DVR实现巡航数据结构
     }
 
 
+
+
     //快速移动参数
-    public static class NET_VCA_RUN extends Structure {
+    public static class NET_VCA_RUN extends HIKSDKStructure {
         public NET_VCA_POLYGON struRegion;//区域范围
         public float fRunDistance;        //人快速移动最大距离, 范围: [0.1, 1.00] 像素模式 实际模式(1,20)m/s
         public byte bySensitivity;            //灵敏度参数，范围[1,5]
@@ -4670,7 +4674,7 @@ DVR实现巡航数据结构
 
 
     //奔跑检测
-    public static class NET_VCA_RUNNING extends Structure {
+    public static class NET_VCA_RUNNING extends HIKSDKStructure {
         public NET_VCA_POLYGON struRegion;  //区域范围
         public int dwSpeed;      //奔跑速度，范围[1,10]
         public short wDuration;      // 触发报警时间阈值
@@ -4679,7 +4683,7 @@ DVR实现巡航数据结构
     }
 
     //倒地参数
-    public static class NET_VCA_FALL_DOWN extends Structure {
+    public static class NET_VCA_FALL_DOWN extends HIKSDKStructure {
         public NET_VCA_POLYGON struRegion;//区域范围
         public short wDuration;      /* 触发事件阈值 1-60s*/
         public short bySensitivity;       /* 灵敏度参数，范围[1,5] */
@@ -4689,7 +4693,7 @@ DVR实现巡航数据结构
 
     public static final int MAX_INTRUSIONREGION_NUM = 8; //最大区域数数
 
-    public static class NET_VCA_FIELDDETECION extends Structure {
+    public static class NET_VCA_FIELDDETECION extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable; //使能，是否开启
         public byte byEnableDualVca;// 启用支持智能后检索 0-不启用，1-启用
@@ -4705,7 +4709,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[100];
     }
 
-    public static class NET_DVR_CHANNEL_GROUP extends Structure {
+    public static class NET_DVR_CHANNEL_GROUP extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;
         public int dwGroup;
@@ -4716,13 +4720,13 @@ DVR实现巡航数据结构
     }
 
     //线结构参数
-    public static class NET_VCA_LINE extends Structure {
+    public static class NET_VCA_LINE extends HIKSDKStructure {
         public NET_VCA_POINT struStart;
         public NET_VCA_POINT struEnd;
     }
 
     //点坐标参数
-    public static class NET_VCA_POINT extends Structure {
+    public static class NET_VCA_POINT extends HIKSDKStructure {
         public float fX;
         public float fY;
 
@@ -4730,7 +4734,7 @@ DVR实现巡航数据结构
     }
 
     //进入/离开区域参数
-    public static class NET_VCA_AREA extends Structure {
+    public static class NET_VCA_AREA extends HIKSDKStructure {
         public NET_VCA_POLYGON struRegion;
         public byte bySensitivity;        //灵敏度参数，范围[1,5]
         /*
@@ -4747,12 +4751,12 @@ DVR实现巡航数据结构
     }
 
     //多边形结构体
-    public static class NET_VCA_POLYGON extends Structure {
+    public static class NET_VCA_POLYGON extends HIKSDKStructure {
         public int dwPointNum;
         public NET_VCA_POINT[] struPos = new NET_VCA_POINT[VCA_MAX_POLYGON_POINT_NUM];
     }
 
-    public static class NET_VCA_SIZE_FILTER extends Structure {
+    public static class NET_VCA_SIZE_FILTER extends HIKSDKStructure {
         public byte byActive;            //是否激活尺寸过滤器 0-否 非0-是
         public byte byMode;         //过滤器模式SIZE_FILTER_MODE
         public byte[] byRes = new byte[2];        //保留，置0
@@ -4762,13 +4766,13 @@ DVR实现巡航数据结构
 
 
     //尺寸过滤策略
-    public static class NET_VCA_FILTER_STRATEGY extends Structure {
+    public static class NET_VCA_FILTER_STRATEGY extends HIKSDKStructure {
         public byte byStrategy;      //尺寸过滤策略 0 - 不启用 1-高度和宽度过滤,2-面积过滤
         public byte[] byRes = new byte[11];       //保留
     }
 
     //异常行为检测报警
-    public static class NET_VCA_RULE_ALARM extends Structure {
+    public static class NET_VCA_RULE_ALARM extends HIKSDKStructure {
         public int dwSize;
         public int dwRelativeTime;
         public int dwAbsTime;
@@ -4788,7 +4792,7 @@ DVR实现巡航数据结构
         public Pointer pImage;
     }
 
-    public static class NET_DVR_SYSTEM_TIME extends Structure {
+    public static class NET_DVR_SYSTEM_TIME extends HIKSDKStructure {
         public short wYear;           //年
         public short wMonth;          //月
         public short wDay;            //日
@@ -4800,7 +4804,7 @@ DVR实现巡航数据结构
     }
 
     //设备支持AI开放平台接入，上传视频检测数据
-    public static class NET_AIOP_VIDEO_HEAD extends Structure {
+    public static class NET_AIOP_VIDEO_HEAD extends HIKSDKStructure {
         public int dwSize;      //dwSize = sizeof(NET_AIOP_VIDEO_HEAD)
         public int dwChannel;    //设备分析通道的通道号；
         public NET_DVR_SYSTEM_TIME struTime = new NET_DVR_SYSTEM_TIME();    //时间
@@ -4817,7 +4821,7 @@ DVR实现巡航数据结构
     }
 
     //设备支持AI开放平台接入，上传图片检测数据
-    public static class NET_AIOP_PICTURE_HEAD extends Structure {
+    public static class NET_AIOP_PICTURE_HEAD extends HIKSDKStructure {
         public int dwSize;           //dwSize = sizeof(NET_AIOP_PICTURE_HEAD)
         public NET_DVR_SYSTEM_TIME struTime = new NET_DVR_SYSTEM_TIME();    //时间
         public byte[] szPID = new byte[64];        //透传下发的图片ID，来自于图片任务派发
@@ -4831,7 +4835,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_AI_PICTUR_UPLOAD extends Structure {
+    public static class NET_DVR_AI_PICTUR_UPLOAD extends HIKSDKStructure {
         public int dwSize;
         public byte[] szTaskID = new byte[64];   //任务id，strlen.max = 64,业务平台统一维护管理
         public byte[] szPID = new byte[64];   //图片id，strlen.max = 64，业务平台统一维护管理
@@ -4839,7 +4843,7 @@ DVR实现巡航数据结构
     }
 
     // AI开放平台接入轮询视频检测报警结构体。
-    public static class NET_AIOP_POLLING_SNAP_HEAD extends Structure {
+    public static class NET_AIOP_POLLING_SNAP_HEAD extends HIKSDKStructure {
         public int dwSize;            //dwSize = sizeof(NET_AIOP_POLLING_SNAP_HEAD)
         public int dwChannel;      //设备分析通道的通道号(走SDK协议)；
         public NET_DVR_SYSTEM_TIME struTime = new NET_DVR_SYSTEM_TIME();    //时间
@@ -4856,7 +4860,7 @@ DVR实现巡航数据结构
     }
 
     // AI开放平台接入轮询视频检测报警结构体。
-    public static class NET_AIOP_POLLING_VIDEO_HEAD extends Structure {
+    public static class NET_AIOP_POLLING_VIDEO_HEAD extends HIKSDKStructure {
         public int dwSize;            //dwSize = sizeof(NET_AIOP_POLLING_VIDEO_HEAD)
         public int dwChannel;      //设备分析通道的通道号(走SDK协议)；
         public NET_DVR_SYSTEM_TIME struTime;    //时间
@@ -4873,7 +4877,7 @@ DVR实现巡航数据结构
     }
 
     //规则触发参数
-    public static class NET_VCA_RULE_TRIGGER_PARAM extends Structure {
+    public static class NET_VCA_RULE_TRIGGER_PARAM extends HIKSDKStructure {
         public byte byTriggerMode;   //规则的触发方式，0- 不启用，1- 点 2- 目标面积
         public byte byTriggerPoint;  //触发点，触发方式为点时有效 0- 中,1-上,2-下
         public byte[] byRes1 = new byte[2];       //保留
@@ -4881,7 +4885,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[4];       //保留
     }
 
-    public static class NET_VCA_ONE_RULE_V42 extends Structure {
+    public static class NET_VCA_ONE_RULE_V42 extends HIKSDKStructure {
         public byte byActive;       //是否激活规则, 0-否，非0-是
         public byte byEventPriority;//事件优先级 0-低，1-中，2-高
         public byte[] byRes1 = new byte[4];           //保留，设置为0字段
@@ -4901,7 +4905,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_PTZ_POSITION extends Structure {
+    public static class NET_DVR_PTZ_POSITION extends HIKSDKStructure {
         // 是否启用场景，在设置场景行为规则的时候该字段无效，在设置球机本地配置场景位置信息时作为使能位
         public byte byEnable;
         public byte[] byRes1 = new byte[3];  //保留
@@ -4911,7 +4915,7 @@ DVR实现巡航数据结构
     }
 
     //异常行为检测配置结构体
-    public static class NET_VCA_RULECFG_V42 extends Structure {
+    public static class NET_VCA_RULECFG_V42 extends HIKSDKStructure {
         public int dwSize;             //结构图大小
         public byte byPicProType;            //报警时图片处理方式 0-不处理 1-上传
         public byte byUpLastAlarm;         //是否先上传最近一次的报警，0-否，1-是
@@ -4934,7 +4938,7 @@ DVR实现巡航数据结构
     public static final int ACCOUNTNUM_LEN = 6;
     public static final int ACCOUNTNUM_LEN_32 = 32;
 
-    public static class NET_DVR_CID_ALARM extends Structure {
+    public static class NET_DVR_CID_ALARM extends HIKSDKStructure {
         public int dwSize;
         public byte[] sCIDCode = new byte[CID_CODE_LEN/*4*/];    //CID事件号
         public byte[] sCIDDescribe = new byte[NAME_LEN/*32*/];    //CID事件名
@@ -4961,7 +4965,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[12];
     }
 
-    public static class NET_DVR_SENSOR_ALARM extends Structure {
+    public static class NET_DVR_SENSOR_ALARM extends HIKSDKStructure {
         public int dwSize;                // 结构体大小
         public int dwAbsTime;            // 绝对时标信息  OSD显示信息
         public byte[] byName = new byte[NAME_LEN];     // sensor 名称
@@ -4976,7 +4980,7 @@ DVR实现巡航数据结构
     }
 
     //开关量报警上传
-    public static class NET_DVR_SWITCH_ALARM extends Structure {
+    public static class NET_DVR_SWITCH_ALARM extends HIKSDKStructure {
         public int dwSize;
         public byte[] byName = new byte[NAME_LEN];     // switch 名称
         public short wSwitchChannel;     // 开关量通道, 0-255
@@ -4984,7 +4988,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[41];            // 保留字节
     }
 
-    public static class NET_DVR_ALARMHOST_EXCEPTION_ALARM extends Structure {
+    public static class NET_DVR_ALARMHOST_EXCEPTION_ALARM extends HIKSDKStructure {
         public int dwSize;             // 结构体大小
         // 异常参数  1-设备防拆报警 2-设备防拆后后恢复正常 3-主电源掉电报警 4-主电源掉电后恢复正常 5-内部通信故障报警
         // 6-内部通信故障后恢复正常  7-电话线断线 8-电话线断线恢复 9-自检失败报警  10-自检失败后恢复正常
@@ -4996,7 +5000,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_ALARMHOST_POINT_VALUE extends Structure {
+    public static class NET_DVR_ALARMHOST_POINT_VALUE extends HIKSDKStructure {
         public byte byChanType;        //接入类型，1-本地模拟量通道，2-本地开关量通道，3-485通道，4-网络通道
         public byte byPointType;    //点类型，1-遥测（模拟量），2-遥信（开关量）
         public byte[] byRes1 = new byte[2];        //保留
@@ -5009,12 +5013,12 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[12];
     }
 
-    public static class NET_DVR_ALARMHOST_DATA_UNION extends Structure {
+    public static class NET_DVR_ALARMHOST_DATA_UNION extends HIKSDKStructure {
         public byte[] byLength = new byte[40];
         public NET_DVR_ALARMHOST_POINT_VALUE struPointValue;    //监测点实时数据
     }
 
-    public static class NET_DVR_ALARMHOST_DATA_UPLOAD extends Structure {
+    public static class NET_DVR_ALARMHOST_DATA_UPLOAD extends HIKSDKStructure {
         public int dwSize;
         public byte byDataType;        //数据类型，1-监测点实时数据上传
         public byte[] byRes1 = new byte[3];
@@ -5023,7 +5027,7 @@ DVR实现巡航数据结构
     }
 
     //车牌识别结果子结构
-    public static class NET_DVR_PLATE_INFO extends Structure {
+    public static class NET_DVR_PLATE_INFO extends HIKSDKStructure {
         public byte byPlateType;                    //车牌类型
         public byte byColor;                        //车牌颜色
         public byte byBright;                        //车牌亮度
@@ -5044,7 +5048,7 @@ DVR实现巡航数据结构
         public byte[] byBelieve = new byte[MAX_LICENSE_LEN];    //各个识别字符的置信度，如检测到车牌"浙A12345", 置信度为,20,30,40,50,60,70，则表示"浙"字正确的可能性只有%，"A"字的正确的可能性是%
     }
 
-    public static class NET_DVR_VEHICLE_INFO extends Structure {
+    public static class NET_DVR_VEHICLE_INFO extends HIKSDKStructure {
         public int dwIndex;          //车辆序号
         public byte byVehicleType;    //车辆类型 0 表示其它车型，1 表示小型车，2 表示大型车 ,3表示行人触发 ,4表示二轮车触发 5表示三轮车触发(3.5Ver)
         public byte byColorDepth;        //车身颜色深浅
@@ -5077,7 +5081,7 @@ DVR实现巡航数据结构
     }
 
     //手动抓拍
-    public static class NET_DVR_MANUALSNAP extends Structure {
+    public static class NET_DVR_MANUALSNAP extends HIKSDKStructure {
         public byte byOSDEnable;//0-不关闭(默认)，1-关闭
         public byte byLaneNo;//车道号, 范围为1-6，默认为1(抓拍机内部测试使用)
         public byte byChannel;//通道号
@@ -5085,7 +5089,7 @@ DVR实现巡航数据结构
     }
 
     //交通抓拍结果信息
-    public static class NET_DVR_PLATE_RESULT extends Structure {
+    public static class NET_DVR_PLATE_RESULT extends HIKSDKStructure {
         public int dwSize;
         public byte byResultType;
         public byte byChanIndex;
@@ -5112,7 +5116,7 @@ DVR实现巡航数据结构
         public Pointer pBuffer2;
     }
 
-    public static class NET_DVR_TIME_V30 extends Structure {
+    public static class NET_DVR_TIME_V30 extends HIKSDKStructure {
         public short wYear;
         public byte byMonth;
         public byte byDay;
@@ -5126,7 +5130,7 @@ DVR实现巡航数据结构
 
     }
 
-    public static class NET_ITS_PICTURE_INFO extends Structure {
+    public static class NET_ITS_PICTURE_INFO extends HIKSDKStructure {
         public int dwDataLen;
         public byte byType;
         public byte byDataType;
@@ -5145,7 +5149,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[4];
     }
 
-    public static class NET_ITS_PLATE_RESULT extends Structure {
+    public static class NET_ITS_PLATE_RESULT extends HIKSDKStructure {
         public int dwSize;
         public int dwMatchNo;
         public byte byGroupNum;
@@ -5195,7 +5199,7 @@ DVR实现巡航数据结构
     public int MAX_ID_LEN = 48; //编号最大长度
 
     //停车场数据上传
-    public static class NET_ITS_PARK_VEHICLE extends Structure {
+    public static class NET_ITS_PARK_VEHICLE extends HIKSDKStructure {
         public int dwSize; //结构长度
         public byte byGroupNum; //图片组数量（单次轮询抓拍的图片数量）
         public byte byPicNo; //连拍的图片组上传图片序号（接收到图片组数量后，表示接收完成
@@ -5217,7 +5221,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[256];
     }
 
-    public static class NET_DVR_SNAPCFG extends Structure {
+    public static class NET_DVR_SNAPCFG extends HIKSDKStructure {
 
         public int dwSize;
         public byte byRelatedDriveWay;//触发IO关联的车道号
@@ -5230,7 +5234,7 @@ DVR实现巡航数据结构
     }
 
     // 道闸控制
-    public static class NET_DVR_BARRIERGATE_CFG extends Structure {
+    public static class NET_DVR_BARRIERGATE_CFG extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel; //通道号
         public byte byLaneNo;  //道闸号（0-表示无效值(设备需要做有效值判断),1-道闸1）
@@ -5245,7 +5249,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_GROUP_PARAM extends Structure {
+    public static class NET_DVR_GROUP_PARAM extends HIKSDKStructure {
         public int dwTeenage;//少年（人数）
         public int dwYouth;//青年（人数）
         public int dwMidLife;//中年（人数）
@@ -5257,33 +5261,33 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[48];
     }
 
-    public static class NET_DVR_SEXGROUP_PARAM extends Structure {
+    public static class NET_DVR_SEXGROUP_PARAM extends HIKSDKStructure {
         public int dwMale;//男（人数）
         public int dwFemale;//女（人数）
         public byte[] byRes = new byte[64];
     }
 
-    public static class NET_DVR_PROGRAM_INFO extends Structure {
+    public static class NET_DVR_PROGRAM_INFO extends HIKSDKStructure {
         public int dwProgramNo; //节目编号
         public byte[] sProgramName = new byte[NAME_LEN]; //节目名称
         public byte[] byRes = new byte[16];
     }
 
-    public static class NET_DVR_FACECAPTURE_STATISTICS_RESULT extends Structure {
+    public static class NET_DVR_FACECAPTURE_STATISTICS_RESULT extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_TIME_EX struStartTime;/*间隔开始时间*/
         public NET_DVR_TIME_EX struEndTime;/*间隔结束时间*/
         public byte byStatType;//数据类型统计：Bit0-年龄段有效，Bit1-性别有效，Bit2-人数有效
         public byte[] byRes = new byte[7];
         public int dwPeopleNum;//人数统计
-        public byte[] byRes2 = new byte[80]; //
+        public byte[] byRes2=new byte[80]; //
         public NET_DVR_SEXGROUP_PARAM struSexGroupParam;//性别人数统计
         public NET_DVR_PROGRAM_INFO struProgramInfo;        //节目信息
         public byte[] byRes1 = new byte[76];
     }
 
     //获取交通数据条件结构
-    public static class NET_DVR_TRAFFIC_DATA_QUERY_COND extends Structure {
+    public static class NET_DVR_TRAFFIC_DATA_QUERY_COND extends HIKSDKStructure {
         public int dwSize;
         /*
        Bit0-通道有效
@@ -5423,7 +5427,7 @@ DVR实现巡航数据结构
     public static final int MAX_TRAFFIC_PICTURE_NUM = 8; //交通图片数量
 
     //交通数据结构体
-    public static class NET_DVR_TRAFFIC_DATA_QUERY_RESULT extends Structure {
+    public static class NET_DVR_TRAFFIC_DATA_QUERY_RESULT extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;//默认是1（[1~32]）
         public byte[] sLicense = new byte[MAX_LICENSE_LEN/*16*/];
@@ -5555,7 +5559,7 @@ DVR实现巡航数据结构
     //交通图片参数子结构
     public static final int PICTURE_NAME_LEN = 64;
 
-    public static class NET_DVR_TRAFFIC_PICTURE_PARAM extends Structure {
+    public static class NET_DVR_TRAFFIC_PICTURE_PARAM extends HIKSDKStructure {
         public NET_DVR_TIME_V30 struRelativeTime = new NET_DVR_TIME_V30(); //抓拍相对时标
         public NET_DVR_TIME_V30 struAbsTime = new NET_DVR_TIME_V30();  //抓拍绝对时标
         public byte[] szPicName = new byte[PICTURE_NAME_LEN/*64*/];
@@ -5563,7 +5567,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[63];
     }
 
-    public static class NET_DVR_VEHICLE_CONTROL_COND extends Structure {
+    public static class NET_DVR_VEHICLE_CONTROL_COND extends HIKSDKStructure {
         public int dwChannel;
         public int dwOperateType;
         public byte[] sLicense = new byte[MAX_LICENSE_LEN];
@@ -5574,7 +5578,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[116];
     }
 
-    public static class NET_DVR_VEHICLE_CONTROL_LIST_INFO extends Structure {
+    public static class NET_DVR_VEHICLE_CONTROL_LIST_INFO extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;
         public int dwDataIndex;
@@ -5591,7 +5595,7 @@ DVR实现巡航数据结构
     }
 
     //车辆报警
-    public static class NET_DVR_VEHICLE_CONTROL_ALARM extends Structure {
+    public static class NET_DVR_VEHICLE_CONTROL_ALARM extends HIKSDKStructure {
         public int dwSize;
         public byte byListType;   //名单属性：0-允许名单，1-禁止名单，2-临时名单
         public byte byPlateType;  //车牌类型
@@ -5613,7 +5617,7 @@ DVR实现巡航数据结构
     public int MAX_VOICE_INFO_LEN = 128;
 
     //LED屏幕显示参数
-    public static class NET_DVR_LEDDISPLAY_CFG extends Structure {
+    public static class NET_DVR_LEDDISPLAY_CFG extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public byte[] sDisplayInfo = new byte[MAX_LED_INFO_LEN/*512*/]; // LED显示内容
         public byte byDisplayMode;//显示方式:0~左移,1~右移,2~立即显示
@@ -5625,7 +5629,7 @@ DVR实现巡航数据结构
     }
 
     //语音播报控制参数
-    public static class NET_DVR_VOICEBROADCAST_CFG extends Structure {
+    public static class NET_DVR_VOICEBROADCAST_CFG extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public byte[] sInfo = new byte[MAX_VOICE_INFO_LEN/*128*/]; //语音播报内容
         public byte byBroadcastNum;// 语音播报次数， 1~10次
@@ -5634,7 +5638,7 @@ DVR实现巡航数据结构
     }
 
     //缴费金额信息
-    public static class NET_DVR_CHARGEACCOUNT_CFG extends Structure {
+    public static class NET_DVR_CHARGEACCOUNT_CFG extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public float fAccount;//实际收费金额
         public byte[] byRes = new byte[128];
@@ -5645,7 +5649,7 @@ DVR实现巡航数据结构
     public static final int SUPER_PASSWORD_LEN = 8;    //胁迫密码长度
     public static final int UNLOCK_PASSWORD_LEN = 8;   // 解除密码长度
 
-    public static class NET_DVR_DOOR_CFG extends Structure {
+    public static class NET_DVR_DOOR_CFG extends HIKSDKStructure {
         public int dwSize;
         public byte[] byDoorName = new byte[DOOR_NAME_LEN]; //门名称
         public byte byMagneticType; //门磁类型，0-常闭，1-常开
@@ -5673,14 +5677,14 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[43];
     }
 
-    public static class NET_DVR_DOOR_STATUS_PLAN extends Structure {
+    public static class NET_DVR_DOOR_STATUS_PLAN extends HIKSDKStructure {
         public int dwSize;
         public int dwTemplateNo; //计划模板编号，为0表示取消关联，恢复默认状态（普通状态）
         public byte[] byRes = new byte[64];
     }
 
 
-    public static class NET_DVR_EVENT_CARD_LINKAGE_COND extends Structure {
+    public static class NET_DVR_EVENT_CARD_LINKAGE_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwEventID; //事件ID
         public short wLocalControllerID; //就地控制器序号[1,64]
@@ -5690,7 +5694,7 @@ DVR实现巡航数据结构
     public static final int MAX_ALARMHOST_ALARMIN_NUM = 512;//网络报警主机最大报警输入口数
     public static final int MAX_ALARMHOST_ALARMOUT_NUM = 512;//网络报警主机最大报警输出口数
 
-    public static class NET_DVR_EVENT_CARD_LINKAGE_CFG_V50 extends Structure {
+    public static class NET_DVR_EVENT_CARD_LINKAGE_CFG_V50 extends HIKSDKStructure {
         public int dwSize;    //结构体大小
         public byte byProMode;                          //联动方式，0-事件，1-卡号, 2-MAC地址
         public byte[] byRes1 = new byte[3];
@@ -5713,35 +5717,37 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[500];                           //保留
     }
 
-    public static class NET_DVR_EVENT_LINKAGE_CARD_CFG_V51 extends Structure {
-        public int dwSize;    //结构体大小
-        public byte byProMode;                          //联动方式，0-事件，1-卡号，2-MAC地址，3-工号（人员ID）
-        public byte[] byRes1 = new byte[3];
-        public int dwEventSourceID;                    //事件源ID，当主类型为设备事件时无效， 当主类型是门事件时为门编号;当主类型为读卡器事件时，为读卡器ID;当为报警输入事件时为防区报警输入ID或事件报警输入ID。0xffffffff表示联动全部
-        public NET_DVR_EVETN_CARD_LINKAGE_UNION uLinkageInfo;  //联动方式参数
-        public byte[] byAlarmout = new byte[MAX_ALARMHOST_ALARMOUT_NUM];            //关联的报警输出号，按位表示，为0表示不关联，为1表示关联
-        public byte[] byRes2 = new byte[32];                         //保留
-        public byte[] byOpenDoor = new byte[MAX_DOOR_NUM_256];     //按位表示,是否联动开门，0-不联动，1-联动
-        public byte[] byCloseDoor = new byte[MAX_DOOR_NUM_256];    //按位表示,是否联动关门，0-不联动，1-联动
-        public byte[] byNormalOpen = new byte[MAX_DOOR_NUM_256];   //按位表示,是否联动常开，0-不联动，1-联动
-        public byte[] byNormalClose = new byte[MAX_DOOR_NUM_256];  //按位表示,是否联动常关，0-不联动，1-联动
-        public byte byMainDevBuzzer;                    //主机蜂鸣器   0-不联动，1-联动输出
-        public byte byCapturePic;                           //是否联动抓拍，0-不联动抓拍，1-联动抓拍
-        public byte byRecordVideo;                          //是否联动录像，0-不联动录像，1-联动录像
-        public byte byMainDevStopBuzzer;               //主机停止蜂鸣   0-不联动，1-联动输出
-        public short wAudioDisplayID;                    //联动语音播放ID：0-不联动，目前范围1-32
-        public byte byAudioDisplayMode;                 //联动语音播放模式：0-关闭，1-单次播放，2-循环播放
-        public byte[] byRes3 = new byte[25];                         //保留
-        public byte[] byReaderBuzzer = new byte[MAX_CARD_READER_NUM_512]; //联动读卡器蜂鸣器，按位表示，0-不联动，1-联动
-        public byte[] byAlarmOutClose = new byte[MAX_ALARMHOST_ALARMOUT_NUM];            //关联报警输出关闭，按字节表示，为0表示不关联，为1表示关联
-        public byte[] byAlarmInSetup = new byte[MAX_ALARMHOST_ALARMIN_NUM];  //关联防区布防，按字节表示，为0表示不关联，为1表示关联
-        public byte[] byAlarmInClose = new byte[MAX_ALARMHOST_ALARMIN_NUM];  //关联防区撤防，按字节表示，为0表示不关联，为1表示关联
-        public byte[] byReaderStopBuzzer = new byte[MAX_CARD_READER_NUM_512]; //联动读卡器停止蜂鸣，按字节表示，0-不联动，1-联动
-        public byte[] byRes = new byte[512];                   //保留
+    public static class NET_DVR_EVENT_LINKAGE_CARD_CFG_V51 extends HIKSDKStructure {
+        public int              dwSize;    //结构体大小
+        public byte             byProMode;                          //联动方式，0-事件，1-卡号，2-MAC地址，3-工号（人员ID）
+        public byte[]           byRes1=new byte[3];
+        public int              dwEventSourceID;                    //事件源ID，当主类型为设备事件时无效， 当主类型是门事件时为门编号;当主类型为读卡器事件时，为读卡器ID;当为报警输入事件时为防区报警输入ID或事件报警输入ID。0xffffffff表示联动全部
+        public NET_DVR_EVETN_CARD_LINKAGE_UNION    uLinkageInfo;  //联动方式参数
+        public byte[]           byAlarmout=new byte[MAX_ALARMHOST_ALARMOUT_NUM];            //关联的报警输出号，按位表示，为0表示不关联，为1表示关联
+        public byte[]           byRes2=new byte[32];                         //保留
+        public byte[]           byOpenDoor=new byte[MAX_DOOR_NUM_256];     //按位表示,是否联动开门，0-不联动，1-联动
+        public byte[]           byCloseDoor=new byte[MAX_DOOR_NUM_256];    //按位表示,是否联动关门，0-不联动，1-联动
+        public byte[]           byNormalOpen=new byte[MAX_DOOR_NUM_256];   //按位表示,是否联动常开，0-不联动，1-联动
+        public byte[]           byNormalClose=new byte[MAX_DOOR_NUM_256];  //按位表示,是否联动常关，0-不联动，1-联动
+        public byte             byMainDevBuzzer;                    //主机蜂鸣器   0-不联动，1-联动输出
+        public byte             byCapturePic;                           //是否联动抓拍，0-不联动抓拍，1-联动抓拍
+        public byte             byRecordVideo;                          //是否联动录像，0-不联动录像，1-联动录像
+        public byte             byMainDevStopBuzzer;               //主机停止蜂鸣   0-不联动，1-联动输出
+        public short            wAudioDisplayID;                    //联动语音播放ID：0-不联动，目前范围1-32
+        public byte             byAudioDisplayMode;                 //联动语音播放模式：0-关闭，1-单次播放，2-循环播放
+        public byte[]           byRes3=new byte[25];                         //保留
+        public byte[]           byReaderBuzzer=new byte[MAX_CARD_READER_NUM_512]; //联动读卡器蜂鸣器，按位表示，0-不联动，1-联动
+        public byte[]           byAlarmOutClose=new byte[MAX_ALARMHOST_ALARMOUT_NUM];            //关联报警输出关闭，按字节表示，为0表示不关联，为1表示关联
+        public byte[]           byAlarmInSetup=new byte[MAX_ALARMHOST_ALARMIN_NUM];  //关联防区布防，按字节表示，为0表示不关联，为1表示关联
+        public byte[]           byAlarmInClose=new byte[MAX_ALARMHOST_ALARMIN_NUM];  //关联防区撤防，按字节表示，为0表示不关联，为1表示关联
+        public byte[]           byReaderStopBuzzer=new byte[MAX_CARD_READER_NUM_512]; //联动读卡器停止蜂鸣，按字节表示，0-不联动，1-联动
+        public byte[]           byRes=new byte[512];                   //保留
     }
 
 
-    public static class NET_DVR_EVENT_LINKAGE_INFO extends Structure {
+
+
+    public static class NET_DVR_EVENT_LINKAGE_INFO extends HIKSDKStructure {
         public short wMainEventType;                     //事件主类型，0-设备事件，1-报警输入事件，2-门事件，3-读卡器事件
         public short wSubEventType;                      //事件次类型
         public byte[] byRes = new byte[28];
@@ -5755,7 +5761,7 @@ DVR实现巡航数据结构
     }
 
     //卡参数配置条件
-    public static class NET_DVR_CARD_CFG_COND extends Structure {
+    public static class NET_DVR_CARD_CFG_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwCardNum;
         public byte byCheckCardNo;
@@ -5763,18 +5769,18 @@ DVR实现巡航数据结构
     }
 
     //获取卡参数的发送数据
-    public static class NET_DVR_CARD_CFG_SEND_DATA extends Structure {
+    public static class NET_DVR_CARD_CFG_SEND_DATA extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[32];
         public byte[] byRes = new byte[16];
     }
 
-    public static class CARDRIGHTPLAN extends Structure {
+    public static class CARDRIGHTPLAN extends HIKSDKStructure {
         public byte[] byRightPlan = new byte[4];
     }
 
     //卡参数
-    public static class NET_DVR_CARD_CFG extends Structure {
+    public static class NET_DVR_CARD_CFG extends HIKSDKStructure {
         public int dwSize;
         public int dwModifyParamType;
         public byte[] byCardNo = new byte[32];
@@ -5804,11 +5810,11 @@ DVR实现巡航数据结构
     public int MAX_CARD_RIGHT_PLAN_NUM = 4; //卡权限最大计划个数
     public int MAX_CASE_SENSOR_NUM = 8;  //最大case sensor触发器数
 
-    public static class CARDRIGHTPLAN_WORD extends Structure {
+    public static class CARDRIGHTPLAN_WORD extends HIKSDKStructure {
         public short[] wRightPlan = new short[MAX_CARD_RIGHT_PLAN_NUM];
     }
 
-    public static class NET_DVR_CARD_CFG_V50 extends Structure {
+    public static class NET_DVR_CARD_CFG_V50 extends HIKSDKStructure {
         public int dwSize;
         public int dwModifyParamType;//需要修改的卡参数，设置卡参数时有效，按位表示，每位代表一种参数，1为需要修改，0为不修改
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //卡号
@@ -5841,9 +5847,8 @@ DVR实现巡航数据结构
         public byte byCardModelType;  //0-空，1-  S50，2-  S70，3- FM1208 CPU卡，4- FM1216 CPU卡，5-国密CPU卡，6-身份证，7- NFC
         public byte[] byRes3 = new byte[83];
     }
-
     //有效期参数结构体
-    public static class NET_DVR_VALID_PERIOD_CFG extends Structure {
+    public static class NET_DVR_VALID_PERIOD_CFG extends HIKSDKStructure {
         public byte byEnable;
         public byte byBeginTimeFlag;      //是否限制起始时间的标志，0-不限制，1-限制
         public byte byEnableTimeFlag;     //是否限制终止时间的标志，0-不限制，1-限制
@@ -5855,7 +5860,7 @@ DVR实现巡航数据结构
     }
 
     //扩展结构体信息
-    public static class NET_DVR_ID_CARD_INFO_EXTEND extends Structure {
+    public static class NET_DVR_ID_CARD_INFO_EXTEND extends HIKSDKStructure {
         public byte byRemoteCheck; //是否需要远程核验（0-无效，1-不需要（默认），2-需要）
         public byte byThermometryUnit; //测温单位（0-摄氏度（默认），1-华氏度，2-开尔文）
         public byte byIsAbnomalTemperature; //特征抓拍测温是否温度异常：1-是，0-否
@@ -5872,7 +5877,7 @@ DVR实现巡航数据结构
     }
 
     //身份证信息报警
-    public static class NET_DVR_ID_CARD_INFO_ALARM extends Structure {
+    public static class NET_DVR_ID_CARD_INFO_ALARM extends HIKSDKStructure {
         public int dwSize;        //结构长度
         public NET_DVR_ID_CARD_INFO struIDCardCfg = new NET_DVR_ID_CARD_INFO();//身份证信息
         public int dwMajor; //报警主类型，参考宏定义
@@ -5904,7 +5909,7 @@ DVR实现巡航数据结构
 
     public static final int CARD_READER_DESCRIPTION = 32;            //读卡器描述
 
-    public static class NET_DVR_CARD_READER_CFG_V50 extends Structure {
+    public static class NET_DVR_CARD_READER_CFG_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable; //是否使能，1-使能，0-不使能
         public byte byCardReaderType; //读卡器类型，1-DS-K110XM/MK/C/CK，2-DS-K192AM/AMP，3-DS-K192BM/BMP，4-DS-K182AM/AMP，5-DS-K182BM/BMP，6-DS-K182AMF/ACF，7-韦根或485不在线，8- DS-K1101M/MK，9- DS-K1101C/CK，10- DS-K1102M/MK/M-A，11- DS-K1102C/CK，12- DS-K1103M/MK，13- DS-K1103C/CK，14- DS-K1104M/MK，15- DS-K1104C/CK，16- DS-K1102S/SK/S-A，17- DS-K1102G/GK，18- DS-K1100S-B，19- DS-K1102EM/EMK，20- DS-K1102E/EK，21- DS-K1200EF，22- DS-K1200MF，23- DS-K1200CF，24- DS-K1300EF，25- DS-K1300MF，26- DS-K1300CF，27- DS-K1105E，28- DS-K1105M，29- DS-K1105C，30- DS-K182AMF，31- DS-K196AMF，32-DS-K194AMP，33-DS-K1T200EF/EF-C/MF/MF-C/CF/CF-C,34-DS-K1T300EF/EF-C/MF/MF-C/CF/CF-C，35-DS-K1T105E/E-C/M/M-C/C/C-C,36-DS-K1T803F/F-M/F-S/F-E,37-DS-K1A801F/F-M/F-S/F-E,38-DS-K1107M/MK,39-DS-K1107E/EK,40-DS-K1107S/SK,41-DS-K1108M/MK,42-DS-K1108E/EK,43-DS-K1108S/SK,44-DS-K1200F,45-DS-K1S110-I,46-DS-K1T200M-PG/PGC,47-DS-K1T200M-PZ/PZC,48-DS-K1109H
@@ -5974,19 +5979,19 @@ DVR实现巡航数据结构
     public static final int NET_SDK_NEXT_STATUS__FINISH = 1002;
     public static final int NET_SDK_GET_NEXT_STATUS_FAILED = 1003;
 
-    public static class NET_DVR_CARD_COND extends Structure {
+    public static class NET_DVR_CARD_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwCardNum; //设置或获取卡数量，获取时置为0xffffffff表示获取所有卡信息
         public byte[] byRes = new byte[64];
     }
 
-    public static class NET_DVR_CARD_SEND_DATA extends Structure {
+    public static class NET_DVR_CARD_SEND_DATA extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //卡号
         public byte[] byRes = new byte[16];
     }
 
-    public static class NET_DVR_CARD_RECORD extends Structure {
+    public static class NET_DVR_CARD_RECORD extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];
         public byte byCardType;
@@ -6013,7 +6018,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[256];
     }
 
-    public static class NET_DVR_CARD_STATUS extends Structure {
+    public static class NET_DVR_CARD_STATUS extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];
         public int dwErrorCode;
@@ -6022,7 +6027,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_FACE_COND extends Structure {
+    public static class NET_DVR_FACE_COND extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];
         public int dwFaceNum;
@@ -6030,7 +6035,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[124];
     }
 
-    public static class NET_DVR_FACE_RECORD extends Structure {
+    public static class NET_DVR_FACE_RECORD extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];
         public int dwFaceLen;
@@ -6038,7 +6043,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[128];
     }
 
-    public static class NET_DVR_FACE_STATUS extends Structure {
+    public static class NET_DVR_FACE_STATUS extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];
         public byte[] byErrorMsg = new byte[ERROR_MSG_LEN];
@@ -6047,7 +6052,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[131];
     }
 
-    public static class NET_DVR_FINGERPRINT_COND extends Structure {
+    public static class NET_DVR_FINGERPRINT_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwFingerprintNum;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];
@@ -6056,7 +6061,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[131];
     }
 
-    public static class NET_DVR_FINGERPRINT_RECORD extends Structure {
+    public static class NET_DVR_FINGERPRINT_RECORD extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];
         public int dwFingerPrintLen;     //指纹数据长度
@@ -6068,7 +6073,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[96];
     }
 
-    public static class NET_DVR_FINGERPRINT_STATUS extends Structure {
+    public static class NET_DVR_FINGERPRINT_STATUS extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //指纹关联的卡号
         public byte byCardReaderRecvStatus;  //指纹读卡器状态，按字节表示，0-失败，1-成功，2-该指纹模组不在线，3-重试或指纹质量差，4-内存已满，5-已存在该指纹，6-已存在该指纹ID，7-非法指纹ID，8-该指纹模组无需配置
@@ -6080,7 +6085,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[20];
     }
 
-    public static class NET_DVR_CAPTURE_FINGERPRINT_COND extends Structure {
+    public static class NET_DVR_CAPTURE_FINGERPRINT_COND extends HIKSDKStructure {
         public int dwSize;
         public byte byFingerPrintPicType;    //图片类型：0-无意义
         public byte byFingerNo;              //手指编号，范围1-10
@@ -6088,7 +6093,7 @@ DVR实现巡航数据结构
     }
 
     //
-    public static class NET_DVR_CAPTURE_FINGERPRINT_CFG extends Structure {
+    public static class NET_DVR_CAPTURE_FINGERPRINT_CFG extends HIKSDKStructure {
         public int dwSize;
         public int dwFingerPrintDataSize;    //指纹数据大小
         public byte[] byFingerData = new byte[MAX_FINGER_PRINT_LEN];    //图片类型：0-无意义
@@ -6099,7 +6104,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[62];
     }
 
-    public static class NET_DVR_FINGER_PRINT_INFO_CTRL_V50 extends Structure {
+    public static class NET_DVR_FINGER_PRINT_INFO_CTRL_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte byMode;          //删除方式，0-按卡号（人员ID）方式删除，1-按读卡器删除
         public byte[] byRes1 = new byte[3];       //保留
@@ -6113,7 +6118,7 @@ DVR实现巡航数据结构
         public NET_DVR_FINGER_PRINT_BYREADER_V50 struByReader;   //按读卡器的方式删除
     }
 
-    public static class NET_DVR_FINGER_PRINT_BYREADER_V50 extends Structure {
+    public static class NET_DVR_FINGER_PRINT_BYREADER_V50 extends HIKSDKStructure {
         public int dwCardReaderNo;  //按值表示，指纹读卡器编号
         public byte byClearAllCard;  //是否删除所有卡的指纹信息，0-按卡号（人员ID）删除指纹信息，1-删除所有卡（人员ID）的指纹信息
         public byte[] byRes1 = new byte[3];       //保留
@@ -6122,7 +6127,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[516];          //保留
     }
 
-    public static class NET_DVR_FINGER_PRINT_BYCARD_V50 extends Structure {
+    public static class NET_DVR_FINGER_PRINT_BYCARD_V50 extends HIKSDKStructure {
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //指纹关联的卡号
         public byte[] byEnableCardReader = new byte[MAX_CARD_READER_NUM_512];  //指纹的读卡器信息，按位表示
         public byte[] byFingerPrintID = new byte[10];        //需要删除的手指编号，按数组下标，值表示0-不删除，1-删除该指纹
@@ -6131,7 +6136,7 @@ DVR实现巡航数据结构
     }
 
     //人脸删除控制参数结构体
-    public static class NET_DVR_FACE_PARAM_CTRL extends Structure {
+    public static class NET_DVR_FACE_PARAM_CTRL extends HIKSDKStructure {
         public int dwSize;
         public byte byMode;          //删除方式，0-按卡号方式删除，1-按读卡器删除
         public byte[] byRes1 = new byte[3];        //保留
@@ -6160,7 +6165,7 @@ DVR实现巡航数据结构
     }
 
     //指纹删除控制参数结构体
-    public static class NET_DVR_FINGER_PRINT_INFO_CTRL extends Structure {
+    public static class NET_DVR_FINGER_PRINT_INFO_CTRL extends HIKSDKStructure {
         public int dwSize;
         public byte byMode;          //删除方式，0-按卡号方式删除，1-按读卡器删除
         public byte[] byRes1 = new byte[3];        //保留
@@ -6194,14 +6199,14 @@ DVR实现巡航数据结构
         public NET_DVR_FINGER_PRINT_BYREADER struByReader;   //按读卡器的方式删除
     }
 
-    public static class NET_DVR_FINGER_PRINT_BYCARD extends Structure {
+    public static class NET_DVR_FINGER_PRINT_BYCARD extends HIKSDKStructure {
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //人脸关联的卡号
         public byte[] byEnableCardReader = new byte[MAX_CARD_READER_NUM_512];  //人脸的读卡器信息，按数组表示
         public byte[] byFaceID = new byte[MAX_FACE_NUM];        //需要删除的人脸编号，按数组下标，值表示0-不删除，1-删除该人脸
         public byte[] byRes1 = new byte[34];          //保留
     }
 
-    public static class NET_DVR_FINGER_PRINT_BYREADER extends Structure {
+    public static class NET_DVR_FINGER_PRINT_BYREADER extends HIKSDKStructure {
         public int dwCardReaderNo;  //按值表示，人脸读卡器编号
         public byte byClearAllCard;  //是否删除所有卡的人脸信息，0-按卡号删除人脸信息，1-删除所有卡的人脸信息
         public byte[] byRes1 = new byte[3];       //保留
@@ -6210,7 +6215,7 @@ DVR实现巡航数据结构
     }
 
     //门禁主机参数
-    public static class NET_DVR_ACS_CFG extends Structure {
+    public static class NET_DVR_ACS_CFG extends HIKSDKStructure {
         public int dwSize;            //结构体大小
         public byte byRS485Backup;  //是否启用下行RS485通信备份功能，0-不启用，1-启用
         public byte byShowCapPic;    //是否显示抓拍图片， 0-不显示，1-显示
@@ -6230,34 +6235,34 @@ DVR实现巡航数据结构
     /**************
      * 优化接口结构体定义结束
      ***************************/
-    public static class NET_DVR_UPLOAD_ID_BLOCKLIST_COND extends Structure {
+    public static class NET_DVR_UPLOAD_ID_BLOCKLIST_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwBlockListNum; //禁止名单数量
         public byte[] byRes = new byte[128];
     }
 
-    public static class NET_DVR_UPLOAD_ID_BLOCKLIST_CFG extends Structure {
+    public static class NET_DVR_UPLOAD_ID_BLOCKLIST_CFG extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_ID_CARD_INFO struIDCardCfg;  //身份证信息（该结构体中姓名和身份证号码为必填项，其他字段为选填项）
         public byte byBlockListValid;   //身份证禁止名单是否有效：0-无效，1-有效（用于按身份证号码删除身份证禁止名单，该字段为0时代表删除）
         public byte[] byRes = new byte[127];  //预留
     }
 
-    public static class NET_DVR_UPLOAD_ID_BLOCKLIST_STATUS extends Structure {
+    public static class NET_DVR_UPLOAD_ID_BLOCKLIST_STATUS extends HIKSDKStructure {
         public int dwSize;
         public byte[] byIDNum = new byte[MAX_ID_NUM_LEN];   //身份证号码
         public byte byStatus; //状态：0-无效，1-处理中，2-上传失败，3-成功
         public byte[] byRes = new byte[63];
     }
 
-    public static class REMOTECONFIGSTATUS extends Structure {
+    public static class REMOTECONFIGSTATUS extends HIKSDKStructure {
         public byte[] byStatus = new byte[4];
         public byte[] byErrorCode = new byte[4];
     }
 
 
     //开锁记录
-    public static class NET_DVR_UNLOCK_RECORD_INFO extends Structure {
+    public static class NET_DVR_UNLOCK_RECORD_INFO extends HIKSDKStructure {
         public byte byUnlockType; //开锁方式，参考UNLOCK_TYPE_ENUM
         public byte[] byRes1 = new byte[3]; //保留
         public byte[] byControlSrc = new byte[NAME_LEN]; //操作发起源信息，刷卡开锁时为卡号，蓝牙开锁时为萤石的APP账号，二维码开锁时为访客的手机号，其余情况下为设备编号
@@ -6274,13 +6279,13 @@ DVR实现巡航数据结构
     }
 
     //公告信息阅读回执
-    public static class NET_DVR_NOTICEDATA_RECEIPT_INFO extends Structure {
+    public static class NET_DVR_NOTICEDATA_RECEIPT_INFO extends HIKSDKStructure {
         public byte[] byNoticeNumber = new byte[MAX_NOTICE_NUMBER_LEN]; //公告编号
         public byte[] byRes = new byte[224];  //保留
     }
 
     //认证记录（设备未实现）
-    public static class NET_DVR_AUTH_INFO extends Structure {
+    public static class NET_DVR_AUTH_INFO extends HIKSDKStructure {
         public byte byAuthResult; //认证结果：0-无效，1-认证成功，2-认证失败
         public byte byAuthType; //认证方式：0-无效，1-指纹，2-人脸
         public byte[] byRes1 = new byte[2]; //保留
@@ -6291,41 +6296,40 @@ DVR实现巡航数据结构
     }
 
     //车牌信息上传
-    public static class NET_DVR_UPLOAD_PLATE_INFO extends Structure {
+    public static class NET_DVR_UPLOAD_PLATE_INFO extends HIKSDKStructure {
         public byte[] sLicense = new byte[MAX_LICENSE_LEN];        //车牌号码
         public byte byColor;                      //车牌颜色，参考结构VCA_PLATE_COLOR
         public byte[] byRes = new byte[239];  //保留
     }
 
-    public static class NET_DVR_SEND_CARD_INFO extends Structure {
+    public static class NET_DVR_SEND_CARD_INFO extends HIKSDKStructure {
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN/*32*/]; //卡号
         public byte[] byRes = new byte[224];  //保留
     }
 
     //防区报警信息结构体
-    public static class NET_DVR_ZONE_ALARM_INFO extends Structure {
-        public byte[] byZoneName = new byte[NAME_LEN]; //防区名称
+    public static class  NET_DVR_ZONE_ALARM_INFO extends HIKSDKStructure {
+        public byte[]  byZoneName = new byte[NAME_LEN]; //防区名称
         public int dwZonendex;//防区号
         public byte byZoneType;//防区类型 ENUM_ALARM_ZONE_TYPE_MANUAL-紧急开关报警;ENUM_ALARM_ZONE_TYPE_MAGNETIC-门磁报警;ENUM_ALARM_ZONE_TYPE_SMOKE-烟感报警;ENUM_ALARM_ZONE_TYPE_ACTIVE_INFRARED-主动红外报警;ENUM_ALARM_ZONE_TYPE_PASSIVE_INFRARED-被动红外报警;ENUM_ALARM_ZONE_TYPE_GAS-煤气报警
         public byte[] byRes = new byte[219]; //保留,置为0
     }
-
     //可视对讲报警信息联合体
     public static class NET_DVR_VIDEO_INTERCOM_ALARM_INFO_UNION extends Union {
         public byte[] byLen = new byte[256]; //联合体大小
-        public NET_DVR_ZONE_ALARM_INFO struZoneAlarm = new NET_DVR_ZONE_ALARM_INFO(); //开锁记录
+        public  NET_DVR_ZONE_ALARM_INFO struZoneAlarm = new NET_DVR_ZONE_ALARM_INFO(); //开锁记录
     }
 
     //可视对讲报警信息结构体
-    public static class NET_DVR_VIDEO_INTERCOM_ALARM extends Structure {
+    public static class NET_DVR_VIDEO_INTERCOM_ALARM extends HIKSDKStructure {
         public int dwSize; //结构体大小
         public NET_DVR_TIME_EX struTime = new NET_DVR_TIME_EX(); //时间
         public byte[] byDevNumber = new byte[MAX_DEV_NUMBER_LEN]; //设备编号
-        public byte byAlarmType;//报警类型：1- 防区报警，2- 防拆报警，3- 劫持报警，4- 多次密码开锁失败报警，5- 门没开，6- 门没关，7- SOS(呼救报警)，8- 通话对讲，9- 智能锁劫持指纹报警，
+        public byte  byAlarmType;//报警类型：1- 防区报警，2- 防拆报警，3- 劫持报警，4- 多次密码开锁失败报警，5- 门没开，6- 门没关，7- SOS(呼救报警)，8- 通话对讲，9- 智能锁劫持指纹报警，
         // 10- 智能锁劫持密码报警，11- 智能锁撬门报警，12- 智能锁门锁锁定报警，13- 智能锁电量不足报警, 14-禁止名单报警, 15-智能锁掉线, 16-门禁安全模块防拆报警
         public byte[] byRes1 = new byte[3]; //保留
         public NET_DVR_VIDEO_INTERCOM_ALARM_INFO_UNION uAlarmInfo = new NET_DVR_VIDEO_INTERCOM_ALARM_INFO_UNION(); //报警信息，byAlarmType为1时有效
-        public short wLockID;    //锁ID，（0-表示门口机本机控制器上接的锁、1-表示外接控制器上接的锁）（报警类型为5和6时有效）
+        public short  wLockID;    //锁ID，（0-表示门口机本机控制器上接的锁、1-表示外接控制器上接的锁）（报警类型为5和6时有效）
         public byte[] byRes2 = new byte[254]; //保留，置为0
     }
 
@@ -6340,7 +6344,7 @@ DVR实现巡航数据结构
     }
 
     //可视对讲事件记录
-    public static class NET_DVR_VIDEO_INTERCOM_EVENT extends Structure {
+    public static class NET_DVR_VIDEO_INTERCOM_EVENT extends HIKSDKStructure {
         public int dwSize; //结构体大小
         public NET_DVR_TIME_EX struTime = new NET_DVR_TIME_EX(); //时间
         public byte[] byDevNumber = new byte[MAX_DEV_NUMBER_LEN]; //设备编号
@@ -6352,20 +6356,21 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[252]; //保留
     }
 
-    public static class NET_DVR_VIDEO_CALL_PARAM extends Structure {
-        public int dwSize;
-        public int dwCmdType;      //信令类型  0-请求呼叫，1-取消本次呼叫，2-接听本次呼叫 3-拒绝本地来电呼叫 4-被叫响铃超时 5-结束本次通话，6-设备正在通话中，7-客户端正在通话中，8室内机不在线
+    public static class NET_DVR_VIDEO_CALL_PARAM extends HIKSDKStructure
+    {
+        public int    dwSize;
+        public int   dwCmdType;      //信令类型  0-请求呼叫，1-取消本次呼叫，2-接听本次呼叫 3-拒绝本地来电呼叫 4-被叫响铃超时 5-结束本次通话，6-设备正在通话中，7-客户端正在通话中，8室内机不在线
         public short wPeriod;  //期号, 范围[0,9]
         public short wBuildingNumber; //楼号
         public short wUnitNumber;  //单元号
         public short wFloorNumber;  //层号
-        public short wRoomNumber;    //房间号
-        public short wDevIndex; //设备编号
-        public byte byUnitType; //设备类型，1-门口机，2-管理机，3-室内机，4-围墙机，5-别墅门口机，6-二次确认机，7-8700客户端，8-4200客户端，9-APP
-        public byte[] byRes = new byte[115];     //保留
+        public short  wRoomNumber;    //房间号
+        public short  wDevIndex; //设备编号
+        public byte    byUnitType; //设备类型，1-门口机，2-管理机，3-室内机，4-围墙机，5-别墅门口机，6-二次确认机，7-8700客户端，8-4200客户端，9-APP
+        public byte[]    byRes=new byte[115];     //保留
     }
 
-    public static class NET_DVR_CONTROL_GATEWAY extends Structure {
+    public static class NET_DVR_CONTROL_GATEWAY extends HIKSDKStructure {
         public int dwSize; //结构体大小
         public int dwGatewayIndex; //门禁序号，从1开始
         public byte byCommand; //操作命令，0-关闭，1-打开，2-常开（通道状态），3-恢复（普通状态）
@@ -6380,14 +6385,14 @@ DVR实现巡航数据结构
 
 
     //公告图片信息结构体
-    public static class NET_DVR_NOTICE_PIC extends Structure {
+    public static class NET_DVR_NOTICE_PIC extends HIKSDKStructure {
         public Pointer pPicData; //图片指针
         public int dwPicDataLen; //图片数据长度
         public byte[] byRes = new byte[32]; //保留
     }
 
     //公告数据
-    public static class NET_DVR_NOTICE_DATA extends Structure {
+    public static class NET_DVR_NOTICE_DATA extends HIKSDKStructure {
         public int dwSize; //结构体大小
         public NET_DVR_TIME_EX struTime = new NET_DVR_TIME_EX(); //公告时间
         public byte[] byNoticeNumber = new byte[MAX_NOTICE_NUMBER_LEN]; //公告编号
@@ -6400,14 +6405,14 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[128]; //保留
     }
 
-    public static class NET_DVR_DATE extends Structure {
+    public static class NET_DVR_DATE extends HIKSDKStructure {
         public short wYear;        //年
         public byte byMonth;        //月
         public byte byDay;        //日
     }
 
     //身份证信息
-    public static class NET_DVR_ID_CARD_INFO extends Structure {
+    public static class NET_DVR_ID_CARD_INFO extends HIKSDKStructure {
         public int dwSize;        //结构长度
         public byte[] byName = new byte[MAX_ID_NAME_LEN];   //姓名
         public NET_DVR_DATE struBirth; //出生日期
@@ -6422,7 +6427,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[101];
     }
 
-    public static class NET_DVR_ACS_EVENT_INFO_EXTEND_V20 extends Structure {
+    public static class NET_DVR_ACS_EVENT_INFO_EXTEND_V20 extends HIKSDKStructure {
         public byte byRemoteCheck; //是否需要远程核验（0-无效，1-不需要（默认），2-需要）
         public byte byThermometryUnit; //测温单位（0-摄氏度（默认），1-华氏度，2-开尔文）
         public byte byIsAbnomalTemperature; //特征抓拍测温是否温度异常：1-是，0-否
@@ -6441,7 +6446,7 @@ DVR实现巡航数据结构
     }
 
     //门禁主机报警信息结构体
-    public static class NET_DVR_ACS_ALARM_INFO extends Structure {
+    public static class NET_DVR_ACS_ALARM_INFO extends HIKSDKStructure {
         public int dwSize;
         public int dwMajor; //报警主类型，参考宏定义
         public int dwMinor; //报警次类型，参考宏定义
@@ -6465,7 +6470,7 @@ DVR实现巡航数据结构
     }
 
     //门禁主机事件信息
-    public static class NET_DVR_ACS_EVENT_INFO extends Structure {
+    public static class NET_DVR_ACS_EVENT_INFO extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[32];
         public byte byCardType;
@@ -6501,7 +6506,7 @@ DVR实现巡航数据结构
 
     public static final int NET_DEV_NAME_LEN = 64;
 
-    public static class NET_DVR_ACS_EVENT_INFO_EXTEND extends Structure {
+    public static class NET_DVR_ACS_EVENT_INFO_EXTEND extends HIKSDKStructure {
         public int dwFrontSerialNo; //事件流水号，为0无效（若该字段为0，平台根据dwSerialNo判断是否丢失事件；若该字段不为0，平台根据该字段和dwSerialNo字段共同判断是否丢失事件）（主要用于解决报警订阅后导致dwSerialNo不连续的情况）
         public byte byUserType; //人员类型：0-无效，1-普通人（主人），2-来宾（访客），3-禁止名单人，4-管理员
         public byte byCurrentVerifyMode; //读卡器当前验证方式：0-无效，1-休眠，2-刷卡+密码，3-刷卡，4-刷卡或密码，5-指纹，6-指纹+密码，7-指纹或刷卡，8-指纹+刷卡，9-指纹+刷卡+密码，10-人脸或指纹或刷卡或密码，11-人脸+指纹，12-人脸+密码，13-人脸+刷卡，14-人脸，15-工号+密码，16-指纹或密码，17-工号+指纹，18-工号+指纹+密码，19-人脸+指纹+刷卡，20-人脸+密码+指纹，21-工号+人脸，22-人脸或人脸+刷卡，23-指纹或人脸，24-刷卡或人脸或密码，25-刷卡或人脸，26-刷卡或人脸或指纹，27-刷卡或指纹或密码
@@ -6520,7 +6525,7 @@ DVR实现巡航数据结构
     /*
     门禁主机报警事件细节结构体
      */
-    public static class NET_DVR_ACS_EVENT_DETAIL extends Structure {
+    public static class NET_DVR_ACS_EVENT_DETAIL extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //卡号（mac地址），为0无效
         public byte byCardType; //卡类型，1-普通卡，3-禁止名单卡，4-巡更卡，5-胁迫卡，6-超级卡，7-来宾卡，8-解除卡，为0无效
@@ -6570,7 +6575,7 @@ DVR实现巡航数据结构
     /*
     门禁主机报警事件配置结构体
      */
-    public static class NET_DVR_ACS_EVENT_CFG extends Structure {
+    public static class NET_DVR_ACS_EVENT_CFG extends HIKSDKStructure {
         public int dwSize;
         public int dwMajor; //报警主类型，参考宏定义
         public int dwMinor; //报警次类型，参考宏定义
@@ -6594,7 +6599,7 @@ DVR实现巡航数据结构
 
     public static final int NET_SDK_MONITOR_ID_LEN = 64;
 
-    public static class NET_DVR_ACS_EVENT_COND extends Structure {
+    public static class NET_DVR_ACS_EVENT_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwMajor; //报警主类型，参考事件上传宏定义，0-全部
         public int dwMinor; //报警次类型，参考事件上传宏定义，0-全部
@@ -6616,7 +6621,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[140]; //保留
     }
 
-    public static class NET_DVR_ACS_WORK_STATUS_V50 extends Structure {
+    public static class NET_DVR_ACS_WORK_STATUS_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte[] byDoorLockStatus = new byte[MAX_DOOR_NUM_256]; //门锁状态(继电器开合状态)，0-正常关，1-正常开，2-短路报警，3-断路报警，4-异常报警
         public byte[] byDoorStatus = new byte[MAX_DOOR_NUM_256]; //门状态(楼层状态)，1-休眠，2-常开状态(自由)，3-常闭状态(禁用)，4-普通状态(受控)
@@ -6671,7 +6676,7 @@ DVR实现巡航数据结构
     public static final int ACS_PARAM_EXAMINEE_INFO = 0x00200000; //考生信息参数
     public static final int ACS_PARAM_FAILED_FACE_INFO = 0x00400000; //升级设备人脸建模失败记录
 
-    public static class NET_DVR_ACS_PARAM_TYPE extends Structure {
+    public static class NET_DVR_ACS_PARAM_TYPE extends HIKSDKStructure {
         public int dwSize;
         public int dwParamType; //参数类型，按位表示
 
@@ -6680,7 +6685,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_FACE_PARAM_COND extends Structure {
+    public static class NET_DVR_FACE_PARAM_COND extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];    //人脸关联的卡号
         public byte[] byEnableCardReader = new byte[MAX_CARD_READER_NUM_512];  //人脸的读卡器是否有效，0-无效，1-有效
@@ -6689,7 +6694,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[127];   //保留
     }
 
-    public static class NET_DVR_FACE_PARAM_CFG extends Structure {
+    public static class NET_DVR_FACE_PARAM_CFG extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN];    //人脸关联的卡号
         public int dwFaceLen;    //人脸数据长度<DES加密处理>，设备端返回的即加密后的数据
@@ -6700,7 +6705,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[126];
     }
 
-    public static class NET_DVR_FACE_PARAM_STATUS extends Structure {
+    public static class NET_DVR_FACE_PARAM_STATUS extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //人脸关联的卡号
         public byte[] byCardReaderRecvStatus = new byte[MAX_CARD_READER_NUM_512];  //人脸读卡器状态，按字节表示，0-失败，1-成功，2-重试或人脸质量差，3-内存已满，4-已存在该人脸，5-非法人脸ID
@@ -6711,14 +6716,14 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[130];
     }
 
-    public static class NET_DVR_FACE_PARAM_BYCARD extends Structure {
+    public static class NET_DVR_FACE_PARAM_BYCARD extends HIKSDKStructure {
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //人脸关联的卡号
         public byte[] byEnableCardReader = new byte[MAX_CARD_READER_NUM_512];  //人脸的读卡器信息，按数组表示
         public byte[] byFaceID = new byte[MAX_FACE_NUM];        //需要删除的人脸编号，按数组下标，值表示0-不删除，1-删除该人脸
         public byte[] byRes1 = new byte[42];          //保留
     }
 
-    public static class NET_DVR_FACE_PARAM_BYREADER extends Structure {
+    public static class NET_DVR_FACE_PARAM_BYREADER extends HIKSDKStructure {
         public int dwCardReaderNo;  //按值表示，人脸读卡器编号
         public byte byClearAllCard;  //是否删除所有卡的人脸信息，0-按卡号删除人脸信息，1-删除所有卡的人脸信息
         public byte[] byRes1 = new byte[3];       //保留
@@ -6732,14 +6737,14 @@ DVR实现巡航数据结构
         public NET_DVR_FACE_PARAM_BYREADER struByReader;   //按读卡器的方式删除
     }
 
-    public static class NET_DVR_CHECK_FACE_PICTURE_COND extends Structure {
+    public static class NET_DVR_CHECK_FACE_PICTURE_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwPictureNum; //图片数量
         public byte byCheckTemplate; //0-校验图片是否合法（默认），1-校验图片和建模数据是否匹配
         public byte[] byRes = new byte[127];
     }
 
-    public static class NET_DVR_CHECK_FACE_PICTURE_CFG extends Structure {
+    public static class NET_DVR_CHECK_FACE_PICTURE_CFG extends HIKSDKStructure {
         public int dwSize;
         public int dwPictureNo; //图片编号
         public int dwPictureLen; //图片长度（图片大小不超过200k）
@@ -6749,7 +6754,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[248];
     }
 
-    public static class NET_DVR_CHECK_FACE_PICTURE_STATUS extends Structure {
+    public static class NET_DVR_CHECK_FACE_PICTURE_STATUS extends HIKSDKStructure {
         public int dwSize;
         public int dwPictureNo; //图片编号
         public byte byCheckStatus; //校验结果：0-无效，1-建模成功，2-建模失败，3-人脸模块通讯异常，4-图像无人脸，5-人脸朝上，6-人脸朝下，7-人脸偏左，8-人脸偏右，9-人脸顺时旋转，
@@ -6757,7 +6762,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[127];
     }
 
-    public static class NET_DVR_FINGER_PRINT_CFG_V50 extends Structure {
+    public static class NET_DVR_FINGER_PRINT_CFG_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //指纹关联的卡号
         public int dwFingerPrintLen;    //指纹数据长度
@@ -6771,7 +6776,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[128];
     }
 
-    public static class NET_DVR_FINGER_PRINT_STATUS_V50 extends Structure {
+    public static class NET_DVR_FINGER_PRINT_STATUS_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //指纹关联的卡号
         public byte[] byCardReaderRecvStatus = new byte[MAX_CARD_READER_NUM_512];  //指纹读卡器状态，按字节表示，0-失败，1-成功，2-该指纹模组不在线，3-重试或指纹质量差，4-内存已满，5-已存在该指纹，6-已存在该指纹ID，7-非法指纹ID，8-该指纹模组无需配置，10-指纹读卡器版本过低（无法支持工号）
@@ -6786,7 +6791,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[128];
     }
 
-    public static class NET_DVR_FINGER_PRINT_INFO_COND_V50 extends Structure {
+    public static class NET_DVR_FINGER_PRINT_INFO_COND_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //指纹关联的卡号（该字段获取时有效，设置时无效）
         public byte[] byEnableCardReader = new byte[MAX_CARD_READER_NUM_512];  //指纹的读卡器是否有效，0-无效，1-有效
@@ -6798,7 +6803,7 @@ DVR实现巡航数据结构
         public byte[] byRes1 = new byte[128];          //保留
     }
 
-    public static class NET_DVR_GROUP_CFG extends Structure {
+    public static class NET_DVR_GROUP_CFG extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable; //是否启用，0-不启用，1-启用
         public byte[] byRes1 = new byte[3];
@@ -6807,7 +6812,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[32];
     }
 
-    public static class NET_DVR_MULTI_CARD_CFG_V50 extends Structure {
+    public static class NET_DVR_MULTI_CARD_CFG_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable;
         public byte bySwipeIntervalTimeout;
@@ -6816,7 +6821,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[32];
     }
 
-    public static class NET_DVR_MULTI_CARD_GROUP_CFG_V50 extends Structure {
+    public static class NET_DVR_MULTI_CARD_GROUP_CFG_V50 extends HIKSDKStructure {
         public byte byEnable;
         public byte byEnableOfflineVerifyMode;
         public byte[] byRes1 = new byte[2];
@@ -6824,7 +6829,7 @@ DVR实现巡航数据结构
         public NET_DVR_GROUP_COMBINATION_INFO_V50[] struGroupCombination = (NET_DVR_GROUP_COMBINATION_INFO_V50[]) new NET_DVR_GROUP_COMBINATION_INFO_V50().toArray(8);
     }
 
-    public static class NET_DVR_GROUP_COMBINATION_INFO_V50 extends Structure {
+    public static class NET_DVR_GROUP_COMBINATION_INFO_V50 extends HIKSDKStructure {
         public byte byEnable;
         public byte byMemberNum;
         public byte bySequenceNo;
@@ -6834,11 +6839,11 @@ DVR实现巡航数据结构
 
 
     //自定义结构体，用于二维数组转换
-    public static class NET_DVR_SINGLE_PLAN_SEGMENT_WEEK extends Structure {
+    public static class NET_DVR_SINGLE_PLAN_SEGMENT_WEEK extends HIKSDKStructure {
         public NET_DVR_SINGLE_PLAN_SEGMENT[] struPlanCfgDay = new NET_DVR_SINGLE_PLAN_SEGMENT[MAX_TIMESEGMENT_V30]; //一天的计划参数
     }
 
-    public static class NET_DVR_WEEK_PLAN_CFG extends Structure {
+    public static class NET_DVR_WEEK_PLAN_CFG extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable;  //是否使能，1-使能，0-不使能
         public byte[] byRes1 = new byte[3];
@@ -6846,7 +6851,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[16];
     }
 
-    public static class NET_DVR_SINGLE_PLAN_SEGMENT extends Structure {
+    public static class NET_DVR_SINGLE_PLAN_SEGMENT extends HIKSDKStructure {
         public byte byEnable; //是否使能，1-使能，0-不使能
         public byte byDoorStatus; //门状态模式（梯控模式），0-无效，1-常开状态（自由），2-常闭状态（禁用），3-普通状态（门状态计划使用）
         public byte byVerifyMode; //验证方式，0-无效，1-刷卡，2-刷卡+密码(读卡器验证方式计划使用)，3-刷卡,4-刷卡或密码(读卡器验证方式计划使用), 5-指纹，6-指纹+密码，7-指纹或刷卡，8-指纹+刷卡，9-指纹+刷卡+密码（无先后顺序），10-人脸或指纹或刷卡或密码，11-人脸+指纹，12-人脸+密码，
@@ -6856,19 +6861,19 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_TIME_SEGMENT extends Structure {
+    public static class NET_DVR_TIME_SEGMENT extends HIKSDKStructure {
         public NET_DVR_SIMPLE_DAYTIME struBeginTime; //开始时间点
         public NET_DVR_SIMPLE_DAYTIME struEndTime;   //结束时间点
     }
 
-    public static class NET_DVR_SIMPLE_DAYTIME extends Structure {
+    public static class NET_DVR_SIMPLE_DAYTIME extends HIKSDKStructure {
         public byte byHour; //时
         public byte byMinute; //分
         public byte bySecond; //秒
         public byte byRes;
     }
 
-    public static class NET_DVR_WEEK_PLAN_COND extends Structure {
+    public static class NET_DVR_WEEK_PLAN_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwWeekPlanNumber; //周计划编号
         public short wLocalControllerID; //就地控制器序号[1,64]
@@ -6878,7 +6883,7 @@ DVR实现巡航数据结构
     public static final int TEMPLATE_NAME_LEN = 32;      //计划模板名称长度
     public static final int MAX_HOLIDAY_GROUP_NUM = 16;  //计划模板最大假日组数
 
-    public static class NET_DVR_PLAN_TEMPLATE extends Structure {
+    public static class NET_DVR_PLAN_TEMPLATE extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable; //是否启用，1-启用，0-不启用
         public byte[] byRes1 = new byte[3];
@@ -6888,19 +6893,19 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[32];
     }
 
-    public static class NET_DVR_PLAN_TEMPLATE_COND extends Structure {
+    public static class NET_DVR_PLAN_TEMPLATE_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwPlanTemplateNumber; //计划模板编号，从1开始，最大值从门禁能力集获取
         public short wLocalControllerID; //就地控制器序号[1,64]，0无效
         public byte[] byRes = new byte[106];
     }
 
-    public static class NET_DVR_CAPTURE_FACE_COND extends Structure {
+    public static class NET_DVR_CAPTURE_FACE_COND extends HIKSDKStructure {
         public int dwSize;
         public byte[] byRes = new byte[128];
     }
 
-    public static class NET_DVR_FACE_FEATURE extends Structure {
+    public static class NET_DVR_FACE_FEATURE extends HIKSDKStructure {
         public NET_VCA_RECT struFace; //人脸子图区域
         public NET_VCA_POINT struLeftEye;    // 左眼坐标
         public NET_VCA_POINT struRightEye;   // 右眼坐标
@@ -6909,7 +6914,7 @@ DVR实现巡航数据结构
         public NET_VCA_POINT struNoseTip;   // 鼻子坐标
     }
 
-    public static class NET_DVR_CAPTURE_FACE_CFG extends Structure {
+    public static class NET_DVR_CAPTURE_FACE_CFG extends HIKSDKStructure {
         public int dwSize;
         public int dwFaceTemplate1Size;  //人脸模板1数据大小，等于0时，代表无人脸模板1数据
         public Pointer pFaceTemplate1Buffer; //人脸模板1数据缓存（不大于2.5k）
@@ -6929,7 +6934,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[56];
     }
 
-    public static class NET_DVR_XML_CONFIG_INPUT extends Structure {
+    public static class NET_DVR_XML_CONFIG_INPUT extends HIKSDKStructure {
         public int dwSize;
         public Pointer lpRequestUrl;
         public int dwRequestUrlLen;
@@ -6939,7 +6944,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_STRING_POINTER extends Structure {
+    public static class NET_DVR_STRING_POINTER extends HIKSDKStructure {
         public byte[] byString;
 
         public NET_DVR_STRING_POINTER(int iLen) {
@@ -6947,7 +6952,7 @@ DVR实现巡航数据结构
         }
     }
 
-    public static class NET_DVR_XML_CONFIG_OUTPUT extends Structure {
+    public static class NET_DVR_XML_CONFIG_OUTPUT extends HIKSDKStructure {
         public int dwSize;
         public Pointer lpOutBuffer;
         public int dwOutBufferSize;
@@ -6958,7 +6963,7 @@ DVR实现巡航数据结构
     }
 
     //报警场景信息
-    public static class NET_DVR_SCENE_INFO extends Structure {
+    public static class NET_DVR_SCENE_INFO extends HIKSDKStructure {
         public int dwSceneID;              //场景ID, 0 - 表示该场景无效
         public byte[] bySceneName = new byte[NAME_LEN];  //场景名称
         public byte byDirection;            //监测方向 1-上行，2-下行，3-双向，4-由东向西，5-由南向北，6-由西向东，7-由北向南，8-其它
@@ -6968,13 +6973,13 @@ DVR实现巡航数据结构
     }
 
     // 方向结构体
-    public static class NET_DVR_DIRECTION extends Structure {
+    public static class NET_DVR_DIRECTION extends HIKSDKStructure {
         public NET_VCA_POINT struStartPoint = new NET_VCA_POINT();   // 方向起始点
         public NET_VCA_POINT struEndPoint = new NET_VCA_POINT();     // 方向结束点
     }
 
     // 交通事件信息
-    public static class NET_DVR_AID_INFO extends Structure {
+    public static class NET_DVR_AID_INFO extends HIKSDKStructure {
         public byte byRuleID;   // 规则序号，为规则配置结构下标，0-16
         public byte[] byRes1 = new byte[3];
         public byte[] byRuleName = new byte[NAME_LEN]; //  规则名称
@@ -6994,7 +6999,7 @@ DVR实现巡航数据结构
     public int DEVICE_ID_LEN = 48;
 
     //交通取证报警
-    public static class NET_DVR_TFS_ALARM extends Structure {
+    public static class NET_DVR_TFS_ALARM extends HIKSDKStructure {
         public int dwSize;                //结构体大小
         public int dwRelativeTime;        //相对时标
         public int dwAbsTime;               //绝对时标
@@ -7039,7 +7044,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[30]; //保留
     }
 
-    public static class NET_ITS_OVERLAPCFG_COND extends Structure {
+    public static class NET_ITS_OVERLAPCFG_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;
         public int dwConfigMode; //配置模式，0-终端，1-前端(直连前端或终端接前端)
@@ -7054,7 +7059,7 @@ DVR实现巡航数据结构
     }
 
     //字符叠加每一条信息结构体
-    public static class NET_ITS_OVERLAP_SINGLE_ITEM_PARAM_V50 extends Structure {
+    public static class NET_ITS_OVERLAP_SINGLE_ITEM_PARAM_V50 extends HIKSDKStructure {
         public byte[] byRes1 = new byte[2];                   // 保留
         public byte byItemType;       //类型，详见OVERLAP_ITEM_TYPE
         public byte byChangeLineNum; //叠加项后的换行数[0-10](默认0)
@@ -7071,7 +7076,7 @@ DVR实现巡航数据结构
 
     public int MAX_OVERLAP_ITEM_NUM = 50; //最大字符叠加种数
 
-    public static class NET_ITS_OVERLAP_ITEM_PARAM_V50 extends Structure {
+    public static class NET_ITS_OVERLAP_ITEM_PARAM_V50 extends HIKSDKStructure {
         public NET_ITS_OVERLAP_SINGLE_ITEM_PARAM_V50[] struSingleItem = new NET_ITS_OVERLAP_SINGLE_ITEM_PARAM_V50[MAX_OVERLAP_ITEM_NUM]; //单条字符参数
         public int dwLinePercent;  //叠加行百分比(0-100),(默认100)
         public int dwItemsStlye;   //叠加方式：0-横排,1-竖排(默认横排)
@@ -7098,7 +7103,7 @@ DVR实现巡航数据结构
     }
 
     //叠加项具体信息
-    public static class NET_ITS_OVERLAP_INFO_PARAM extends Structure {
+    public static class NET_ITS_OVERLAP_INFO_PARAM extends HIKSDKStructure {
         public byte[] bySite = new byte[128];           //地点描述
         public byte[] byRoadNum = new byte[32];  //路口编号
         public byte[] byInstrumentNum = new byte[32];                //设备编号
@@ -7111,7 +7116,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[64];        //保留
     }
 
-    public static class NET_ITS_OVERLAP_CFG_V50 extends Structure {
+    public static class NET_ITS_OVERLAP_CFG_V50 extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable; //是否启用，0-不启用，1-启用
         public byte[] byRes1 = new byte[3];
@@ -7122,8 +7127,8 @@ DVR实现巡航数据结构
     }
 
     //人体特征识别结果结构体
-    public static class NET_VCA_HUMAN_FEATURE extends Structure {
-        public byte byRes3;
+    public static class NET_VCA_HUMAN_FEATURE extends HIKSDKStructure {
+        public byte byRes3;    
         public byte bySex;         //性别, 0-表示“未知”（算法不支持）,1 – 男 , 2 – 女, 0xff-算法支持，但是没有识别出来
         public byte byEyeGlass;    //是否戴眼镜 0-表示“未知”（算法不支持）,1 – 不戴, 2 – 戴,0xff-算法支持，但是没有识别出来
         //抓拍图片人脸年龄的使用方式，如byAge为15,byAgeDeviation为1,表示，实际人脸图片年龄的为14-16之间
@@ -7140,7 +7145,7 @@ DVR实现巡航数据结构
     }
 
     //特征抓拍附加信息结构体
-    public static class NET_VCA_FACESNAP_ADDINFO extends Structure {
+    public static class NET_VCA_FACESNAP_ADDINFO extends HIKSDKStructure {
         //人脸矩形框,该坐标为人脸小图(头肩照)中人脸的坐标
         public NET_VCA_RECT struFacePicRect = new NET_VCA_RECT();
         public int iSwingAngle;//旋转角, -90~90度
@@ -7158,7 +7163,7 @@ DVR实现巡航数据结构
     }
 
     //特征抓拍结果
-    public static class NET_VCA_FACESNAP_RESULT extends Structure {
+    public static class NET_VCA_FACESNAP_RESULT extends HIKSDKStructure {
         public int dwSize;             // 结构大小
         public int dwRelativeTime;     // 相对时标
         public int dwAbsTime;            // 绝对时标
@@ -7195,7 +7200,7 @@ DVR实现巡航数据结构
     }
 
     //特征抓拍信息
-    public static class NET_VCA_FACESNAP_INFO_ALARM extends Structure {
+    public static class NET_VCA_FACESNAP_INFO_ALARM extends HIKSDKStructure {
         public int dwRelativeTime;     // 相对时标
         public int dwAbsTime;            // 绝对时标
         public int dwSnapFacePicID;       //抓拍人脸图ID
@@ -7217,7 +7222,7 @@ DVR实现巡航数据结构
     }
 
     //籍贯参数
-    public static class NET_DVR_AREAINFOCFG extends Structure {
+    public static class NET_DVR_AREAINFOCFG extends HIKSDKStructure {
         public short wNationalityID; //国籍
         public short wProvinceID; //省
         public short wCityID; //市
@@ -7228,7 +7233,7 @@ DVR实现巡航数据结构
     //人员信息
     public int MAX_HUMAN_BIRTHDATE_LEN = 10;
 
-    public static class NET_VCA_HUMAN_ATTRIBUTE extends Structure {
+    public static class NET_VCA_HUMAN_ATTRIBUTE extends HIKSDKStructure {
         public byte bySex; //性别：0-男，1-女
         public byte byCertificateType; //证件类型：0-身份证，1-警官证
         public byte[] byBirthDate = new byte[MAX_HUMAN_BIRTHDATE_LEN]; //出生年月，如：201106
@@ -7243,7 +7248,7 @@ DVR实现巡航数据结构
 
 
     //禁止名单报警信息
-    public static class NET_VCA_BLOCKLIST_INFO_ALARM extends Structure {
+    public static class NET_VCA_BLOCKLIST_INFO_ALARM extends HIKSDKStructure {
         public NET_VCA_BLOCKLIST_INFO struBlockListInfo = new NET_VCA_BLOCKLIST_INFO(); //禁止名单基本信息
         public int dwBlockListPicLen;       //禁止名单人脸子图的长度，为0表示没有图片，大于0表示有图片
         public int dwFDIDLen;// 人脸库ID长度
@@ -7256,7 +7261,7 @@ DVR实现巡航数据结构
     }
 
     //禁止名单信息
-    public static class NET_VCA_BLOCKLIST_INFO extends Structure {
+    public static class NET_VCA_BLOCKLIST_INFO extends HIKSDKStructure {
         public int dwSize;   //结构大小
         public int dwRegisterID;  //名单注册ID号（只读）
         public int dwGroupNo; //分组号
@@ -7274,7 +7279,7 @@ DVR实现巡航数据结构
 
 
     //禁止名单比对结果报警上传
-    public static class NET_VCA_FACESNAP_MATCH_ALARM extends Structure {
+    public static class NET_VCA_FACESNAP_MATCH_ALARM extends HIKSDKStructure {
         public int dwSize;             // 结构大小
         public float fSimilarity; //相似度，[0.001,1]
         public NET_VCA_FACESNAP_INFO_ALARM struSnapInfo = new NET_VCA_FACESNAP_INFO_ALARM(); //抓拍信息
@@ -7291,7 +7296,7 @@ DVR实现巡航数据结构
         public byte byModelingStatus;// 建模状态
         public byte byLivenessDetectionStatus;//活体检测状态：0-保留，1-未知（检测失败），2-非真人人脸，3-真人人脸，4-未开启活体检测
         public byte cTimeDifferenceH;         /*与UTC的时差（小时），-12 ... +14， +表示东区,0xff无效*/
-        public byte cTimeDifferenceM;        /*与UTC的时差（分钟），-30, 30, 45， +表示东区，0xff无效*/
+        public byte cTimeDifferenceM;      	/*与UTC的时差（分钟），-30, 30, 45， +表示东区，0xff无效*/
         public byte byMask;                //抓拍图是否戴口罩，0-保留，1-未知，2-不戴口罩，3-戴口罩
         public byte bySmile;               //抓拍图是否微笑，0-保留，1-未知，2-不微笑，3-微笑
         public byte byContrastStatus;      //比对结果，0-保留，1-比对成功，2-比对失败
@@ -7299,7 +7304,7 @@ DVR实现巡航数据结构
     }
 
     //交通事件报警(扩展)
-    public static class NET_DVR_AID_ALARM_V41 extends Structure {
+    public static class NET_DVR_AID_ALARM_V41 extends HIKSDKStructure {
         public int dwSize;              //结构长度
         public int dwRelativeTime;        //相对时标
         public int dwAbsTime;            //绝对时标
@@ -7328,7 +7333,7 @@ DVR实现巡航数据结构
 
 
     //交通统计信息报警(扩展)
-    public static class NET_DVR_TPS_ALARM_V41 extends Structure {
+    public static class NET_DVR_TPS_ALARM_V41 extends HIKSDKStructure {
         public int dwSize;          // 结构体大小
         public int dwRelativeTime;  // 相对时标
         public int dwAbsTime;       // 绝对时标
@@ -7342,7 +7347,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[24];      // 保留
     }
 
-    public static class NET_DVR_LANE_PARAM_V41 extends Structure {
+    public static class NET_DVR_LANE_PARAM_V41 extends HIKSDKStructure {
         public byte[] byRuleName = new byte[NAME_LEN]; // 车道规则名称
         public byte byRuleID;             // 规则序号，为规则配置结构下标，0-7
         public byte byLaneType;             // 车道上行或下行
@@ -7367,7 +7372,7 @@ DVR实现巡航数据结构
 
     public int MAX_TPS_RULE = 8;     // 最大参数规则数目
 
-    public static class NET_DVR_TPS_INFO_V41 extends Structure {
+    public static class NET_DVR_TPS_INFO_V41 extends HIKSDKStructure {
         public int dwLanNum;          // 交通参数的车道数目
         public NET_DVR_LANE_PARAM_V41[] struLaneParam = new NET_DVR_LANE_PARAM_V41[MAX_TPS_RULE];
         public int dwSceneID;//场景ID
@@ -7375,14 +7380,14 @@ DVR实现巡航数据结构
     }
 
     // 车道队列结构体
-    public static class NET_DVR_LANE_QUEUE extends Structure {
+    public static class NET_DVR_LANE_QUEUE extends HIKSDKStructure {
         public NET_VCA_POINT struHead;       //队列头
         public NET_VCA_POINT struTail;       //队列尾
         public int dwLength;      //实际队列长度 单位为米 [0-500]
     }
 
     //TPS统计过车数据上传
-    public static class NET_DVR_TPS_STATISTICS_INFO extends Structure {
+    public static class NET_DVR_TPS_STATISTICS_INFO extends HIKSDKStructure {
         public int dwSize;          // 结构体大小
         public int dwChan;//通道号
         public NET_DVR_TPS_STATISTICS_PARAM struTPSStatisticsInfo;// 交通参数统计信息
@@ -7391,7 +7396,7 @@ DVR实现巡航数据结构
 
 
     // 交通参数统计信息
-    public static class NET_DVR_TPS_STATISTICS_PARAM extends Structure {
+    public static class NET_DVR_TPS_STATISTICS_PARAM extends HIKSDKStructure {
         public byte byStart;          // 开始码
         public byte byCMD;         // 命令号， 08-定时成组数据指令
         public byte[] byRes = new byte[2];        // 预留字节
@@ -7405,7 +7410,7 @@ DVR实现巡航数据结构
     }
 
     //统计信息
-    public static class NET_DVR_TPS_LANE_PARAM extends Structure {
+    public static class NET_DVR_TPS_LANE_PARAM extends HIKSDKStructure {
         public byte byLane;             // 对应车道号
         public byte bySpeed;             // 车道过车平均速度
         public byte[] byRes = new byte[2];             // 保留
@@ -7420,7 +7425,7 @@ DVR实现巡航数据结构
     }
 
     //TPS实时过车数据上传
-    public static class NET_DVR_TPS_REAL_TIME_INFO extends Structure {
+    public static class NET_DVR_TPS_REAL_TIME_INFO extends HIKSDKStructure {
         public int dwSize;          // 结构体大小
         public int dwChan;//通道号
         public NET_DVR_TIME_V30 struTime;    //检测时间
@@ -7434,7 +7439,7 @@ DVR实现巡航数据结构
     }
 
     //实时信息
-    public static class NET_DVR_TPS_PARAM extends Structure {
+    public static class NET_DVR_TPS_PARAM extends HIKSDKStructure {
         public byte byStart;          // 开始码
         public byte byCMD;         // 命令号，01-进入指令，02-离开指令，03-拥堵状态指令(为03时，只有byLaneState和byQueueLen有效)，04-多线圈状态（为04时，wLoopState和wStateMask有效，表示byLane车道上多个线圈的过车状态）
         public short wSpaceHeadway;        //车头间距，以米来计算
@@ -7457,7 +7462,7 @@ DVR实现巡航数据结构
         public short wTimeHeadway;        // 车头时距，以秒计算
     }
 
-    public static class NET_DVR_TIME_SEARCH_COND extends Structure {
+    public static class NET_DVR_TIME_SEARCH_COND extends HIKSDKStructure {
         public short wYear; //年
         public byte byMonth; //月
         public byte byDay; //日
@@ -7471,7 +7476,7 @@ DVR实现巡航数据结构
     }
 
     //事件搜索条件
-    public static class NET_DVR_SEARCH_EVENT_PARAM extends Structure {
+    public static class NET_DVR_SEARCH_EVENT_PARAM extends HIKSDKStructure {
         public short wMajorType;        //0-移动侦测，1-报警输入, 2-智能事件 5-pos录像 7-门禁事件, 8-非视频联动事件
         public short wMinorType;       //搜索次类型- 根据主类型变化，0xffff表示全部
         public NET_DVR_TIME struStartTime = new NET_DVR_TIME();    //搜索的开始时间，停止时间: 同时为(0, 0) 表示从最早的时间开始，到最后，最前面的4000个事件
@@ -7488,7 +7493,7 @@ DVR实现巡航数据结构
     }
 
     //审讯事件搜索条件
-    public static class EVENT_INQUESTPARAM extends Structure {
+    public static class EVENT_INQUESTPARAM extends HIKSDKStructure {
         public byte byRoomIndex;    //审讯室编号,按值表示，从1开始
         public byte[] byRes1 = new byte[3];
         public byte[] sInquestInfo = new byte[INQUEST_CASE_LEN];
@@ -7496,7 +7501,7 @@ DVR实现巡航数据结构
     }
 
     //事件搜索条件
-    public static class NET_DVR_SEARCH_EVENT_PARAM_V50 extends Structure {
+    public static class NET_DVR_SEARCH_EVENT_PARAM_V50 extends HIKSDKStructure {
         public short wMajorType;            //0-移动侦测，1-报警输入, 2-智能事件 5-pos录像 7-门禁事件, 8-非视频联动事件
         public short wMinorType;            //搜索次类型- 根据主类型变化，0xffff表示全部
         public NET_DVR_TIME_SEARCH_COND struStartTime = new NET_DVR_TIME_SEARCH_COND();    //搜索的开始时间，停止时间: 同时为(0, 0) 表示从最早的时间开始，到最后，最前面的4000个事件
@@ -7521,21 +7526,21 @@ DVR实现巡航数据结构
         public EVENT_IOTPARAM_V50 struIOTAlarm = new EVENT_IOTPARAM_V50();
     }
 
-    public static class EVENT_ALARMPARAM_V50 extends Structure {
+    public static class EVENT_ALARMPARAM_V50 extends HIKSDKStructure {
         /*报警输入号，按值表示,采用紧凑型排列，0xffff表示后续无效*/
         public short[] wAlarmInNo = new short[128];
         public byte[] byRes = new byte[544]; //保留
     }
 
     //移动侦测
-    public static class EVENT_MOTIONPARAM_V50 extends Structure {
+    public static class EVENT_MOTIONPARAM_V50 extends HIKSDKStructure {
         /* 移动侦测通道，按值表示 ,采用紧凑型排列，0xffff表示后续无效*/
         public short[] wMotDetChanNo = new short[MAX_CHANNUM_V30];
         public byte[] byRes = new byte[672];                /*保留*/
     }
 
     //异常行为检测
-    public static class EVENT_VCAPARAM_V50 extends Structure {
+    public static class EVENT_VCAPARAM_V50 extends HIKSDKStructure {
         //异常行为检测对应的通道，按值表示,采用紧凑型排列，0xffff表示后续无效
         public short[] wChanNo = new short[MAX_CHANNUM_V30];
         public byte byRuleID;      //异常行为检测类型，规则0xff表示全部，从0开始
@@ -7547,13 +7552,13 @@ DVR实现巡航数据结构
     }
 
     //审讯事件搜索条件
-    public static class EVENT_INQUESTPARAM_V50 extends Structure {
+    public static class EVENT_INQUESTPARAM_V50 extends HIKSDKStructure {
         public byte byRoomIndex;    //审讯室编号,从1开始
         public byte[] byRes = new byte[799];     //保留
     }
 
     //智能侦测查找条件 ，通道号按值表示
-    public static class EVENT_VCADETECTPARAM_V50 extends Structure {
+    public static class EVENT_VCADETECTPARAM_V50 extends HIKSDKStructure {
         public byte byAll;  //查找全部通道，0-否，此时dwChanNo参数有效，
         //1-查找全部通道，此时dwChanNo参数无效。
         public byte[] byRes1 = new byte[3];
@@ -7561,7 +7566,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[668];
     }
 
-    public static class EVENT_STREAMIDPARAM_V50 extends Structure {
+    public static class EVENT_STREAMIDPARAM_V50 extends HIKSDKStructure {
         public NET_DVR_STREAM_INFO struIDInfo = new NET_DVR_STREAM_INFO(); // 流id信息，72字节长
         public int dwCmdType;  // 外部触发类型，NVR接入云存储使用
         public byte byBackupVolumeNum; //存档卷号，CVR使用
@@ -7571,7 +7576,7 @@ DVR实现巡航数据结构
     }
 
     //pos录像
-    public static class EVENT_POSPARAM_V50 extends Structure {
+    public static class EVENT_POSPARAM_V50 extends HIKSDKStructure {
         public short[] wChannel = new short[MAX_CHANNUM_V30];        //通道，按值表示,紧凑型排列，遇到0xffff时表示数组后续值无效
         public byte byAllChan;        //是否查找全部通道，0-否，此时wChannel有效，1-全部通道，此时wChannel无效
         public byte byCaseSensitive;      //0-不区分大小写， 1-区分大小写
@@ -7582,7 +7587,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[284];          //保留
     }
 
-    public static class EVENT_TRIALPARAM_V50 extends Structure {
+    public static class EVENT_TRIALPARAM_V50 extends HIKSDKStructure {
         public byte[] byCaseNo = new byte[SEARCH_CASE_NO_LEN];
         public byte[] byCaseName = new byte[SEARCH_CASE_NAME_LEN];
         public byte[] byLitigant1 = new byte[SEARCH_LITIGANT_LEN];
@@ -7593,7 +7598,7 @@ DVR实现巡航数据结构
     }
 
     //门禁事件搜索条件
-    public static class EVENT_ACSPARAM_V50 extends Structure {
+    public static class EVENT_ACSPARAM_V50 extends HIKSDKStructure {
         public int dwMajor; //报警主类型（与事件上传主类型一致，0代表全部）
         public int dwMinor; //报警次类型（与事件上传主类型一致，0代表全部）
         public byte[] byCardNo = new byte[ACS_CARD_NO_LEN]; //卡号
@@ -7603,7 +7608,7 @@ DVR实现巡航数据结构
     }
 
     //非视频联动事件搜索条件
-    public static class EVENT_IOTPARAM_V50 extends Structure {
+    public static class EVENT_IOTPARAM_V50 extends HIKSDKStructure {
         public short wDeviceType;            //设备类型,0-海康门禁主机，1-海康可视对讲设备, 2-海康报警主机（预留） 3-GJD报警主机 4-Luminite报警主机, 5-OPTEX报警主机,6-cameraDetector模拟相机传感器设备
         public short wEventType;            //搜索次类型- 根据主类型变化，0xffff表示全部
         public short[] wChannel = new short[MAX_CHANNUM_V30/*64*/];        //通道号，按值表示,紧凑型排列，遇到0xffff时表示数组后续值无效
@@ -7617,7 +7622,7 @@ DVR实现巡航数据结构
     }
 
     //查找返回结果
-    public static class NET_DVR_SEARCH_EVENT_RET extends Structure {
+    public static class NET_DVR_SEARCH_EVENT_RET extends HIKSDKStructure {
         public short wMajorType;            //主类型
         public short wMinorType;            //次类型
         public NET_DVR_TIME struStartTime = new NET_DVR_TIME();    //事件开始的时间
@@ -7635,14 +7640,14 @@ DVR实现巡航数据结构
     }
 
     //报警输入结果
-    public static class EVENT_ALARMSTRET extends Structure {
+    public static class EVENT_ALARMSTRET extends HIKSDKStructure {
 
         public int dwAlarmInNo;     //报警输入号
         public byte[] byRes = new byte[SEARCH_EVENT_INFO_LEN];
     }
 
     //审讯事件
-    public static class EVENT_INQUESTRET extends Structure {
+    public static class EVENT_INQUESTRET extends HIKSDKStructure {
         public byte byRoomIndex;     //审讯室编号,从1开始
         public byte byDriveIndex;    //刻录机编号,从1开始
         public byte[] byRes1 = new byte[6];       //保留
@@ -7659,7 +7664,7 @@ DVR实现巡航数据结构
     }
 
     //查找返回结果
-    public static class NET_DVR_SEARCH_EVENT_RET_V50 extends Structure {
+    public static class NET_DVR_SEARCH_EVENT_RET_V50 extends HIKSDKStructure {
         public short wMajorType;            //主类型
         public short wMinorType;            //次类型
         public NET_DVR_TIME_SEARCH struStartTime = new NET_DVR_TIME_SEARCH();    //事件开始的时间
@@ -7683,19 +7688,19 @@ DVR实现巡航数据结构
     }
 
     //报警输入结果
-    public static class EVENT_ALARMRET_V50 extends Structure {
+    public static class EVENT_ALARMRET_V50 extends HIKSDKStructure {
         public int dwAlarmInNo;     //报警输入号
         public byte[] byRes = new byte[796];
     }
 
     //移动侦测结果
-    public static class EVENT_MOTIONRET_V50 extends Structure {
+    public static class EVENT_MOTIONRET_V50 extends HIKSDKStructure {
         public int dwMotDetNo;    //移动侦测通道
         public byte[] byRes = new byte[796];
     }
 
     //异常行为检测结果
-    public static class EVENT_VCARET_V50 extends Structure {
+    public static class EVENT_VCARET_V50 extends HIKSDKStructure {
         public int dwChanNo;                    //触发事件的通道号
         public byte byRuleID;                    //规则ID
         public byte[] byRes1 = new byte[3];                    //保留
@@ -7705,7 +7710,7 @@ DVR实现巡航数据结构
     }
 
     //审讯事件
-    public static class EVENT_INQUESTRET_V50 extends Structure {
+    public static class EVENT_INQUESTRET_V50 extends HIKSDKStructure {
         public byte byRoomIndex;     //审讯室编号,从1开始
         public byte byDriveIndex;    //刻录机编号,从1开始
         public byte[] byRes1 = new byte[6];       //保留
@@ -7716,7 +7721,7 @@ DVR实现巡航数据结构
     }
 
     //流id录像查询结果
-    public static class EVENT_STREAMIDRET_V50 extends Structure {
+    public static class EVENT_STREAMIDRET_V50 extends HIKSDKStructure {
         public int dwRecordType;    //录像类型 0-定时录像 1-移动侦测 2-报警录像 3-报警|移动侦测 4-报警&移动侦测 5-命令触发 6-手动录像 7-震动报警 8-环境触发 9-智能报警 10-回传录像
         public int dwRecordLength;    //录像大小
         public byte byLockFlag;    // 锁定标志 0：没锁定 1：锁定
@@ -7731,12 +7736,12 @@ DVR实现巡航数据结构
     }
 
     //POS录像查询结果
-    public static class EVENT_POSRET_V50 extends Structure {
+    public static class EVENT_POSRET_V50 extends HIKSDKStructure {
         public int dwChanNo;        //触发产生pos事件的通道
         public byte[] byRes = new byte[796];
     }
 
-    public static class EVENT_TRIALRET_V50 extends Structure {
+    public static class EVENT_TRIALRET_V50 extends HIKSDKStructure {
         public byte byRoomIndex;     //审讯室编号,从1开始
         public byte byDriveIndex;    //刻录机编号,从1开始
         public short wSegmetSize;     //本片断的大小, 单位M
@@ -7753,12 +7758,12 @@ DVR实现巡航数据结构
     }
 
     //非视频通道查询结果
-    public static class EVENT_IOTRET_V50 extends Structure {
+    public static class EVENT_IOTRET_V50 extends HIKSDKStructure {
         public int dwChanNo;        //触发产生事件的通道号（事件源通道）
         public byte[] byRes = new byte[796];
     }
 
-    public static class NET_DVR_INQUEST_RESUME_SEGMENT extends Structure {
+    public static class NET_DVR_INQUEST_RESUME_SEGMENT extends HIKSDKStructure {
         public NET_DVR_TIME struStartTime = new NET_DVR_TIME(); //事件起始时间
         public NET_DVR_TIME struStopTime = new NET_DVR_TIME();  //事件终止时间
         public byte byRoomIndex;         //审讯室编号,从1开始
@@ -7768,7 +7773,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[24];           //保留
     }
 
-    public static class NET_DVR_INQUEST_RESUME_EVENT extends Structure {
+    public static class NET_DVR_INQUEST_RESUME_EVENT extends HIKSDKStructure {
         public int dwResumeNum;       //需恢复的事件个数
         public NET_DVR_INQUEST_RESUME_SEGMENT[] struResumeSegment = new NET_DVR_INQUEST_RESUME_SEGMENT[MAX_RESUME_SEGMENT];
         public byte byResumeMode;        //恢复模式，0-单光盘恢复，1-双光盘恢复
@@ -7776,7 +7781,7 @@ DVR实现巡航数据结构
     }
 
     //报警信息查询条件结构体
-    public static class NET_DVR_ALARM_SEARCH_COND extends Structure {
+    public static class NET_DVR_ALARM_SEARCH_COND extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_TIME_SEARCH_COND strStartTime; //开始时间,时间为空则代表不通过时间筛选。
         public NET_DVR_TIME_SEARCH_COND strStopTime;  //结束时间, 时间为空则代表不通过时间筛选。
@@ -7792,7 +7797,7 @@ DVR实现巡航数据结构
     }
 
     //报警信息查询结果结构体
-    public static class NET_DVR_ALARM_SEARCH_RESULT extends Structure {
+    public static class NET_DVR_ALARM_SEARCH_RESULT extends HIKSDKStructure {
         public int dwSize;
         /*
   	报警命令，该字段值与报警布防类型相同，目前支持：
@@ -7813,7 +7818,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[128];
     }
 
-    public static class NET_DVR_ALARM_ISAPI_INFO extends Structure {
+    public static class NET_DVR_ALARM_ISAPI_INFO extends HIKSDKStructure {
         public Pointer pAlarmData;           // 报警数据（参见下表）
         public int dwAlarmDataLen;   // 报警数据长度
         public byte byDataType;        // 0-invalid,1-xml,2-json
@@ -7824,7 +7829,7 @@ DVR实现巡航数据结构
         public byte[] byRes1 = new byte[32];
     }
 
-    public static class NET_DVR_LOCAL_GENERAL_CFG extends Structure {
+    public static class NET_DVR_LOCAL_GENERAL_CFG extends HIKSDKStructure {
         public byte byExceptionCbDirectly;    //0-通过线程池异常回调，1-直接异常回调给上层
         public byte byNotSplitRecordFile;     //回放和预览中保存到本地录像文件不切片 0-默认切片，1-不切片
         public byte byResumeUpgradeEnable;    //断网续传升级使能，0-关闭（默认），1-开启
@@ -7836,14 +7841,14 @@ DVR实现巡航数据结构
 
     }
 
-    public static class NET_DVR_LOCAL_TCP_PORT_BIND_CFG extends Structure {
+    public static class NET_DVR_LOCAL_TCP_PORT_BIND_CFG extends HIKSDKStructure {
         public short wLocalBindTcpMinPort;            //本地绑定Tcp最小端口
         public short wLocalBindTcpMaxPort;            //本地绑定Tcp最大端口
         public byte[] byRes = new byte[60];                        //保留
     }
 
 
-    public static class NET_DVR_LOCAL_CHECK_DEV extends Structure {
+    public static class NET_DVR_LOCAL_CHECK_DEV extends HIKSDKStructure {
         public int dwCheckOnlineTimeout;     //巡检时间间隔，单位ms  最小值为30s，最大值120s。为0时，表示用默认值(120s)
         public int dwCheckOnlineNetFailMax;  //由于网络原因失败的最大累加次数；超过该值SDK才回调用户异常，为0时，表示使用默认值1
         public byte[] byRes = new byte[256];
@@ -7851,7 +7856,7 @@ DVR实现巡航数据结构
 
     public static final int MAX_FILE_PATH_LEN = 256; //文件路径长度
 
-    public static class NET_DVR_ALARM_ISAPI_PICDATA extends Structure {
+    public static class NET_DVR_ALARM_ISAPI_PICDATA extends HIKSDKStructure {
         public int dwPicLen;
         public byte byPicType;  //图片格式: 1- jpg
         public byte[] byRes = new byte[3];
@@ -7859,7 +7864,7 @@ DVR实现巡航数据结构
         public Pointer pPicData; // 图片数据
     }
 
-    public static class NET_DVR_FOCUSMODE_CFG extends Structure {
+    public static class NET_DVR_FOCUSMODE_CFG extends HIKSDKStructure {
         public int dwSize;
         public byte byFocusMode;  /* 聚焦模式，0-自动，1-手动，2-半自动 */
         public byte byAutoFocusMode; /* 自动聚焦模式，0-关，1-模式A，2-模式B，3-模式AB，4-模式C 自动聚焦模式，需要在聚焦模式为自动时才显示*/
@@ -7877,7 +7882,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[48];
     }
 
-    public static class NET_DVR_SERIALSTART_V40 extends Structure {
+    public static class NET_DVR_SERIALSTART_V40 extends HIKSDKStructure {
         public int dwSize;         //结构体大小
         public int dwSerialType;    //串口号（1-232串口，2-485串口）
         public byte bySerialNum;   //串口编号
@@ -7886,7 +7891,7 @@ DVR实现巡航数据结构
 
     }
 
-    public static class NET_DVR_PRESET_NAME extends Structure {
+    public static class NET_DVR_PRESET_NAME extends HIKSDKStructure {
         public int dwSize;
         public short wPresetNum;   //预置点编号
         public byte[] byRes1 = new byte[2]; //字节对齐
@@ -7898,7 +7903,7 @@ DVR实现巡航数据结构
     }
 
     //Sensor信息
-    public static class NET_DVR_SENSOR_PARAM extends Structure {
+    public static class NET_DVR_SENSOR_PARAM extends HIKSDKStructure {
         public byte bySensorType;//SensorType:0-CCD,1-CMOS
         public byte[] byRes = new byte[31];
         public float fHorWidth;//水平宽度 精确到小数点后两位 *10000
@@ -7907,14 +7912,14 @@ DVR实现巡航数据结构
     }
 
     //球机位置信息
-    public static class NET_DVR_PTZPOS_PARAM extends Structure {
+    public static class NET_DVR_PTZPOS_PARAM extends HIKSDKStructure {
         public float fPanPos;//水平参数，精确到小数点后1位
         public float fTiltPos;//垂直参数，精确到小数点后1位
         public float fZoomPos;//变倍参数，精确到小数点后1位
         public byte[] byRes = new byte[16];
     }
 
-    public static class NET_DVR_LLI_PARAM extends Structure {
+    public static class NET_DVR_LLI_PARAM extends HIKSDKStructure {
         public float fSec;//秒[0.000000,60.000000]
         public byte byDegree;//度:纬度[0,90] 经度[0,180]
         public byte byMinute;//分[0,59]
@@ -7922,7 +7927,7 @@ DVR实现巡航数据结构
     }
 
     //GIS信息上传
-    public static class NET_DVR_GIS_UPLOADINFO extends Structure {
+    public static class NET_DVR_GIS_UPLOADINFO extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public int dwRelativeTime; //相对时标
         public int dwAbsTime; //绝对时标
@@ -7942,7 +7947,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[256];
     }
 
-    public static class NET_DVR_DAYTIME extends Structure {
+    public static class NET_DVR_DAYTIME extends HIKSDKStructure {
         public byte byHour;//0~24
         public byte byMinute;//0~60
         public byte bySecond;//0~60
@@ -7951,12 +7956,12 @@ DVR实现巡航数据结构
         public byte[] byRes1 = new byte[2];
     }
 
-    public static class NET_DVR_SCHEDULE_DAYTIME extends Structure {
+    public static class NET_DVR_SCHEDULE_DAYTIME extends HIKSDKStructure {
         public NET_DVR_DAYTIME struStartTime; //开始时间
         public NET_DVR_DAYTIME struStopTime; //结束时间
     }
 
-    public static class NET_DVR_BUILTIN_SUPPLEMENTLIGHT extends Structure {
+    public static class NET_DVR_BUILTIN_SUPPLEMENTLIGHT extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public byte byMode;//补光灯模式 0-定时，1-开启，2-关闭，3-自动（非光敏，算法画面识别）
         public byte byBrightnessLimit;//亮度限制[0,100]
@@ -7972,7 +7977,7 @@ DVR实现巡航数据结构
         public byte[] byRes1 = new byte[254];
     }
 
-    public static class NET_DVR_HANDLEEXCEPTION_V41 extends Structure {
+    public static class NET_DVR_HANDLEEXCEPTION_V41 extends HIKSDKStructure {
         public int dwHandleType;        //异常处理,异常处理方式的"或"结果
         /*0x00: 无响应*/
         /*0x01: 布防器上警告*/
@@ -7992,22 +7997,22 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[64];           //保留
     }
 
-    public static class NET_DVR_PRESETCHAN_INFO extends Structure {
+    public static class NET_DVR_PRESETCHAN_INFO extends HIKSDKStructure {
         public int dwEnablePresetChan;    /*启用预置点的通道, 0xfffffff表示不调用预置点*/
         public int dwPresetPointNo;        /*调用预置点通道对应的预置点序号, 0xfffffff表示不调用预置点。*/
     }
 
-    public static class NET_DVR_CRUISECHAN_INFO extends Structure {
+    public static class NET_DVR_CRUISECHAN_INFO extends HIKSDKStructure {
         public int dwEnableCruiseChan;    /*启用巡航的通道*/
         public int dwCruiseNo;        /*巡航通道对应的巡航编号, 0xfffffff表示无效*/
     }
 
-    public static class NET_DVR_PTZTRACKCHAN_INFO extends Structure {
+    public static class NET_DVR_PTZTRACKCHAN_INFO extends HIKSDKStructure {
         public int dwEnablePtzTrackChan;    /*启用云台的通道*/
         public int dwPtzTrackNo;        /*云台通道对应的编号, 0xfffffff表示无效*/
     }
 
-    public static class NET_DVR_EVENT_TRIGGER extends Structure {
+    public static class NET_DVR_EVENT_TRIGGER extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public NET_DVR_HANDLEEXCEPTION_V41 struHandleException;     //异常处理方式
         public int[] dwRelRecordChan = new int[MAX_CHANNUM_V40]; //实际触发录像通道，按值表示，采用紧凑型排列，从下标0开始顺序读取，中间遇到0xffffffff则后续无效。
@@ -8018,7 +8023,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[255];
     }
 
-    public static class NET_DVR_FACELIB_GUARD_COND extends Structure {
+    public static class NET_DVR_FACELIB_GUARD_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;  //通道号
         public byte[] szFDID = new byte[68];//人脸库的ID
@@ -8026,7 +8031,7 @@ DVR实现巡航数据结构
     }
 
     //导入人脸数据条件
-    public static class NET_DVR_FACELIB_COND extends Structure {
+    public static class NET_DVR_FACELIB_COND extends HIKSDKStructure {
         public int dwSize;
         public byte[] szFDID = new byte[NET_SDK_MAX_FDID_LEN/*256*/];//人脸库ID
         public byte byConcurrent;//设备并发处理 0-不开启，1-开始
@@ -8037,7 +8042,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[60];
     }
 
-    public static class NET_DVR_SEND_PARAM_IN extends Structure {
+    public static class NET_DVR_SEND_PARAM_IN extends HIKSDKStructure {
         public Pointer pSendData;             //发送的缓冲区,PicURL == 1 的时候，内存中存储的是 URL 字符串,byUploadModeling == 1 的时候，内存中存储的是 建模base64加密数据
         public int dwSendDataLen;         //发送数据长度,PicURL == 1 的时候，表示的 URL 字符串的长度,byUploadModeling == 1 的时候，表示为建模数据base64后的加密长度
         public NET_DVR_TIME_V30 struTime = new NET_DVR_TIME_V30();   //图片时间
@@ -8058,13 +8063,13 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[192];
     }
 
-    public static class NET_DVR_INQUEST_ROOM extends Structure {
+    public static class NET_DVR_INQUEST_ROOM extends HIKSDKStructure {
         public byte byRoomIndex;     //审讯室编号
         public byte byFileType;        //0-审讯文件，1-开庭上传文件
         public byte[] byRes = new byte[22];       //保留
     }
 
-    public static class NET_DVR_INQUEST_CDRW_CFG extends Structure {
+    public static class NET_DVR_INQUEST_CDRW_CFG extends HIKSDKStructure {
         public int dwSize;
         public int dwNum;                       //刻录机的数量
         public int[] dwRwSelectPara = new int[MAX_CHANNUM_V30];// 是否选中该光驱
@@ -8076,7 +8081,7 @@ DVR实现巡航数据结构
         public byte[] sLable = new byte[64];                  //光盘名称
     }
 
-    public static class NET_DVR_INQUEST_CDRW_STATUS extends Structure {
+    public static class NET_DVR_INQUEST_CDRW_STATUS extends HIKSDKStructure {
         /*运行状态：0-审讯开始，
      1-审讯过程中刻录，2-审讯停止，
      3-刻录审讯文件,
@@ -8090,7 +8095,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[16];             //保留
     }
 
-    public static class NET_DVR_INQUEST_CDRW extends Structure {
+    public static class NET_DVR_INQUEST_CDRW extends HIKSDKStructure {
         public int dwEnable;            //刻录机状态是否有效,0-无效,1-有效
         public int dwStatus;            /*当dwType=0时， 0-光盘正常，1-无光盘或光盘异常,
                                                             当dwType=1或2时，0-刻录正常，1-无光盘或光盘异常，2-光盘已封盘(81不支持)，3-光盘空间不足， 4-异常导致审讯终止(81不支持)
@@ -8106,7 +8111,7 @@ DVR实现巡航数据结构
     }
 
     //实时温度检测条件参数
-    public static class NET_DVR_REALTIME_THERMOMETRY_COND extends Structure {
+    public static class NET_DVR_REALTIME_THERMOMETRY_COND extends HIKSDKStructure {
         public int dwSize; /*结构体大小*/
         public int dwChan; /*通道号，从1开始，0xffffffff代表获取全部通道*/
         public byte byRuleID;/*规则ID，0代表获取全部规则，具体规则ID从1开始*/
@@ -8116,14 +8121,14 @@ DVR实现巡航数据结构
     }
 
     //点测温实时信息
-    public static class NET_DVR_POINT_THERM_CFG extends Structure {
+    public static class NET_DVR_POINT_THERM_CFG extends HIKSDKStructure {
         public float fTemperature;
         public NET_VCA_POINT struPoint;
         public byte[] byRes = new byte[120];
     }
 
     //框/线测温实时信息
-    public static class NET_DVR_LINEPOLYGON_THERM_CFG extends Structure {
+    public static class NET_DVR_LINEPOLYGON_THERM_CFG extends HIKSDKStructure {
         public float fMaxTemperature;
         public float fMinTemperature;
         public float fAverageTemperature;
@@ -8133,7 +8138,7 @@ DVR实现巡航数据结构
     }
 
     //实时温度信息
-    public static class NET_DVR_THERMOMETRY_UPLOAD extends Structure {
+    public static class NET_DVR_THERMOMETRY_UPLOAD extends HIKSDKStructure {
         public int dwSize; /* 结构体大小 */
         public int dwRelativeTime;
         public int dwAbsTime;
@@ -8156,7 +8161,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[95];
     }
 
-    public static class NET_PTZ_INFO extends Structure {
+    public static class NET_PTZ_INFO extends HIKSDKStructure {
         public float fPan;
         public float fTilt;
         public float fZoom;
@@ -8165,21 +8170,21 @@ DVR实现巡航数据结构
     }
 
     //测温模式配置
-    public static class NET_DVR_THERMOMETRY_MODE extends Structure {
+    public static class NET_DVR_THERMOMETRY_MODE extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public byte byMode;//测温模式，0~普通模式，1~专家模式
         public byte byThermometryROIEnabled; //测温ROI使能 0-保留 1-不开启 2-开启（基于互斥兼容考虑）
         public byte[] byRes = new byte[62];
     }
 
-    public static class NET_DVR_THERMOMETRY_COND extends Structure {
+    public static class NET_DVR_THERMOMETRY_COND extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public int dwChannel;
         public short wPresetNo;//0-保留
         public byte[] byRes = new byte[62];
     }
 
-    public static class NET_DVR_THERMOMETRY_PRESETINFO_PARAM extends Structure {
+    public static class NET_DVR_THERMOMETRY_PRESETINFO_PARAM extends HIKSDKStructure {
         public byte byEnabled;  //是否使能：0- 否，1- 是
         public byte byRuleID;//规则ID 0-表示无效，从1开始 （list内部判断数据有效性）
         public short wDistance;//距离(m)[0, 10000]
@@ -8196,7 +8201,7 @@ DVR实现巡航数据结构
         public NET_VCA_POLYGON struRegion = new NET_VCA_POLYGON();//区域、线（当规则标定类型为"框"或者"线"的时候生效）
     }
 
-    public static class NET_DVR_THERMOMETRY_PRESETINFO extends Structure {
+    public static class NET_DVR_THERMOMETRY_PRESETINFO extends HIKSDKStructure {
         public int dwSize;//结构体大小
         public short wPresetNo;//0-保留
         public byte[] byRes = new byte[2];
@@ -8204,7 +8209,7 @@ DVR实现巡航数据结构
     }
 
     //温度报警（检测温度和配置温度比较报警）
-    public static class NET_DVR_THERMOMETRY_ALARM extends Structure {
+    public static class NET_DVR_THERMOMETRY_ALARM extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;//通道号
         public byte byRuleID;//规则ID
@@ -8236,7 +8241,7 @@ DVR实现巡航数据结构
     }
 
     //温差报警
-    public static class NET_DVR_THERMOMETRY_DIFF_ALARM extends Structure {
+    public static class NET_DVR_THERMOMETRY_DIFF_ALARM extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;//通道号
         public byte byAlarmID1;//规则AlarmID1
@@ -8267,7 +8272,7 @@ DVR实现巡航数据结构
     }
 
     //船只检测报警上传
-    public static class NET_DVR_SHIPSDETECTION_ALARM extends Structure {
+    public static class NET_DVR_SHIPSDETECTION_ALARM extends HIKSDKStructure {
         public int dwSize;
         public NET_VCA_DEV_INFO struDevInfo;   //设备信息
         public int dwRelativeTime; //相对时标
@@ -8294,7 +8299,7 @@ DVR实现巡航数据结构
     public static final int MAX_SHIPS_NUM = 20;   //船只检测最大船只数
 
     //船只信息
-    public static class NET_DVR_SHIPSINFO extends Structure {
+    public static class NET_DVR_SHIPSINFO extends HIKSDKStructure {
         public float fShipsLength; //船只长度；1~1000.0m，精确到小数点后一位
         public float fShipsHeight; //船只高度；1~1000.0m，精确到小数点后一位
         public float fShipsWidth;  //船只宽度；1~1000.0m，精确到小数点后一位
@@ -8306,13 +8311,13 @@ DVR实现巡航数据结构
         public NET_VCA_POLYGON struShipsRect; //船只区域，归一化值，相对于大图（可见光图、热成像图)的分辨率
     }
 
-    public static class NET_DVR_ARRAY_LIST extends Structure {
+    public static class NET_DVR_ARRAY_LIST extends HIKSDKStructure {
         public int dwSize;     // 结构体大小
         public int dwCount;    // 阵列个数
         public NET_DVR_ARRAY_INFO[] struArrayInfo = new NET_DVR_ARRAY_INFO[SUPPORT_ARRAY_NUM];
     }
 
-    public static class NET_DVR_BGA_INFO extends Structure {
+    public static class NET_DVR_BGA_INFO extends HIKSDKStructure {
         public byte byBga;  // 后台任务及类型
         public byte byBgaState;           /*函数返回值--后台任务状态*/
         public short wBgaPercentage;     /*函数返回值--后台任务执行百分比*/
@@ -8320,7 +8325,7 @@ DVR实现巡航数据结构
     }
 
     // 阵列信息
-    public static class NET_DVR_ARRAY_INFO extends Structure {
+    public static class NET_DVR_ARRAY_INFO extends HIKSDKStructure {
         public short wArrayID; // 阵列ID
         public byte byRaidMode; // raid模式  参照RAID_MODE
         public byte byStatus;  // 0-在线 1-磁盘丢失 2-下线 3-降级 4-异常 5-次正常 6-外来盘  7-已删除 8-SMART状态异常 0xff-不存在
@@ -8341,7 +8346,7 @@ DVR实现巡航数据结构
     }
 
     //物理磁盘
-    public static class NET_DVR_PHY_DISK_INFO extends Structure {
+    public static class NET_DVR_PHY_DISK_INFO extends HIKSDKStructure {
         public short wPhySlot;         // 硬盘槽位
         public byte byType;         // 硬盘信息；0 普通，1全局热备，2-阵列热备 3-阵列盘
         public byte byStatus;       // 硬盘状态；  0-正常 1-降级 2-已删除 3-磁盘丢失 4-下线 5-次正常 6-外来 7-异常 8-SMART状态异常 9-休眠 10-有坏块 0xff-不存在
@@ -8354,7 +8359,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[101];         // 保留字节
     }
 
-    public static class NET_DVR_WORKSTATE_V40 extends Structure {
+    public static class NET_DVR_WORKSTATE_V40 extends HIKSDKStructure {
         public int dwSize;            //结构体大小
         public int dwDeviceStatic;      //设备的状态,0-正常,1-CPU占用率太高,超过85%,2-硬件错误,例如串口死掉
         public NET_DVR_DISKSTATE[] struHardDiskStatic = new NET_DVR_DISKSTATE[MAX_DISKNUM_V30];   //硬盘状态,一次最多只能获取33个硬盘信息
@@ -8369,7 +8374,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[116];                 //保留
     }
 
-    public static class NET_DVR_GETWORKSTATE_COND extends Structure {
+    public static class NET_DVR_GETWORKSTATE_COND extends HIKSDKStructure {
         public int dwSize;  //结构体长度
         public byte byFindHardByCond; /*0-查找全部磁盘(但一次最多只能查找33个)，此时dwFindHardStatusNum无效*/
         public byte byFindChanByCond;  /*0-查找全部通道，此时dwFindChanNum无效*/
@@ -8380,7 +8385,7 @@ DVR实现巡航数据结构
     }
 
     //多边型结构体
-    public static class NET_ITC_POLYGON extends Structure {
+    public static class NET_ITC_POLYGON extends HIKSDKStructure {
         public int dwPointNum; //有效点 大于等于3，若是3点在一条线上认为是无效区域，线交叉认为是无效区域
         public NET_VCA_POINT[] struPos = new NET_VCA_POINT[ITC_MAX_POLYGON_POINT_NUM]; //多边形边界点,最多20个
     }
@@ -8390,7 +8395,7 @@ DVR实现巡航数据结构
         public NET_ITC_POLYGON struPolygon = new NET_ITC_POLYGON();
     }
 
-    public static class NET_ITC_PLATE_RECOG_REGION_PARAM extends Structure {
+    public static class NET_ITC_PLATE_RECOG_REGION_PARAM extends HIKSDKStructure {
         public byte byMode; //区域类型，0-矩形，1-多边形
         public byte[] byRes1 = new byte[3];
         public CUSTOM_uRegion uRegion = new CUSTOM_uRegion();
@@ -8398,7 +8403,7 @@ DVR实现巡航数据结构
     }
 
     //单组IO测速参数
-    public static class NET_ITC_SINGLE_IOSPEED_PARAM extends Structure {
+    public static class NET_ITC_SINGLE_IOSPEED_PARAM extends HIKSDKStructure {
         public byte byEnable; //是否启用，0-不启用，1-启用
         public byte byTrigCoil1; //第一线圈关联IO，0-IO1,1-IO2,2-IO3,3-IO4,4-IO5,5-IO6
         public byte byCoil1IOStatus;//第一线圈IO输入口状态，0-下降沿（默认），1-上升沿，2-上升沿和下降沿，3-高电平，4-低电平
@@ -8435,7 +8440,7 @@ DVR实现巡航数据结构
     }
 
     //牌识参数
-    public static class NET_ITC_PLATE_RECOG_PARAM extends Structure {
+    public static class NET_ITC_PLATE_RECOG_PARAM extends HIKSDKStructure {
         public byte[] byDefaultCHN = new byte[MAX_CHJC_NUM]; /*设备运行省份的汉字简写*/
         public byte byEnable; //是否启用该区域牌识，0-否，1-是
         public int dwRecogMode;
@@ -8479,25 +8484,25 @@ DVR实现巡航数据结构
     }
 
     //卡口IO测速参数
-    public static class NET_ITC_POST_IOSPEED_PARAM extends Structure {
+    public static class NET_ITC_POST_IOSPEED_PARAM extends HIKSDKStructure {
         public NET_ITC_PLATE_RECOG_PARAM struPlateRecog; //牌识参数
         public NET_ITC_SINGLE_IOSPEED_PARAM[] struSingleIOSpeed = new NET_ITC_SINGLE_IOSPEED_PARAM[MAX_IOSPEED_GROUP_NUM]; //单个IO测速组参数
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_GEOGLOCATION extends Structure {
+    public static class NET_DVR_GEOGLOCATION extends HIKSDKStructure {
         public int[] iRes = new int[2]; /*保留*/
         public int dwCity; /*城市，详见PROVINCE_CITY_IDX */
     }
 
-    public static class NET_ITC_INTERVAL_PARAM extends Structure {
+    public static class NET_ITC_INTERVAL_PARAM extends HIKSDKStructure {
         public byte byIntervalType;    //间隔类型（默认按时间），0-时间起效,1-距离起效
         public byte[] byRes1 = new byte[3];
         public short[] wInterval = new short[MAX_INTERVAL_NUM];//连拍间隔时间（单位ms）或连拍间隔距离（单位分米），当byIntervalType为0时，表示间隔时间，当byIntervalType为1时，表示距离
         public byte[] byRes = new byte[8];
     }
 
-    public static class NET_ITC_VTLANE_PARAM extends Structure {
+    public static class NET_ITC_VTLANE_PARAM extends HIKSDKStructure {
         public byte byRelatedDriveWay;//关联的车道号
         public byte bySpeedCapEn; //是否启用超速抓拍，0-否，1-是
         public byte bySignSpeed;//标志限速，单位km/h
@@ -8518,7 +8523,7 @@ DVR实现巡航数据结构
         public NET_VCA_LINE struLine = new NET_VCA_LINE(); //车道线
     }
 
-    public static class NET_ITC_VTCOIL_INFO extends Structure {
+    public static class NET_ITC_VTCOIL_INFO extends HIKSDKStructure {
         public NET_VCA_RECT struLaneRect = new NET_VCA_RECT();  /*虚拟线圈区域*/
         public byte byTrigFlag; //触发标志，0-车头触发；1-车尾触发；2-车头/车尾都触发
         public byte byTrigSensitive;  //触发灵敏度，1-100
@@ -8534,7 +8539,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[30];
     }
 
-    public static class NET_ITC_RADAR_PARAM extends Structure {
+    public static class NET_ITC_RADAR_PARAM extends HIKSDKStructure {
         public byte byRadarType;    //雷达类型，0-无雷达,1-安道雷雷达，2-奥利维亚，3-川速微波4,雷达接IO扩展盒(此参数在卡口虚拟线圈、混行卡口界面中使用，卡口RS485雷达不使用),0xff-其它类型
         public byte byLevelAngle;   //与水平线所成角度,默认为25°(0到90度)
         public short wRadarSensitivity; //雷达灵敏度
@@ -8546,7 +8551,7 @@ DVR实现巡航数据结构
     }
 
     //卡口虚拟线圈触发参数
-    public static class NET_ITC_POST_VTCOIL_PARAM extends Structure {
+    public static class NET_ITC_POST_VTCOIL_PARAM extends HIKSDKStructure {
         public byte byRelatedLaneNum;//关联的车道个数
         public byte byIsDisplay; //视频中是否显示虚拟线圈，0-不显示，1-显示
         public byte byLoopPos; //晚间触发线圈的偏向（默认10）
@@ -8583,7 +8588,7 @@ DVR实现巡航数据结构
     }
 
     //车道属性参数结构
-    public static class NET_ITC_LANE_LOGIC_PARAM extends Structure {
+    public static class NET_ITC_LANE_LOGIC_PARAM extends HIKSDKStructure {
         public byte byUseageType;     //车道用途类型，详见ITC_LANE_USEAGE_TYPE
         public byte byDirectionType;  //车道方向类型，详见ITC_LANE_DIRECTION_TYPE
         public byte byCarDriveDirect; //车辆行驶方向，详见ITC_LANE_CAR_DRIVE_DIRECT
@@ -8591,13 +8596,13 @@ DVR实现巡航数据结构
     }
 
     //视频电警线结构
-    public static class NET_ITC_LINE extends Structure {
+    public static class NET_ITC_LINE extends HIKSDKStructure {
         public NET_VCA_LINE struLine = new NET_VCA_LINE(); //线参数
         public byte byLineType; //线类型，详见ITC_LINE_TYPE
         public byte[] byRes = new byte[7];
     }
 
-    public static class NET_ITC_SNAPMODE_PARAM extends Structure {
+    public static class NET_ITC_SNAPMODE_PARAM extends HIKSDKStructure {
         public byte byVehicleCapMode;//机动车抓拍模式，0-频闪模式；1-爆闪模式
         public byte byNoVehicleCapMode;//非机动车抓拍模式，0-频闪模式；1-爆闪模式
         public byte byPasserCapMode;//行人抓拍模式，0-频闪模式；1-爆闪模式
@@ -8605,7 +8610,7 @@ DVR实现巡航数据结构
     }
 
     //size = 128
-    public static class NET_ITC_HVT_EC_PARAM extends Structure {
+    public static class NET_ITC_HVT_EC_PARAM extends HIKSDKStructure {
         public int dwCapShutter;            //抓拍快门0~65535
         public short wCapGain;            //抓拍增益0～100
         public byte[] byRes = new byte[2];
@@ -8616,7 +8621,7 @@ DVR实现巡航数据结构
         public byte[] byRes1 = new byte[108];
     }
 
-    public static class NET_ITC_LANE_HVT_PARAM extends Structure {
+    public static class NET_ITC_LANE_HVT_PARAM extends HIKSDKStructure {
         public byte byLaneNO; //关联的车道号 1~255（用于叠加和上传）
         public byte bySignSpeed;    //标志限速，单位km/h 0～255  70
         public byte bySpeedLimit;    //限速值，单位km/h 0～255    80 实际起效
@@ -8644,7 +8649,7 @@ DVR实现巡航数据结构
         public byte[] byRes4 = new byte[60];
     }
 
-    public static class NET_ITC_POST_HVT_PARAM extends Structure {
+    public static class NET_ITC_POST_HVT_PARAM extends HIKSDKStructure {
         public byte byLaneNum;//识别的车道个数，1-6
         public byte bySceneMode;//0-未知1-城区道路；2-小区出入口
         public byte byRoadExpBright;//路面期望亮度（视频曝光参数调整的依据之一。在无机动车时，依据此亮度期望值，调整视频曝光参数）
@@ -8659,7 +8664,7 @@ DVR实现巡航数据结构
     }
 
     //抓拍机4.0新增
-    public static class NET_ITC_LANE_HVT_PARAM_V50 extends Structure {
+    public static class NET_ITC_LANE_HVT_PARAM_V50 extends HIKSDKStructure {
         public byte byLaneNO;        //关联的车道号1～255(用于叠加和上传)
         public byte byFlashMode;    //闪光灯闪烁模式，0-同时闪，1-轮流闪
         public byte bySignSpeed;    //小车标志限高速，单位km/h
@@ -8696,7 +8701,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[280];
     }
 
-    public static class NET_ITC_POST_HVT_PARAM_V50 extends Structure {
+    public static class NET_ITC_POST_HVT_PARAM_V50 extends HIKSDKStructure {
         public byte byLaneNum;    //识别的车道个数，1-6
         public byte byCapType;        //抓拍类型，0-机、非、人（默认），1-机动车
         public byte byCapMode;    //抓拍方式，0-视频抽帧，1-打断抓拍，2-混合模式，
@@ -8715,7 +8720,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_ITC_LANE_PARAM extends Structure {
+    public static class NET_ITC_LANE_PARAM extends HIKSDKStructure {
         public byte byEnable; //是否启用该车道，0-不启用，1-启用
         public byte byRelatedDriveWay;//关联的车道号
         public short wDistance; //线圈距离，计算速度
@@ -8746,7 +8751,7 @@ DVR实现巡航数据结构
     }
 
     //卡口RS485车检器触发参数
-    public static class NET_ITC_POST_RS485_PARAM extends Structure {
+    public static class NET_ITC_POST_RS485_PARAM extends HIKSDKStructure {
         public byte byRelatedLaneNum;//关联的车道个数
         public byte byTriggerSpareMode; //触发备用模式，0-默认，1-卡口虚拟线圈模式,2-卡口混合车道模式
         public byte byFaultToleranceTime;//容错时间(单位:分钟)，用于检测车检器是否正常的最大时间
@@ -8757,7 +8762,7 @@ DVR实现巡航数据结构
     }
 
     //卡口RS485雷达触发参数
-    public static class NET_ITC_POST_RS485_RADAR_PARAM extends Structure {
+    public static class NET_ITC_POST_RS485_RADAR_PARAM extends HIKSDKStructure {
         public byte byRelatedLaneNum;//关联的车道个数
         public byte[] byRes1 = new byte[3];
         public NET_ITC_PLATE_RECOG_PARAM struPlateRecog = new NET_ITC_PLATE_RECOG_PARAM(); //牌识参数
@@ -8789,7 +8794,7 @@ DVR实现巡航数据结构
     }
 
     //单个触发参数结构
-    public static class NET_ITC_SINGLE_TRIGGERCFG extends Structure {
+    public static class NET_ITC_SINGLE_TRIGGERCFG extends HIKSDKStructure {
         public byte byEnable;    //是否启用该触发模式，0-否，1-是
         public byte[] byRes1 = new byte[3];
         public int dwTriggerType; //触发类型，详见ITC_TRIGGERMODE_TYPE
@@ -8798,14 +8803,14 @@ DVR实现巡航数据结构
     }
 
     //触发参数结构
-    public static class NET_ITC_TRIGGERCFG extends Structure {
+    public static class NET_ITC_TRIGGERCFG extends HIKSDKStructure {
         public int dwSize;            //结构长度
         public NET_ITC_SINGLE_TRIGGERCFG struTriggerParam;  //单个触发参数
         public byte[] byRes = new byte[32];
     }
 
     //单个IO接入信号灯参数
-    public static class NET_ITC_SINGLE_IO_LIGHT_PARAM extends Structure {
+    public static class NET_ITC_SINGLE_IO_LIGHT_PARAM extends HIKSDKStructure {
         public byte byLightType; //交通灯导向类型,0-左转灯,1-直行灯,2-右转灯
         public byte byRelatedIO; //关联的IO口号
         public byte byRedLightState; //红灯电平状态，0-高电平红灯，1-低电平红灯
@@ -8813,13 +8818,13 @@ DVR实现巡航数据结构
     }
 
     //IO接入信号灯参数
-    public static class NET_ITC_IO_LIGHT_PARAM extends Structure {
+    public static class NET_ITC_IO_LIGHT_PARAM extends HIKSDKStructure {
         public NET_ITC_SINGLE_IO_LIGHT_PARAM[] struIOLight = new NET_ITC_SINGLE_IO_LIGHT_PARAM[MAX_LIGHT_NUM]; //单个IO接入信号灯参数
         public byte[] byRes = new byte[8];
     }
 
     //单个485接入信号灯参数
-    public static class NET_ITC_SINGLE_RS485_LIGHT_PARAM extends Structure {
+    public static class NET_ITC_SINGLE_RS485_LIGHT_PARAM extends HIKSDKStructure {
         public byte byLightType; //交通灯导向类型，0-左转灯，1-直行灯，2-右转灯
         public byte byRelatedLightChan; //关联的红绿灯检测器通道号
         public byte byInputLight;    //接入的信号灯类型，0-接红灯，1-接绿灯
@@ -8828,12 +8833,12 @@ DVR实现巡航数据结构
     }
 
     //485接入信号灯参数
-    public static class NET_ITC_RS485_LIGHT_PARAM extends Structure {
+    public static class NET_ITC_RS485_LIGHT_PARAM extends HIKSDKStructure {
         public NET_ITC_SINGLE_RS485_LIGHT_PARAM[] struRS485Light = new NET_ITC_SINGLE_RS485_LIGHT_PARAM[MAX_LIGHT_NUM]; //单个485接入信号灯参数
         public byte[] byRes = new byte[8];
     }
 
-    public static class NET_POS_PARAM extends Structure {
+    public static class NET_POS_PARAM extends HIKSDKStructure {
         public short wLeft;
         public short wTop;
         public short wRight;
@@ -8841,7 +8846,7 @@ DVR实现巡航数据结构
     }
 
     //单组视频检测交通信号灯参数结构
-    public static class NET_ITC_SINGLE_VIDEO_DETECT_LIGHT_PARAM extends Structure {
+    public static class NET_ITC_SINGLE_VIDEO_DETECT_LIGHT_PARAM extends HIKSDKStructure {
         public byte byLightNum; //交通灯个数
         public byte byStraightLight; //是否有直行标志灯，0-否 ，1-是
         public byte byLeftLight; //是否有左转标志灯，0-否，1-是
@@ -8855,7 +8860,7 @@ DVR实现巡航数据结构
     }
 
     //视频检测交通信号灯参数结构(最大可有12个区域检测，488字节)
-    public static class NET_ITC_VIDEO_DETECT_LIGHT_PARAM extends Structure {
+    public static class NET_ITC_VIDEO_DETECT_LIGHT_PARAM extends HIKSDKStructure {
         public NET_ITC_SINGLE_VIDEO_DETECT_LIGHT_PARAM[] struTrafficLight = new NET_ITC_SINGLE_VIDEO_DETECT_LIGHT_PARAM[MAX_VIDEO_DETECT_LIGHT_NUM]; //单个视频检测信号灯参数
         public byte[] byRes = new byte[8];
     }
@@ -8869,7 +8874,7 @@ DVR实现巡航数据结构
     }
 
     //交通信号灯参数结构
-    public static class NET_ITC_TRAFFIC_LIGHT_PARAM extends Structure {
+    public static class NET_ITC_TRAFFIC_LIGHT_PARAM extends HIKSDKStructure {
         public byte bySource; //交通信号灯接入源，0-IO接入，1-RS485接入
         public byte[] byRes1 = new byte[3];
         public NET_ITC_LIGHT_ACCESSPARAM_UNION struLightAccess = new NET_ITC_LIGHT_ACCESSPARAM_UNION();//信号灯接入参数
@@ -8877,7 +8882,7 @@ DVR实现巡航数据结构
     }
 
     //违规检测参数结构
-    public static class NET_ITC_VIOLATION_DETECT_PARAM extends Structure {
+    public static class NET_ITC_VIOLATION_DETECT_PARAM extends HIKSDKStructure {
         public int dwVioDetectType; //违规检测类型, 按位表示, 详见ITC_VIOLATION_DETECT_TYPE ,0-不启用,1-启用
         public byte byDriveLineSnapTimes; //压车道线抓拍张数,2-3
         public byte byReverseSnapTimes; //逆行抓拍,2-3
@@ -8897,7 +8902,7 @@ DVR实现巡航数据结构
     }
 
     //违规检测线参数结构
-    public static class NET_ITC_VIOLATION_DETECT_LINE extends Structure {
+    public static class NET_ITC_VIOLATION_DETECT_LINE extends HIKSDKStructure {
         public NET_ITC_LINE struLaneLine = new NET_ITC_LINE(); //车道线参数
         public NET_ITC_LINE struStopLine = new NET_ITC_LINE(); //停止线参数
         public NET_ITC_LINE struRedLightLine = new NET_ITC_LINE(); //闯红灯触发线参数
@@ -8907,7 +8912,7 @@ DVR实现巡航数据结构
     }
 
     //单个车道视频电警触发参数结构
-    public static class NET_ITC_LANE_VIDEO_EPOLICE_PARAM extends Structure {
+    public static class NET_ITC_LANE_VIDEO_EPOLICE_PARAM extends HIKSDKStructure {
         public byte byLaneNO; //关联的车道号
         public byte bySensitivity; //线圈灵敏度，[1,100]
         public byte byEnableRadar;//启用雷达测试0-不启用，1-启用
@@ -8931,7 +8936,7 @@ DVR实现巡航数据结构
     }
 
     //视频电警触发参数结构
-    public static class NET_ITC_VIDEO_EPOLICE_PARAM extends Structure {
+    public static class NET_ITC_VIDEO_EPOLICE_PARAM extends HIKSDKStructure {
         public byte byEnable;    //是否启用，0-不启用，1-启用
         public byte byLaneNum; //识别的车道个数
         public byte byLogicJudge;//闯红灯违规判断逻辑，设置值为：0-按方向，1-按车道
@@ -8947,13 +8952,13 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_CURTRIGGERMODE extends Structure {
+    public static class NET_DVR_CURTRIGGERMODE extends HIKSDKStructure {
         public int dwSize;
         public int dwTriggerType; //触发类型，详见ITC_TRIGGERMODE_TYPE
         public byte[] byRes = new byte[24];
     }
 
-    public static class NET_ITC_VIDEO_TRIGGER_COND extends Structure {
+    public static class NET_ITC_VIDEO_TRIGGER_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;
         public int dwTriggerMode; //视频触发模式类型，详见ITC_TRIGGERMODE_TYPE
@@ -8965,14 +8970,14 @@ DVR实现巡航数据结构
         public NET_ITC_VIDEO_EPOLICE_PARAM struVideoEP = new NET_ITC_VIDEO_EPOLICE_PARAM(); //视频电警参数
     }
 
-    public static class NET_ITC_VIDEO_TRIGGER_PARAM extends Structure {
+    public static class NET_ITC_VIDEO_TRIGGER_PARAM extends HIKSDKStructure {
         public int dwSize;
         public int dwMode; //触发模式，详见ITC_TRIGGERMODE_TYPE
         public NET_ITC_VIDEO_TRIGGER_PARAM_UNION uVideoTrigger = new NET_ITC_VIDEO_TRIGGER_PARAM_UNION(); //触发模式参数
         public byte[] byRes = new byte[32];
     }
 
-    public static class NET_DVR_CMS_PARAM extends Structure {
+    public static class NET_DVR_CMS_PARAM extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_IPADDR struAddr = new NET_DVR_IPADDR();                    // 平台服务器IP
         public short wServerPort;                   // 平台服务器侦听端口，
@@ -8997,13 +9002,13 @@ DVR实现巡航数据结构
     }
 
     //设置完全获取出厂值
-    public static class NET_DVR_COMPLETE_RESTORE_INFO extends Structure {
+    public static class NET_DVR_COMPLETE_RESTORE_INFO extends HIKSDKStructure {
         public int dwSize; //结构体长度
         public int dwChannel; //通道号
         public byte[] byRes = new byte[64];
     }
 
-    public static class NET_DVR_STD_ABILITY extends Structure {
+    public static class NET_DVR_STD_ABILITY extends HIKSDKStructure {
         public Pointer lpCondBuffer;    //[in]条件参数(码字格式),例如通道号等.可以为NULL
         public int dwCondSize;        //[in] dwCondSize指向的内存大小
         public Pointer lpOutBuffer;    //[out]输出参数(XML格式),不为NULL
@@ -9014,7 +9019,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[32];        //保留字节
     }
 
-    public static class NET_DVR_STD_CONFIG extends Structure {
+    public static class NET_DVR_STD_CONFIG extends HIKSDKStructure {
         public Pointer lpCondBuffer;        //[in]条件参数(结构体格式),例如通道号等.可以为NULL
         public int dwCondSize;            //[in] lpCondBuffer指向的内存大小
         public Pointer lpInBuffer;            //[in]输入参数(结构体格式),设置时不为NULL，获取时为NULL
@@ -9031,12 +9036,12 @@ DVR实现巡航数据结构
 
     public static final int NET_SDK_MAX_FILE_PATH = 256;//路径长度
 
-    public static class NET_DVR_LOCAL_SDK_PATH extends Structure {
+    public static class NET_DVR_LOCAL_SDK_PATH extends HIKSDKStructure {
         public byte[] sPath = new byte[NET_SDK_MAX_FILE_PATH];//组件库地址
         public byte[] byRes = new byte[128];
     }
 
-    public static class BYTE_ARRAY extends Structure {
+    public static class BYTE_ARRAY extends HIKSDKStructure {
         public byte[] byValue;
 
         public BYTE_ARRAY(int iLen) {
@@ -9044,7 +9049,7 @@ DVR实现巡航数据结构
         }
     }
 
-    public static class INT_ARRAY extends Structure {
+    public static class INT_ARRAY extends HIKSDKStructure {
         public int[] intValue;
 
         public INT_ARRAY(int iLen) {
@@ -9052,7 +9057,7 @@ DVR实现巡航数据结构
         }
     }
 
-    public static class INTRef_ARRAY extends Structure {
+    public static class INTRef_ARRAY extends HIKSDKStructure {
         public IntByReference[] intValue;
 
         public INTRef_ARRAY(int iLen) {
@@ -9061,7 +9066,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_JSON_DATA_CFG extends Structure {
+    public static class NET_DVR_JSON_DATA_CFG extends HIKSDKStructure {
         public int dwSize;                        //结构体大小
         public Pointer lpJsonData;                //JSON报文
         public int dwJsonDataSize;                //JSON报文大小
@@ -9072,14 +9077,14 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[248];
     }
 
-    public static class CallBack_USER extends Structure {
+    public static class CallBack_USER extends HIKSDKStructure {
         public byte[] byDeviceID = new byte[16];
         public byte[] byCardNo = new byte[32];
         public byte[] byDevIP = new byte[16];
     }
 
 
-    public static class NET_DVR_CAMERAPARAMCFG_EX extends Structure {
+    public static class NET_DVR_CAMERAPARAMCFG_EX extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_VIDEOEFFECT struVideoEffect = new NET_DVR_VIDEOEFFECT();/*亮度、对比度、饱和度、锐度、色调配置*/
         public NET_DVR_GAIN struGain = new NET_DVR_GAIN();/*自动增益*/
@@ -9192,7 +9197,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_VIDEOEFFECT extends Structure {
+    public static class NET_DVR_VIDEOEFFECT extends HIKSDKStructure {
         public byte byBrightnessLevel; /*0-100*/
         public byte byContrastLevel; /*0-100*/
         public byte bySharpnessLevel; /*0-100*/
@@ -9204,14 +9209,14 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_GAIN extends Structure {
+    public static class NET_DVR_GAIN extends HIKSDKStructure {
         public byte byGainLevel; /*增益：0-100*/
         public byte byGainUserSet; /*用户自定义增益；0-100，对于抓拍机，是CCD模式下的抓拍增益*/
         public byte[] byRes = new byte[2];
         public int dwMaxGainValue;/*最大增益值，单位dB*/
     }
 
-    public static class NET_DVR_WHITEBALANCE extends Structure {
+    public static class NET_DVR_WHITEBALANCE extends HIKSDKStructure {
         public byte byWhiteBalanceMode; /*0-手动白平衡（MWB）,1-自动白平衡1（AWB1）,2-自动白平衡2 (AWB2),3-自动控制改名为锁定白平衡(Locked WB)，
     4-室外(Indoor)，5-室内(Outdoor)6-日光灯(Fluorescent Lamp)，7-钠灯(Sodium Lamp)，
     8-自动(Auto-Track)9-一次白平衡(One Push)，10-室外自动(Auto-Outdoor)，
@@ -9222,7 +9227,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[5];
     }
 
-    public static class NET_DVR_EXPOSURE extends Structure {
+    public static class NET_DVR_EXPOSURE extends HIKSDKStructure {
         public byte byExposureMode; /*0 手动曝光 1自动曝光*/
         public byte byAutoApertureLevel; /* 自动光圈灵敏度, 0-10 */
         public byte[] byRes = new byte[2];
@@ -9231,14 +9236,14 @@ DVR实现巡航数据结构
         public int dwRes;
     }
 
-    public static class NET_DVR_GAMMACORRECT extends Structure {
+    public static class NET_DVR_GAMMACORRECT extends HIKSDKStructure {
         public byte byGammaCorrectionEnabled; /*0 dsibale  1 enable*/
         public byte byGammaCorrectionLevel; /*0-100*/
         public byte[] byRes = new byte[6];
     }
 
 
-    public static class NET_DVR_WDR extends Structure {
+    public static class NET_DVR_WDR extends HIKSDKStructure {
         public byte byWDREnabled; /*宽动态：0 dsibale  1 enable 2 auto*/
         public byte byWDRLevel1; /*0-F*/
         public byte byWDRLevel2; /*0-F*/
@@ -9246,7 +9251,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[16];
     }
 
-    public static class NET_DVR_DAYNIGHT extends Structure {
+    public static class NET_DVR_DAYNIGHT extends HIKSDKStructure {
         public byte byDayNightFilterType; /*日夜切换：0-白天，1-夜晚，2-自动，3-定时，4-报警输入触发, 5-自动模式2（无光敏）,6-黑光，7-黑光自动，8-黑光定时*/
         public byte bySwitchScheduleEnabled; /*0 dsibale  1 enable,(保留)*/
         //定时模式参数
@@ -9265,7 +9270,7 @@ DVR实现巡航数据结构
         public byte byAlarmTrigState; //报警输入触发状态，0-白天，1-夜晚
     }
 
-    public static class NET_DVR_BACKLIGHT extends Structure {
+    public static class NET_DVR_BACKLIGHT extends HIKSDKStructure {
         public byte byBacklightMode; /*背光补偿:0 off 1 UP、2 DOWN、3 LEFT、4 RIGHT、5MIDDLE、6自定义，10-开，11-自动，12-多区域背光补偿*/
         public byte byBacklightLevel; /*0x0-0xF*/
         public byte[] byRes1 = new byte[2];
@@ -9277,7 +9282,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_NOISEREMOVE extends Structure {
+    public static class NET_DVR_NOISEREMOVE extends HIKSDKStructure {
         public byte byDigitalNoiseRemoveEnable; /*0-不启用，1-普通模式数字降噪，2-专家模式数字降噪*/
         public byte byDigitalNoiseRemoveLevel; /*普通模式数字降噪级别：0x0-0xF*/
         public byte bySpectralLevel;       /*专家模式下空域强度：0-100*/
@@ -9288,7 +9293,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_CMOSMODECFG extends Structure {
+    public static class NET_DVR_CMOSMODECFG extends HIKSDKStructure {
         public byte byCaptureMod;   //抓拍模式：0-抓拍模式1；1-抓拍模式2
         public byte byBrightnessGate;//亮度阈值
         public byte byCaptureGain1;   //抓拍增益1,0-100
@@ -9298,13 +9303,13 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[4];
     }
 
-    public static class NET_DVR_DEFOGCFG extends Structure {
+    public static class NET_DVR_DEFOGCFG extends HIKSDKStructure {
         public byte byMode; //模式，0-不启用，1-自动模式，2-常开模式
         public byte byLevel; //等级，0-100
         public byte[] byRes = new byte[6];
     }
 
-    public static class NET_DVR_CMOSMODCFG extends Structure {
+    public static class NET_DVR_CMOSMODCFG extends HIKSDKStructure {
         public byte byCaptureMod;   //抓拍模式：0-抓拍模式1；1-抓拍模式2
         public byte byBrightnessGate;//亮度阈值
         public byte byCaptureGain1;   //抓拍增益1,0-100
@@ -9314,31 +9319,31 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[4];
     }
 
-    public static class NET_DVR_ELECTRONICSTABILIZATION extends Structure {
+    public static class NET_DVR_ELECTRONICSTABILIZATION extends HIKSDKStructure {
         public byte byEnable;//使能 0- 不启用，1- 启用
         public byte byLevel; //等级，0-100
         public byte[] byRes = new byte[6];
     }
 
-    public static class NET_DVR_CORRIDOR_MODE_CCD extends Structure {
+    public static class NET_DVR_CORRIDOR_MODE_CCD extends HIKSDKStructure {
         public byte byEnableCorridorMode; //是否启用走廊模式 0～不启用， 1～启用
         public byte[] byRes = new byte[11];
     }
 
-    public static class NET_DVR_SMARTIR_PARAM extends Structure {
+    public static class NET_DVR_SMARTIR_PARAM extends HIKSDKStructure {
         public byte byMode;//0～手动，1～自动
         public byte byIRDistance;//红外距离等级(等级，距离正比例)level:1~100 默认:50（手动模式下增加）
         public byte byShortIRDistance;// 近光灯距离等级(1~100)
         public byte byLongIRDistance;// 远光灯距离等级(1~100)
     }
 
-    public static class NET_DVR_PIRIS_PARAM extends Structure {
+    public static class NET_DVR_PIRIS_PARAM extends HIKSDKStructure {
         public byte byMode;//0-自动，1-手动
         public byte byPIrisAperture;//红外光圈大小等级(等级,光圈大小正比例)level:1~100 默认:50（手动模式下增加）
         public byte[] byRes = new byte[6];
     }
 
-    public static class NET_DVR_LASER_PARAM_CFG extends Structure {
+    public static class NET_DVR_LASER_PARAM_CFG extends HIKSDKStructure {
         public byte byControlMode;        //控制模式            0-无效，1-自动，2-手动 默认自动
         public byte bySensitivity;        //激光灯灵敏度        0-100 默认50
         public byte byTriggerMode;        //激光灯触发模式    0-无效，1-机芯触发，2-光敏触发 默认机芯触发
@@ -9351,7 +9356,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[7];           //保留
     }
 
-    public static class NET_DVR_FFC_PARAM extends Structure {
+    public static class NET_DVR_FFC_PARAM extends HIKSDKStructure {
         //1-Schedule Mode,2-Temperature Mode, 3-Off
         public byte byMode;
         //（时间:按能力显示，单位分钟，选项有10,20,30,40,50,60,120,180,240）
@@ -9360,21 +9365,21 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[4];
     }
 
-    public static class NET_DVR_DDE_PARAM extends Structure {
+    public static class NET_DVR_DDE_PARAM extends HIKSDKStructure {
         public byte byMode;//1-Off,2-Normal Mode,3-Expert Mode
         public byte byNormalLevel;//普通模式等级范围[1,100]，普通模式下生效
         public byte byExpertLevel;//专家模式等级范围[1,100]，专家模式下生效
         public byte[] byRes = new byte[5];
     }
 
-    public static class NET_DVR_AGC_PARAM extends Structure {
+    public static class NET_DVR_AGC_PARAM extends HIKSDKStructure {
         public byte bySceneType;//1-Normal Sence,2-Highlight Sence,3-Manual Sence
         public byte byLightLevel;//亮度等级[1,100]；手动模式下生效
         public byte byGainLevel; //增益等级[1,100]；手动模式下生效
         public byte[] byRes = new byte[5];
     }
 
-    public static class NET_DVR_SNAP_CAMERAPARAMCFG extends Structure {
+    public static class NET_DVR_SNAP_CAMERAPARAMCFG extends HIKSDKStructure {
         public byte byWDRMode;   // 宽动态模式;0~关闭，1~数字宽动态 2~宽动态
         public byte byWDRType;    // 宽动态切换模式; 0~强制启用，1~按时间启用，2~按亮度启用
         public byte byWDRLevel;   // 宽动态等级，0~6索引对应1-7，默认索引2（即3级）；
@@ -9410,12 +9415,12 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[9];
     }
 
-    public static class NET_DVR_OPTICAL_DEHAZE extends Structure {
+    public static class NET_DVR_OPTICAL_DEHAZE extends HIKSDKStructure {
         public byte byEnable; //0~不启用光学透雾，1~启用光学透雾
         public byte[] byRes = new byte[7];
     }
 
-    public static class NET_DVR_THERMOMETRY_AGC extends Structure {
+    public static class NET_DVR_THERMOMETRY_AGC extends HIKSDKStructure {
         public byte byMode;//AGC模式，0~无效，1~自动，2~手动
         public byte byRes1[] = new byte[3];
         public int iHighTemperature;//最高温度，范围为：-273~9999摄氏度（1~手动模式下生效）
@@ -9423,26 +9428,26 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[8];
     }
 
-    public static class NET_DVR_CHECK_DEV_STATE extends Structure {
+    public static class NET_DVR_CHECK_DEV_STATE extends HIKSDKStructure {
         public int dwTimeout;      //定时检测设备工作状态，单位ms，为0时，表示使用默认值(30000)。最小值为1000
         public DEV_WORK_STATE_CB fnStateCB;
         Pointer pUserData;
         public byte[] byRes = new byte[60];
     }
 
-    public static class NET_DVR_FLOW_INFO extends Structure {
+    public static class NET_DVR_FLOW_INFO extends HIKSDKStructure {
         public int dwSize;             //结构大小
         public int dwSendFlowSize;     //发送流量大小,单位kbps
         public int dwRecvFlowSize;     //接收流量大小,单位kbps
         public byte[] byRes = new byte[20];           //保留
     }
 
-    public static class NET_DVR_AES_KEY_INFO extends Structure {
+    public static class NET_DVR_AES_KEY_INFO extends HIKSDKStructure {
         public byte[] sAESKey = new byte[16];        /*码流加密密钥*/
         public byte[] byRes = new byte[64];          /*保留字节*/
     }
 
-    public static class NET_DVR_ALARM_RS485CFG extends Structure {
+    public static class NET_DVR_ALARM_RS485CFG extends HIKSDKStructure {
         public int dwSize;                 // 结构体大小
         public byte[] sDeviceName = new byte[NAME_LEN];  // 前端设备名称
         public short wDeviceType;            // 前端设备类型,通过NET_DVR_GetDeviceTypeList获取
@@ -9462,7 +9467,7 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[33];              // 保留字节
     }
 
-    public static class NET_DVR_ALARMHOST_RS485_SLOT_CFG extends Structure {
+    public static class NET_DVR_ALARMHOST_RS485_SLOT_CFG extends HIKSDKStructure {
         public int dwSize;              // 结构体大小
         public byte[] sDeviceName = new byte[NAME_LEN];      // 前端设备名称
         public short wDeviceType;            // 前端设备类型ALARM_FRONT_DEVICE _TYPE
@@ -9474,7 +9479,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class NET_DVR_VIDEOWALLDISPLAYPOSITION extends Structure {
+    public static class NET_DVR_VIDEOWALLDISPLAYPOSITION extends HIKSDKStructure {
         public int dwSize;
         public byte byEnable;
         public byte byCoordinateType;//坐标类型。0-基准坐标，1-实际坐标
@@ -9489,19 +9494,19 @@ DVR实现巡航数据结构
 
     public static final int MAX_DISPLAY_NUM = 512; //最大显示输出个数
 
-    public static class NET_DVR_DISPLAYCFG extends Structure {
+    public static class NET_DVR_DISPLAYCFG extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_DISPLAYPARAM[] struDisplayParam = new NET_DVR_DISPLAYPARAM[MAX_DISPLAY_NUM];
         public byte[] byRes2 = new byte[128];
     }
 
-    public static class NET_DVR_DISPLAYPARAM extends Structure {
+    public static class NET_DVR_DISPLAYPARAM extends HIKSDKStructure {
         public int dwDisplayNo;
         public byte byDispChanType;
         public byte[] byRes = new byte[11];
     }
 
-    public static class NET_DVR_WALLOUTPUTPARAM extends Structure {
+    public static class NET_DVR_WALLOUTPUTPARAM extends HIKSDKStructure {
         public int dwSize;
         public int dwResolution; //分辨率
         public NET_DVR_VIDEOEFFECT struRes;
@@ -9516,7 +9521,7 @@ DVR实现巡航数据结构
         public byte[] byRes2 = new byte[51];
     }
 
-    public static class WALLOUTPUTPARAM_ARRAY extends Structure {
+    public static class WALLOUTPUTPARAM_ARRAY extends HIKSDKStructure {
         public NET_DVR_WALLOUTPUTPARAM[] strWalloutputParm;
 
         public WALLOUTPUTPARAM_ARRAY(int iLen) {
@@ -9525,9 +9530,9 @@ DVR实现巡航数据结构
 
     }
 
-    public static class NET_DVR_VIDEO_CALL_COND extends Structure {
-        public int dwSize;
-        public byte[] byRes = new byte[128];
+    public static class NET_DVR_VIDEO_CALL_COND extends HIKSDKStructure{
+        public int    dwSize;
+        public byte[]    byRes=new byte[128];
     }
 
 
@@ -9578,7 +9583,6 @@ DVR实现巡航数据结构
     public static interface FPlayDataCallBack extends Callback {
         public void invoke(int lPlayHandle, int dwDataType, Pointer pBuffer, int dwBufSize, int dwUser);
     }
-
     public static interface FPlayESCallBack extends Callback {
         public void invoke(int lPlayHandle, NET_DVR_PACKET_INFO_EX struPackInfo, Pointer pUser);
     }
@@ -9679,9 +9683,7 @@ DVR实现巡航数据结构
     boolean NET_DVR_StopPlayBack(int lPlayHandle);
 
     boolean NET_DVR_SetPlayDataCallBack(int lPlayHandle, FPlayDataCallBack fPlayDataCallBack, int dwUser);
-
     boolean NET_DVR_SetPlayDataCallBack_V40(int lPlayHandle, FPlayDataCallBack fPlayDataCallBack, Pointer dwUser);
-
     boolean NET_DVR_SetPlayBackESCallBack(int lPlayHandle, FPlayESCallBack fPlayESCallBack, Pointer pUser);
 
     boolean NET_DVR_PlayBackSaveData(int lPlayHandle, String sFileName);
@@ -9927,7 +9929,6 @@ DVR实现巡航数据结构
     //语音转发
 
     boolean NET_DVR_GetCurrentAudioCompress(int lUserID, NET_DVR_COMPRESSION_AUDIO lpCompressAudio);
-
     int NET_DVR_StartVoiceCom_MR(int lUserID, FVoiceDataCallBack_MR fVoiceDataCallBack, int dwUser);
 
     int NET_DVR_StartVoiceCom_MR_V30(int lUserID, int dwVoiceChan, FVoiceDataCallback_MR_V30 fVoiceDataCallBack, Pointer pUser);
@@ -10310,7 +10311,7 @@ DVR实现巡航数据结构
 
     int NET_DVR_UploadFile_V40(int lUserID, int dwUploadType, Pointer lpInBuffer, int dwInBufferSize, String sFileName, Pointer lpOutBuffer, int dwOutBufferSize);
 
-    int NET_DVR_UploadSend(int lUploadHandle, NET_DVR_SEND_PARAM_IN pstruSendParamIN, Pointer lpOutBuffer);
+    int NET_DVR_UploadSend(int  lUploadHandle, NET_DVR_SEND_PARAM_IN pstruSendParamIN, Pointer lpOutBuffer);
 
     int NET_DVR_GetUploadState(int lUploadHandle, Pointer pProgress);
 
@@ -10327,7 +10328,7 @@ DVR实现巡航数据结构
     boolean NET_DVR_StartGetDevState(NET_DVR_CHECK_DEV_STATE pParams);
 
     //gps相关结构定义
-    public static class TimeSegParam extends Structure {
+    public static class TimeSegParam extends HIKSDKStructure {
         //GPS数据查找起始时间
         public NET_DVR_TIME struBeginTime;
         //GPS数据查找结束时间
@@ -10339,7 +10340,7 @@ DVR实现巡航数据结构
     }
 
     //按时间点查询
-    public static class TimePointParam extends Structure {
+    public static class TimePointParam extends HIKSDKStructure {
         //GPS数据查找时间点
         public NET_DVR_TIME struTimePoint;
         //保留
@@ -10354,7 +10355,7 @@ DVR实现巡航数据结构
     }
 
     //gps查询参数定义
-    public static class NET_DVR_GET_GPS_DATA_PARAM extends Structure {
+    public static class NET_DVR_GET_GPS_DATA_PARAM extends HIKSDKStructure {
         //查找方式：0- 按时间段查找GPS数据，1- 按时间点查找GPS数据
         public int dwCmdType;
         public GpsDataParamUion gpsDataParam;
@@ -10381,7 +10382,7 @@ DVR实现巡航数据结构
     }
 
     //gps数据结构定义
-    public static class NET_DVR_GPS_INFO extends Structure {
+    public static class NET_DVR_GPS_INFO extends HIKSDKStructure {
         public byte[] byDirection = new byte[2];
         public byte bySvs;
         public byte byLocateMode;
@@ -10395,7 +10396,7 @@ DVR实现巡航数据结构
     }
 
     //gps返回数据结构定义
-    public static class NET_DVR_GPS_DATA extends Structure {
+    public static class NET_DVR_GPS_DATA extends HIKSDKStructure {
         public NET_DVR_GPS_INFO struGPSInfo;
         public NET_DVR_TIME struTime;
         public byte[] byRes = new byte[12];
@@ -10411,7 +10412,7 @@ DVR实现巡航数据结构
      * 热成像相关
      */
     //设备抓图附加全屏测温数据结构体
-    public static class NET_DVR_JPEGPICTURE_WITH_APPENDDATA extends Structure {
+    public static class NET_DVR_JPEGPICTURE_WITH_APPENDDATA extends HIKSDKStructure {
         public int dwSize;
         public int dwChannel;//通道号
         public int dwJpegPicLen;//Jpeg图片长度
@@ -10425,7 +10426,7 @@ DVR实现巡航数据结构
     }
 
 
-    public static class DATE_TIME extends Structure {
+    public static class DATE_TIME extends HIKSDKStructure {
         public short year;             /*APP->DSP 年*/
         public short month;            /*APP->DSP 月*/
         public short dayOfWeek;        /*APP->DSP 0:星期日-6:星期六*/
@@ -10437,7 +10438,7 @@ DVR实现巡航数据结构
     }
 
     //全屏测温数据解析
-    public static class STREAM_RT_DATA_INFO_S extends Structure {
+    public static class STREAM_RT_DATA_INFO_S extends HIKSDKStructure {
         public int u32RTDataType; // 1-14bit裸数据; 2-全屏测温结果数据; 3-YUV数据
         public int u32FrmNum;
         public int u32StdStamp; //DSP相对时间戳
@@ -10449,14 +10450,14 @@ DVR实现巡航数据结构
         public int u32Chan;
     }
 
-    public static class STREAM_FS_SUPPLE_INFO_TEMP extends Structure {
+    public static class STREAM_FS_SUPPLE_INFO_TEMP extends HIKSDKStructure {
         public int u32TmDataMode;      /* 0为4字节，1为2字节 */
         public int u32TmScale;         /* 测温缩放比例 */
         public int u32TmOffset;        /* 测温偏移量，当前固定为0 */
         public int byIsFreezedata;      /*是否是冻结数据，1:冻结，0:非冻结*/
     }
 
-    public static class STREAM_FARME_INFO_TEMP extends Structure {
+    public static class STREAM_FARME_INFO_TEMP extends HIKSDKStructure {
         public int u32MagicNo;        //0x70827773  "FRMI"的ascii码
         public int u32HeaderSize;     //结构体长度
         public int u32StreamType;     //数据类型： h264/h265, JPEG, Audio, MetaData, RTData: 参见 STREAM_TYPE_E
@@ -10468,7 +10469,7 @@ DVR实现巡航数据结构
     }
 
     //测温规则温度信息
-    public static class NET_DVR_THERMOMETRYRULE_TEMPERATURE_INFO extends Structure {
+    public static class NET_DVR_THERMOMETRYRULE_TEMPERATURE_INFO extends HIKSDKStructure {
         public float fMaxTemperature;
         public float fMinTemperature;
         public float fAverageTemperature;
@@ -10478,12 +10479,12 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[15];
     }
 
-    public static class REMOTECONFIGSTATUS_THERMOMETRY extends Structure {
+    public static class REMOTECONFIGSTATUS_THERMOMETRY extends HIKSDKStructure {
         public byte[] byStatus = new byte[4];
         public byte[] byErrorCode = new byte[4];
     }
 
-    public static class NET_DVR_FIREDETECTION_ALARM extends Structure {
+    public static class NET_DVR_FIREDETECTION_ALARM extends HIKSDKStructure {
         public int dwSize; //结构体大小
         public int dwRelativeTime; //相对时标
         public int dwAbsTime; //绝对时标
@@ -10523,7 +10524,7 @@ DVR实现巡航数据结构
     }
 
     //模块服务配置结构体
-    public static class NET_DVR_DEVSERVER_CFG extends Structure {
+    public static class NET_DVR_DEVSERVER_CFG extends HIKSDKStructure {
         public int dwSize; //结构体大小
         public byte byIrLampServer; //红外灯设置：0- 禁用，1- 启用
         public byte bytelnetServer; //telnet设置：0- 禁用，1- 启用
@@ -10543,26 +10544,26 @@ DVR实现巡航数据结构
     public static final int MAX_UPLOADFILE_URL_LEN = 240;
     public static final int IMPORT_DATA_TO_FACELIB = 39; //导入人脸数据（人脸图片+图片附件信息 到设备人脸库）
 
-    public static class NET_DVR_UPLOAD_FILE_RET extends Structure {
+    public static class NET_DVR_UPLOAD_FILE_RET extends HIKSDKStructure {
 
         public byte[] sUrl = new byte[MAX_UPLOADFILE_URL_LEN];   //url
         public byte[] byRes = new byte[260];
     }
 
-    public static class NET_DVR_FLOW_TEST_PARAM extends Structure {
+    public static class NET_DVR_FLOW_TEST_PARAM extends HIKSDKStructure {
         public int dwSize;              //结构大小
         public int lCardIndex;         //网卡索引
         public int dwInterval;         //设备上传流量时间间隔, 单位:100ms
         public byte[] byRes = new byte[8];           //保留字节
     }
 
-    public static class NET_DVR_RECORD_TIME_SPAN_INQUIRY extends Structure {
+    public static class NET_DVR_RECORD_TIME_SPAN_INQUIRY extends HIKSDKStructure {
         public int dwSize;    //结构体大小
         public byte byType;     //0 正常音视频录像, 1图片通道录像, 2ANR通道录像, 3抽帧通道录像
         public byte[] byRes = new byte[63];
     }
 
-    public static class NET_DVR_RECORD_TIME_SPAN extends Structure {
+    public static class NET_DVR_RECORD_TIME_SPAN extends HIKSDKStructure {
         public int dwSize;        //结构体大小
         public NET_DVR_TIME strBeginTime;  //开始时间
         public NET_DVR_TIME strEndTime;    //结束时间
@@ -10573,7 +10574,7 @@ DVR实现巡航数据结构
     /*
      * 月历录像分布查询条件结构体
      */
-    public static class NET_DVR_MRD_SEARCH_PARAM extends Structure {
+    public static class NET_DVR_MRD_SEARCH_PARAM extends HIKSDKStructure {
         public int dwSize;            // 结构体大小
         public NET_DVR_STREAM_INFO struStreamInfo = new NET_DVR_STREAM_INFO();    // 布防点
         public short wYear;              // 年
@@ -10587,7 +10588,7 @@ DVR实现巡航数据结构
     /*
      * 月历录像分布查询结果结构体
      */
-    public static class NET_DVR_MRD_SEARCH_RESULT extends Structure {
+    public static class NET_DVR_MRD_SEARCH_RESULT extends HIKSDKStructure {
 
         public int dwSize;   // 结构体大小
         public byte[] byRecordDistribution = new byte[32];   // 录像分布，byRecordDistribution[0]=1表示1日存在录像，byRecordDistribution[0]=0表示没有录像，byRecordDistribution[1]表示2日，以此类推
@@ -10598,7 +10599,7 @@ DVR实现巡航数据结构
     public static final int NET_DVR_GET_GISINFO = 3711;
     //GIS信息
 
-    public static class NET_DVR_GIS_INFO extends Structure {
+    public static class NET_DVR_GIS_INFO extends HIKSDKStructure {
         public int dwSize;
         public float fAzimuth;
         public float fHorizontalValue;
@@ -10622,14 +10623,14 @@ DVR实现巡航数据结构
     }
 
     //GBT28181协议的设备编码通道配置
-    public static class NET_DVR_GBT28181_CHANINFO_CFG extends Structure {
+    public static class NET_DVR_GBT28181_CHANINFO_CFG extends HIKSDKStructure {
         public int dwSize;
         public byte[] szVideoChannelNumID = new byte[64];//设备视频通道编码ID：64字节字符串，仅限数字
         public byte[] byRes = new byte[256];
     }
 
     // 巡航路径配置条件结构体
-    public static class NET_DVR_CRUISEPOINT_COND extends Structure {
+    public static class NET_DVR_CRUISEPOINT_COND extends HIKSDKStructure {
         public int dwSize;
         public int dwChan;
         public short wRouteNo;
@@ -10637,21 +10638,21 @@ DVR实现巡航数据结构
     }
 
     // 巡航路径配置结构体
-    public static class NET_DVR_CRUISEPOINT_V40 extends Structure {
+    public static class NET_DVR_CRUISEPOINT_V40 extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_CRUISEPOINT_PARAM[] struCruisePoint = (NET_DVR_CRUISEPOINT_PARAM[]) new NET_DVR_CRUISEPOINT_PARAM().toArray(128);
         public byte[] byRes = new byte[64];
     }
 
     // 巡航路径配置结构体
-    public static class NET_DVR_CRUISEPOINT_V50 extends Structure {
+    public static class NET_DVR_CRUISEPOINT_V50 extends HIKSDKStructure {
         public int dwSize;
         public NET_DVR_CRUISEPOINT_PARAM[] struCruisePoint = (NET_DVR_CRUISEPOINT_PARAM[]) new NET_DVR_CRUISEPOINT_PARAM().toArray(256);
         public byte[] byRes = new byte[64];
     }
 
     // 巡航点参数结构体
-    public static class NET_DVR_CRUISEPOINT_PARAM extends Structure {
+    public static class NET_DVR_CRUISEPOINT_PARAM extends HIKSDKStructure {
         public short wPresetNo;
         public short wDwell;
         public byte bySpeed;
@@ -10660,14 +10661,14 @@ DVR实现巡航数据结构
     }
 
     //因为Java没有二维数组，BYTE_TWODIM是自定义的结构体
-    public static class BYTE_TWODIM extends Structure {
+    public static class BYTE_TWODIM extends HIKSDKStructure {
         public byte[] strIP = new byte[16];
     }
 
     //云台锁定配置结构体
-    public static class NET_DVR_PTZ_LOCKCFG extends Structure {
+    public static class NET_DVR_PTZ_LOCKCFG extends HIKSDKStructure {
         public int dwSize;//结构体大小
-        public byte byWorkMode;//云台锁定控制：0- 解锁，1- 锁定
+        public byte  byWorkMode ;//云台锁定控制：0- 解锁，1- 锁定
         public byte[] byRes = new byte[123];
     }
 }

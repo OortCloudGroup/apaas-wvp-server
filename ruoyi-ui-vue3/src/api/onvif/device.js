@@ -1,4 +1,20 @@
-import request from '@/utils/request'
+import request from '@/utils/request';
+
+export function WSDiscovery(){
+    return request({
+        url: '/onvif/device/WSDiscovery',
+        method: 'get',
+        timeout: 10000 * 6
+    })
+}
+
+export function addOnvif(data) {
+  return request({
+    url: '/onvif/device/addOnvif',
+    method: 'post',
+    data: data
+  })
+}
 
 // 查询onvif 设备列表
 export function listDevice(query) {
@@ -120,6 +136,25 @@ export function removePreset(query) {
 export function addPreset(query) {
   return request({
     url: '/onvif/service/addPreset',
+    method: 'get',
+    params: query
+  })
+}
+
+
+// 云台开始
+export function onvifPZTStart(query) {
+  return request({
+    url: '/onvif/service/onvifPZTStart',
+    method: 'get',
+    params: query
+  })
+}
+
+// 云台结束
+export function onvifPZTEnd(query) {
+  return request({
+    url: '/onvif/service/onvifPZTEnd',
     method: 'get',
     params: query
   })

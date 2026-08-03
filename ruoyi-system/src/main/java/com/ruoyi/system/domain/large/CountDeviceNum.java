@@ -28,6 +28,11 @@ public class CountDeviceNum {
      */
     private Integer totalOnvifNum;
 
+    /**
+     * 大华设备数量
+     */
+    private Integer totalDahuaNum;
+
     public Integer getTotalGbNum() {
         return totalGbNum;
     }
@@ -60,6 +65,14 @@ public class CountDeviceNum {
         this.totalOnvifNum = totalOnvifNum;
     }
 
+    public Integer getTotalDahuaNum() {
+        return totalDahuaNum;
+    }
+
+    public void setTotalDahuaNum(Integer totalDahuaNum) {
+        this.totalDahuaNum = totalDahuaNum;
+    }
+
     @Override
     public String toString() {
         return "CountDeviceNum{" +
@@ -67,6 +80,7 @@ public class CountDeviceNum {
                 ", totalIsupNum=" + totalIsupNum +
                 ", totalRtspNum=" + totalRtspNum +
                 ", totalOnvifNum=" + totalOnvifNum +
+                ", totalDahuaNum=" + totalDahuaNum +
                 '}';
     }
 }

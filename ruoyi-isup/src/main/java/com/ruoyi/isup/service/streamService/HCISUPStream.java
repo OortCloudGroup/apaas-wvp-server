@@ -1,7 +1,10 @@
 package com.ruoyi.isup.service.streamService;
 
 import com.ruoyi.isup.service.cmsService.HCISUPCMS;
-import com.sun.jna.*;
+import com.sun.jna.Callback;
+import com.sun.jna.Library;
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 import java.util.Arrays;
 import java.util.List;

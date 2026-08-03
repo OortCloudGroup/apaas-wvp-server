@@ -104,7 +104,7 @@ export default {
         background: "",
         controlAutoHide: false,
         debug: false,
-        decoder: "static/js/jessibuca/decoder.js",
+        decoder: "jessibuca/decoder.js",
         forceNoOffscreen: false,
         hasAudio: typeof (this.hasAudio) == "undefined" ? true : this.hasAudio,
         heartTimeout: 5,

@@ -6,9 +6,11 @@ import com.ruoyi.wvp.gb28181.service.IGbChannelControlService;
 import com.ruoyi.wvp.service.bean.ErrorCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@Transactional(rollbackFor = Exception.class)
 public class GbChannelControlServiceImpl implements IGbChannelControlService {
 
     @Override

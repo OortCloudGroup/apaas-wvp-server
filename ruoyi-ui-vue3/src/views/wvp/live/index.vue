@@ -139,7 +139,11 @@ const handleNodeClick = async (data) => {
 
       const videoRef = proxy.$refs[`video${activePlayerIndex.value}`];
       if (videoRef && videoRef[0]) {
-        videoRef[0].createPlayer(res.data.flv, 0);
+        if (location.protocol === "https:") {
+          videoRef[0].createPlayer(res.data.https_flv, 0);
+        } else {
+          videoRef[0].createPlayer(res.data.flv, 0);
+        }
       } else {
         proxy.$modal.msgError("请选择播放器");
       }
@@ -152,7 +156,11 @@ const handleNodeClick = async (data) => {
     const ans = await playPush({id: data.dataDeviceId});
     const videoRef = proxy.$refs[`video${activePlayerIndex.value}`];
     if (videoRef && videoRef[0]) {
-      videoRef[0].createPlayer(ans.data.flv, 0);
+      if (location.protocol === "https:") {
+        videoRef[0].createPlayer(res.data.https_flv, 0);
+      } else {
+        videoRef[0].createPlayer(ans.data.flv, 0);
+      }
     } else {
       proxy.$modal.msgError("请选择播放器");
     }
@@ -162,7 +170,11 @@ const handleNodeClick = async (data) => {
     const ans = await playProxy({id: data.dataDeviceId});
     const videoRef = proxy.$refs[`video${activePlayerIndex.value}`];
     if (videoRef && videoRef[0]) {
-      videoRef[0].createPlayer(ans.flv, 0);
+      if (location.protocol === "https:"){
+        videoRef[0].createPlayer(ans.https_flv, 0);
+      } else {
+        videoRef[0].createPlayer(ans.flv, 0);
+      }
     } else {
       proxy.$modal.msgError("请选择播放器");
     }

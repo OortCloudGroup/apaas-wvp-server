@@ -35,7 +35,6 @@ public class RuoYiApplication extends SpringBootServletInitializer {
     private static ConfigurableApplicationContext context;
 
     public static void main(String[] args) {
-        // System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(RuoYiApplication.class, args);
         System.out.println("(♥◠‿◠)ﾉﾞ  ruoyi-wvp启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
                 "\n" +

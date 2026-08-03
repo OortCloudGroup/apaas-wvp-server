@@ -103,6 +103,9 @@ service.interceptors.response.use(res => {
       ElNotification.error({ title: msg })
       return Promise.reject('error')
     } else {
+      if(res.data.total){
+        res.data.total = Number(res.data.total)
+      }
       return  Promise.resolve(res.data)
     }
   },

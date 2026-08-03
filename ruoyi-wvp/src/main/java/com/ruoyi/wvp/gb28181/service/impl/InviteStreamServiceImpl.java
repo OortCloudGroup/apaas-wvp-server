@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 @Service
 @DS("master")
+@Transactional(rollbackFor = Exception.class)
 public class InviteStreamServiceImpl implements IInviteStreamService {
 
     private final Map<String, List<ErrorCallback<StreamInfo>>> inviteErrorCallbackMap = new ConcurrentHashMap<>();

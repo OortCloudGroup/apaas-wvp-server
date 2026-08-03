@@ -98,4 +98,12 @@ public interface IsupDeviceMapper {
      * @return 设备列表
      */
     List<IsupDevice> selectAllIsupDeviceList();
+
+    /**
+     * 查询地图isup设备列表
+     *
+     * @param isupDevice
+     * @return
+     */
+    List<IsupDevice> selectIsupDeviceListMap(IsupDevice isupDevice);
 }

@@ -25,6 +25,7 @@ import java.util.*;
  */
 @Service
 @Slf4j
+@Transactional(rollbackFor = Exception.class)
 public class GroupServiceImpl implements IGroupService {
 
     @Autowired

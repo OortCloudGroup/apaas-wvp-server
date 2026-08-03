@@ -24,7 +24,7 @@ public class ServerLoggerImpl implements ServerLogger {
 
     @Override
     public void logMessage(SIPMessage message, String from, String to, boolean sender, long time) {
-        if (!showLog) {
+        if (showLog) {
             return;
         }
         StringBuilder stringBuilder = new StringBuilder();

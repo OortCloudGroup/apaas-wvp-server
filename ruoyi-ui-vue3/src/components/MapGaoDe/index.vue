@@ -31,8 +31,8 @@ const site = ref('');
 const searchBox = ref(null);
 let map = null;
 
-const lng = ref(113.26);
-const lat = ref(23.13);
+const lng = ref(116.3912757);
+const lat = ref(39.906217);
 
 /** 要传输给父组件的值 */
 const MapLng = ref('');
@@ -61,6 +61,15 @@ const inGaDeMap = async () => {
 
   await getConfigKey("amap.key").then(response => {
     map_key.value = response.msg;
+  });
+
+  await getConfigKey("map_center").then(response => {
+    if (response.msg != ""){
+      const coordStr = response.msg;
+      const [latitude, longitude] = coordStr.split(",").map(item => parseFloat(item.trim()));
+      lat.value = latitude;
+      lng.value = longitude;
+    }
   });
 
   AMapLoader.load({

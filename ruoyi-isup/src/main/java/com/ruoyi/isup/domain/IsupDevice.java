@@ -43,9 +43,24 @@ public class IsupDevice extends BaseEntity {
     private String channel;
 
     /**
-     * 播放路径
+     * 播放类型（1=本地，2=推流，3=EasyNTS）
+     */
+    private String playType;
+
+    /**
+     * 直播流播放地址
      */
     private String url;
+
+    /**
+     * 流id
+     */
+    private String streamId;
+
+    /**
+     * 直播流播放地址
+     */
+    private String easyNTSUrl;
 
     /**
      * 设备注册信息的大小

@@ -55,10 +55,34 @@ public class OnvifDevice extends BaseEntity {
     private String password;
 
     /**
-     * 默认直播流播放地址
+     * 播放类型（1=本地，2=推流，3=EasyNTS）
      */
-    @Excel(name = "默认直播流播放地址")
+    @Excel(name = "播放类型")
+    private String playType;
+
+    /**
+     * 直播流播放地址
+     */
+    @Excel(name = "直播流播放地址")
     private String url;
+
+    /**
+     * 流id
+     */
+    @Excel(name = "流id")
+    private String streamId;
+
+    /**
+     * 直播流播放地址
+     */
+    @Excel(name = "EasyNTS播放地址")
+    private String easyNTSUrl;
+
+    /**
+     * 通道
+     */
+    @Excel(name = "通道")
+    private String channel;
 
     /**
      * 设备厂商

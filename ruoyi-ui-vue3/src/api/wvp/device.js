@@ -59,13 +59,22 @@ export function updateDevice(data) {
     })
 }
 
-// 刷新对应设备
+// 移除设备
 export function deleteDevice(deviceId) {
     return request({
         url: `/api/device/query/devices/${deviceId}/delete`,
         method: 'delete',
     })
 }
+
+// 批量移除设备
+export function batchDeleteDevice(deviceId) {
+    return request({
+        url: `/api/device/query/devices/batchDelete/${deviceId}`,
+        method: 'delete',
+    })
+}
+
 
 // 同步进度查询
 export function syncStatus(deviceId) {

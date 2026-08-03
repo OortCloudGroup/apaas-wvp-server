@@ -70,7 +70,7 @@ public class CameraDetection {
         int thickness = minDwDh / ODConfig.lineThicknessRatio;
         double fontSize = minDwDh / ODConfig.fontSizeRatio;
         int fontFace = Imgproc.FONT_HERSHEY_SIMPLEX;
-        String rtmpUrl = "rtmp://127.0.0.1/live/livestream";
+        String rtmpUrl = "rtmp://192.168.158.199/live/livestream";
         int frameWidth = (int) video.get(Videoio.CAP_PROP_FRAME_WIDTH);
         int frameHeight = (int) video.get(Videoio.CAP_PROP_FRAME_HEIGHT);
         ProcessBuilder processBuilder = new ProcessBuilder(

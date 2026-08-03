@@ -2,6 +2,9 @@ import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import createVitePlugins from './vite/plugins'
 
+const host = "localhost"
+const post = "2001"
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd())
@@ -24,28 +27,19 @@ export default defineConfig(({ mode, command }) => {
       host: true,
       open: true,
       proxy: {
-        // 移植的代理配置
-        '/RPC2_Login': {
-          target: 'http://172.3.101.2:80',
+        // 保留原有的开发API代理
+        '/dev-api': {
+          target: `http://${host}:8080`,
           changeOrigin: true,
-          secure: false
+          rewrite: (p) => p.replace(/^\/dev-api/, '')
         },
-        '/RPC2': {
-          target: 'http://172.3.101.2:80',
-          changeOrigin: true,
-          secure: false
-        },
-        '/RPC_Loadfile': {
-          target: 'http://172.3.101.2:80',
-          changeOrigin: true,
-          secure: false
-        },
-        '/web_caps': {
-          target: 'http://172.3.101.2:80',
-          changeOrigin: true,
-          secure: false
-        },
+      },
+      headers: {
+        'X-Frame-Options': `ALLOW-FROM http://192.140.189.79:${post}`,
+        // 或使用 CSP
+        'Content-Security-Policy': `frame-ancestors 'self' http://192.140.189.79:${post};`
       }
+
     },
 
     css: {

@@ -66,7 +66,7 @@ export const constantRoutes = [
         path: '/index',
         component: () => import('@/views/index'),
         name: 'Index',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
+        meta: { title: '首页', icon: 'home', affix: true }
       },
     ]
   },
@@ -263,6 +263,38 @@ export const dynamicRoutes = [
         component: () => import('@/views/wvp/mediaServer/updateMediaServer'),
         name: 'UpdateMediaServer',
         meta: { title: '修改媒体服务器', activeMenu: '/gbmanger/node' }
+      }
+    ]
+  },
+
+  {
+    path: '/yingshi/ysChannel',
+    component: Layout,
+    hidden: true,
+    permissions: ['yingshi:ys:channel'],
+    children: [
+      {
+        noCache: true,
+        path: 'index',
+        component: () => import('@/views/yingshi/ysChannel/index'),
+        name: 'YsChannel',
+        meta: { title: '萤石通道管理', activeMenu: '/yingshi/ysDevice' }
+      }
+    ]
+  },
+
+  {
+    path: '/lecheng/leChannel',
+    component: Layout,
+    hidden: true,
+    permissions: ['yingshi:ys:listDeviceDetailsByIds'],
+    children: [
+      {
+        noCache: true,
+        path: 'index',
+        component: () => import('@/views/lecheng/leChannel/index'),
+        name: 'LeChannel',
+        meta: { title: '乐橙通道管理', activeMenu: '/lecheng/lcDevice' }
       }
     ]
   },

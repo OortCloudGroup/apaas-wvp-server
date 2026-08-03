@@ -2,11 +2,15 @@ package com.ruoyi.onvif.service.impl;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.onvif.domain.FetchMainAndSubStreamUris;
+import com.ruoyi.onvif.domain.OnvifDevice;
 import com.ruoyi.onvif.domain.bo.AbsoluteMoveBo;
 import com.ruoyi.onvif.domain.bo.FetchMainAndSubStreamUrisBo;
+import com.ruoyi.onvif.domain.bo.OnvifPZT;
 import com.ruoyi.onvif.domain.bo.PresetsBo;
+import com.ruoyi.onvif.mapper.OnvifDeviceMapper;
 import com.ruoyi.onvif.service.IOnvifService;
 import com.ruoyi.onvif.utils.OnvifUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -21,6 +25,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class IOnvifServiceImpl implements IOnvifService {
+
+    @Autowired
+    private OnvifDeviceMapper onvifDeviceMapper;
 
     /**
      * 获取设备信息
@@ -114,6 +121,28 @@ public class IOnvifServiceImpl implements IOnvifService {
     @Override
     public void addPreset(PresetsBo bo) {
         OnvifUtil.setPreset(bo);
+    }
+
+    /**
+     * 云台开始
+     *
+     * @param onvifPZT
+     */
+    @Override
+    public void onvifPZTStart(OnvifPZT onvifPZT) {
+        OnvifDevice onvifDevice = onvifDeviceMapper.selectOnvifDeviceById(onvifPZT.getId());
+        OnvifUtil.onvifPZTStart(onvifDevice,onvifPZT);
+    }
+
+    /**
+     * 云台结束
+     *
+     * @param onvifPZT
+     */
+    @Override
+    public void onvifPZTEnd(OnvifPZT onvifPZT) {
+        OnvifDevice onvifDevice = onvifDeviceMapper.selectOnvifDeviceById(onvifPZT.getId());
+        OnvifUtil.onvifPZTEnd(onvifDevice,onvifPZT);
     }
 
 }

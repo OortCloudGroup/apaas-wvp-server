@@ -59,5 +59,19 @@ public interface OnvifDeviceMapper {
      */
     public int deleteOnvifDeviceByIds(Long[] ids);
 
+    /**
+     * 根据ip查询设备
+     *
+     * @param ip
+     * @return
+     */
     OnvifDevice getOneByIp(String ip);
+
+    /**
+     * 查询地图onvif 设备列表
+     *
+     * @param onvifDevice
+     * @return
+     */
+    List<OnvifDevice> selectOnvifDeviceListMap(OnvifDevice onvifDevice);
 }

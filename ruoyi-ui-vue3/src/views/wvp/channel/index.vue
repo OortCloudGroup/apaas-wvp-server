@@ -51,6 +51,13 @@
         </template>
       </el-table-column>
       <el-table-column prop="subCount" label="子节点数" min-width="100" align="center"/>
+      <el-table-column prop="channelType" label="通道类型" min-width="100" align="center">
+        <template #default="scope">
+          <el-tag v-if="scope.row.channelType === 0">国标设备</el-tag>
+          <el-tag v-if="scope.row.channelType === 1">推流设备</el-tag>
+          <el-tag v-if="scope.row.channelType === 2">拉流代理</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="manufacturer" label="厂家" min-width="100" align="center"/>
       <el-table-column label="位置信息" min-width="120" align="center">
         <template #default="scope">
@@ -534,9 +541,22 @@
           <el-row :gutter="10">
             <el-col :span="2"><span style="width: 80px; line-height: 40px; text-align: right;">播放地址：</span></el-col>
             <el-col :span="18">
-              <el-input v-model="streamInfo.flv" :disabled="true">
+              <el-input v-model="vUrl" :disabled="true" v-show="activeName === 'flv'">
+                <template #prepend>flv地址</template>
                 <template #append>
-                  <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(streamInfo.flv)"/>
+                  <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(vUrl)"/>
+                </template>
+              </el-input>
+              <el-input v-model="rtcUrl" :disabled="true" v-show="activeName === 'webRtc'">
+                <template #prepend>rtcUrl地址</template>
+                <template #append>
+                  <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(rtcUrl)"/>
+                </template>
+              </el-input>
+              <el-input v-model="wsUrl" :disabled="true" v-show="activeName === 'H265'">
+                <template #prepend>wsUrl地址</template>
+                <template #append>
+                  <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(wsUrl)"/>
                 </template>
               </el-input>
             </el-col>
@@ -573,7 +593,7 @@
                 </div>
                 <!-- 速度控制 -->
                 <div class="contro-speed" style="position: absolute; left: 4px; top: 112px; width: 100px;">
-                  <el-slider v-model="controSpeed" :max="100"></el-slider>
+                  <el-slider v-model="controSpeed" :min="1"></el-slider>
                 </div>
               </div>
               <!-- 变倍、聚焦、光圈控制 -->
@@ -653,6 +673,7 @@
 </template>
 
 <script setup name="Channel">
+import useClipboard from 'vue-clipboard3'
 import {checkPermi} from "@/utils/permission";
 import { CaretTop } from '@element-plus/icons-vue'
 import ChannelCode from "../../components/common/channelCode.vue"
@@ -692,6 +713,7 @@ import router from "@/router";
 import {useRoute} from "vue-router";
 import CryptoJS from 'crypto-js';
 import {ZLMRTCClient} from '@/components/rtcPlayer/js/ZLMRTCClient';
+const { toClipboard } = useClipboard()
 
 const route = useRoute();
 const {proxy} = getCurrentInstance();
@@ -888,21 +910,18 @@ const irisCamera = async (command) => {
   ElMessage.success('操作成功！');
 }
 
-const copyToClipboard = (text) => {
+const copyToClipboard = async (text) => {
   if (!text) {
     ElMessage.error('内容为空，无法复制');
     return;
   }
 
-  // 使用 Clipboard API
-  navigator.clipboard.writeText(text).then(
-      () => {
-        ElMessage.success('成功拷贝到粘贴板');
-      },
-      () => {
-        ElMessage.error('复制失败，请重试');
-      }
-  );
+  try {
+    await toClipboard(text)
+    ElMessage.success('成功拷贝到粘贴板');
+  } catch (e) {
+    console.error(e)
+  }
 };
 
 const videoError = (e) => {
@@ -931,9 +950,15 @@ async function start(itemData) {
   channelId.value = itemData.deviceId;
   const res = await sendDevicePush(params);
   streamInfo.value = res.data;
-  vUrl.value = res.data.flv;
-  rtcUrl.value = res.data.rtc;
-  wsUrl.value = res.data.ws_flv;
+  if (location.protocol === "https:") {
+    vUrl.value = res.data.https_flv;
+    rtcUrl.value = res.data.rtcs;
+    wsUrl.value = res.data.wss_flv;
+  } else {
+    vUrl.value = res.data.flv;
+    rtcUrl.value = res.data.rtc;
+    wsUrl.value = res.data.ws_flv;
+  }
   openPlay.value = true;
 }
 

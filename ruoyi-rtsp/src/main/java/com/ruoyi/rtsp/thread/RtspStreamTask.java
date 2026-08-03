@@ -9,6 +9,7 @@ import com.ruoyi.rtsp.domain.ODResult;
 import com.ruoyi.rtsp.domain.bo.RtspDeviceBo;
 import com.ruoyi.rtsp.utils.ImageUtil;
 import com.ruoyi.rtsp.utils.Letterbox;
+import nu.pattern.OpenCV;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -86,7 +87,7 @@ public class RtspStreamTask implements Runnable {
         double fontSize = minDwDh / ODConfig.fontSizeRatio;
         int fontFace = Imgproc.FONT_HERSHEY_SIMPLEX;
         // 推流地址
-        String rtmpUrl = "rtmp://127.0.0.1/live/livestream/" + bo.getMediaId();
+        String rtmpUrl = "rtmp://192.168.2.199/live/livestream/" + bo.getMediaId();
         int frameWidth = (int) video.get(Videoio.CAP_PROP_FRAME_WIDTH);
         int frameHeight = (int) video.get(Videoio.CAP_PROP_FRAME_HEIGHT);
         ProcessBuilder processBuilder = new ProcessBuilder(

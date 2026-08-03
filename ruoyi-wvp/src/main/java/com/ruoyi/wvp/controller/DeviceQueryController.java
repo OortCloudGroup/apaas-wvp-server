@@ -195,6 +195,21 @@ public class DeviceQueryController extends BaseController {
     }
 
     /**
+     * 批量移除设备
+     *
+     * @param deviceIds 设备id
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wvp:device:remove')")
+    @DeleteMapping("/devices/batchDelete/{deviceIds}")
+    public AjaxResult batchDelete(@PathVariable List<String> deviceIds){
+        for (String deviceId : deviceIds) {
+            delete(deviceId);
+        }
+        return success();
+    }
+
+    /**
      * 分页查询子目录通道
      *
      * @param deviceId    通道id

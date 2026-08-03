@@ -2,6 +2,7 @@ package com.ruoyi.wvp.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.wvp.common.SystemAllInfo;
@@ -288,6 +289,7 @@ public class WvpServerController extends BaseController {
 
     @GetMapping(value = "/system/info")
     @ResponseBody
+    @Anonymous
     public AjaxResult getSystemInfo() {
         SystemAllInfo systemAllInfo = redisCatchStorage.getSystemInfo();
 

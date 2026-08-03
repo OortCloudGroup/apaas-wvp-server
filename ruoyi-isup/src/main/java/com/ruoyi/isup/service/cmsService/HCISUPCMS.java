@@ -267,7 +267,9 @@ public interface HCISUPCMS extends Library {
         public NET_EHOME_IPADDRESS struAddress;  //本地监听信息，IP为0.0.0.0的情况下，默认为本地地址，多个网卡的情况下，默认为从操作系统获取到的第一个
         public DEVICE_REGISTER_CB fnCB; //报警信息回调函数
         public Pointer pUserData;   //用户数据
-        public byte[] byRes = new byte[32];
+        public int     dwKeepAliveSec; //心跳间隔（单位：秒,0:默认为30S）
+        public int     dwTimeOutCount; //心跳超时次数（0：默认为3）
+        public byte[] byRes = new byte[24];
     }
 
     public static interface fVoiceDataCallBack extends Callback {

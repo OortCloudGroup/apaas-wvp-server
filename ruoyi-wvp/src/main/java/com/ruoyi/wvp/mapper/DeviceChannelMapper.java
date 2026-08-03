@@ -100,7 +100,8 @@ public interface DeviceChannelMapper {
             " </script>")
     List<Integer> queryChaneIdListByDeviceDbIds(@Param("deviceDbIds") List<Integer> deviceDbIds);
 
-    @Delete("DELETE FROM wvp_device_channel WHERE data_type =1 and data_device_id=#{dataDeviceId}")
+//    @Delete("DELETE FROM wvp_device_channel WHERE data_type =1 and data_device_id=#{dataDeviceId}")
+    @Delete("DELETE FROM wvp_device_channel WHERE data_device_id=#{dataDeviceId}")
     int cleanChannelsByDeviceId(@Param("dataDeviceId") int dataDeviceId);
 
     @Delete("DELETE FROM wvp_device_channel WHERE id=#{id}")

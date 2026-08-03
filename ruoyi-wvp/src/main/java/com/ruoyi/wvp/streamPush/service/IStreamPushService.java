@@ -101,4 +101,12 @@ public interface IStreamPushService {
     void batchRemove(Set<Integer> ids);
 
     void updateGPSFromGPSMsgInfo(List<GPSMsgInfo> gpsMsgInfoList);
+
+    /**
+     * 根据流ID查询
+     *
+     * @param stream
+     * @return
+     */
+    StreamPush selectByStream(String stream);
 }

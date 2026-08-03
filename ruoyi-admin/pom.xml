@@ -69,11 +69,12 @@
             <version>3.0.3</version>
         </dependency>
 
-
         <dependency>
-            <groupId>me.zhyd.oauth</groupId>
-            <artifactId>JustAuth</artifactId>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+            <version>5.6.137</version>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -104,6 +105,23 @@
            </plugin>
         </plugins>
         <finalName>${project.artifactId}</finalName>
-    </build>
 
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>${basedir}/res</directory>-->
+<!--                <filtering>false</filtering>-->
+<!--                <includes>-->
+<!--                    <include>**/*.properties</include>-->
+<!--                    <include>**/*.xml</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--            <resource>-->
+<!--                <directory>${basedir}/libs</directory>-->
+<!--                <filtering>false</filtering>-->
+<!--                <includes>-->
+<!--                    <include>**/*.dll</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
+    </build>
 </project>

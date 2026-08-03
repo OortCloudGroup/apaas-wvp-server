@@ -32,6 +32,7 @@ import java.util.*;
  * 区域管理类
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class RegionServiceImpl implements IRegionService {
 
 

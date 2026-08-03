@@ -131,7 +131,10 @@ public class ChannelProvider {
         if (params.get("civilCode") != null) {
             sqlBuild.append(" AND coalesce(gb_civil_code, civil_code) = #{civilCode}");
         }else {
-            sqlBuild.append(" AND coalesce(gb_civil_code, civil_code) is null");
+            sqlBuild.append("  AND (\n" +
+                    "        (gb_civil_code IS NULL OR gb_civil_code = '')\n" +
+                    "        AND (civil_code IS NULL OR civil_code = '')\n" +
+                    "    )");
         }
         if (params.get("dataType") != null) {
             sqlBuild.append(" AND data_type = #{dataType}");
@@ -157,7 +160,10 @@ public class ChannelProvider {
         if (params.get("groupDeviceId") != null) {
             sqlBuild.append(" AND coalesce(gb_parent_id, parent_id) = #{groupDeviceId}");
         }else {
-            sqlBuild.append(" AND coalesce(gb_parent_id, parent_id) is null");
+            sqlBuild.append(" AND (\n" +
+                    "        (gb_parent_id IS NULL OR gb_parent_id = '')\n" +
+                    "        AND (parent_id IS NULL OR parent_id = '')\n" +
+                    "    )");
         }
         if (params.get("dataType") != null) {
             sqlBuild.append(" AND data_type = #{dataType}");

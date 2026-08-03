@@ -1,5 +1,6 @@
 package com.ruoyi.wvp.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.read.metadata.ReadSheet;
@@ -267,6 +268,34 @@ public class StreamPushController extends BaseController {
             result.setResult(fail);
         });
         streamPushPlayService.start(id, (code, msg, streamInfo) -> {
+            if (code == 0 && streamInfo != null) {
+                WVPResult<StreamContent> success = WVPResult.success(new StreamContent(streamInfo));
+                result.setResult(success);
+            }
+        }, null, null);
+        return result;
+    }
+
+    /**
+     * 根据流id开始播放
+     *
+     * @param stream
+     * @return
+     */
+    @GetMapping(value = "/startPlay/{stream}")
+    @ResponseBody
+    public DeferredResult<WVPResult<StreamContent>> startPlay(@PathVariable String stream) {
+        Assert.notNull(stream, "流id不可为NULL");
+        DeferredResult<WVPResult<StreamContent>> result = new DeferredResult<>(userSetting.getPlayTimeout().longValue());
+        result.onTimeout(() -> {
+            WVPResult<StreamContent> fail = WVPResult.fail(ErrorCode.ERROR100.getCode(), "等待推流超时");
+            result.setResult(fail);
+        });
+        StreamPush streamPush = streamPushService.selectByStream(stream);
+        if(ObjectUtil.isNull(streamPush)){
+            throw new ControllerException(ErrorCode.ERROR100.getCode(), "流不存在");
+        }
+        streamPushPlayService.start(streamPush.getId(), (code, msg, streamInfo) -> {
             if (code == 0 && streamInfo != null) {
                 WVPResult<StreamContent> success = WVPResult.success(new StreamContent(streamInfo));
                 result.setResult(success);

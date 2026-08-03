@@ -43,3 +43,11 @@ export function start(query) {
         params: query
     })
 }
+
+// 根据流id开始播放
+export function startPlay(stream) {
+    return request({
+        url: `/api/push/startPlay/${stream}`,
+        method: 'get',
+    })
+}

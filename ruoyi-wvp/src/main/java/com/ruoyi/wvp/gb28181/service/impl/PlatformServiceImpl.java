@@ -58,6 +58,7 @@ import java.util.Vector;
 @Slf4j
 @Service
 @DS("master")
+@Transactional(rollbackFor = Exception.class)
 public class PlatformServiceImpl implements IPlatformService {
 
     private final static String REGISTER_KEY_PREFIX = "platform_register_";

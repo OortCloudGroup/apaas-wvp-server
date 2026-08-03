@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 查询isup设备列表
-export function listLsupDevice(query) {
+export function listIsupDevice(query) {
   return request({
     url: '/isup/lsupDevice/list',
     method: 'get',
@@ -19,7 +19,22 @@ export function lsupDeviceList(query) {
 }
 
 
-// 查询isup设备详细
+// 播放
+export function start(id) {
+  return request({
+    url: '/isup/lsupDevice/start/' + id,
+    method: 'get'
+  })
+}
+
+export function stopRealPlay(id) {
+  return request({
+    url: '/isup/lsupDevice/stopRealPlay/' + id,
+    method: 'get'
+  })
+}
+
+
 export function getLsupDevice(id) {
   return request({
     url: '/isup/lsupDevice/' + id,
@@ -53,20 +68,41 @@ export function delLsupDevice(id) {
   })
 }
 
-// 获取数字通道
-export function getDigitalChannel(query) {
+// 云台控制（开始）
+export function ptzCtrlStart(id,direction,controSpeed) {
   return request({
-    url: '/onvif/service/getDigitalChannel',
+    url: '/isup/lsupDevice/ptzCtrlStart/' + id,
     method: 'get',
-    params: query
+    params: {
+      direction,
+      controSpeed,
+    }
   })
 }
 
-// 云台控制
-export function ptzCtrl(query) {
+// 云台控制（结束）
+export function ptzCtrlEnd(id) {
   return request({
-    url: '/isup/lsupDevice/ptzCtrl',
+    url: '/isup/lsupDevice/ptzCtrlEnd/' + id,
     method: 'get',
-    params: query
+  })
+}
+
+// 云台控制（聚焦）
+export function ptzCtrlFocus(id,controSpeed) {
+  return request({
+    url: '/isup/lsupDevice/ptzCtrlFocus/' + id,
+    method: 'get',
+    params: {
+      controSpeed,
+    }
+  })
+}
+
+// 获取所有数字通道状态
+export function getAllDigitalChannelStatus(id) {
+  return request({
+    url: '/isup/lsupDevice/getAllDigitalChannelStatus/' + id,
+    method: 'get',
   })
 }

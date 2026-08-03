@@ -8,11 +8,13 @@ import com.ruoyi.wvp.mapper.DeviceAlarmMapper;
 import com.ruoyi.wvp.gb28181.service.IDeviceAlarmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @DS("master")
+@Transactional(rollbackFor = Exception.class)
 public class DeviceAlarmServiceImpl implements IDeviceAlarmService {
 
     @Autowired

@@ -29,12 +29,27 @@ public class IsupConfig {
     @Value("${isup.smsServer.Port}")
     private int smsServerPort;
 
-    @Value("${isup.smsServer.ListenIP}")
-    private String smsServerListenIP;
-
     @Value("${isup.smsServer.ListenPort}")
     private int smsServerListenPort;
 
+    @Value("${isup.ssService.Port}")
+    private int ssServicePort;
+
+    @Value("${isup.alarmService.Port}")
+    private int alarmServicePort;
+
     @Value("${isup.isupKey}")
     private String isupKey;
+
+    @Value("${isup.alarmService.Type}")
+    private String alarmServerType;
+
+    @Value("${isup.picServer.Port}")
+    private String picServerPort;
+
+    @Value("${isup.picServer.Type}")
+    private String picServerType;
+
+    @Value("${isup.smsBackServerListe.Port}")
+    private String smsBackServerListenPort;
 }

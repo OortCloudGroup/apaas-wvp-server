@@ -124,9 +124,9 @@ export default {
         // @see https://github.com/numberwolf/h265web.js/blob/8b26a31ffa419bd0a0f99fbd5111590e144e36a8/example_normal/index.js#L252C9-L263C11
         // mediaInfo = playerObj.mediaInfo();
       }
-      h265web.onPlayTime = (...args) => {
-        console.log(args)
-      }
+      // h265web.onPlayTime = (...args) => {
+      //   console.log(args)
+      // }
       h265web.do()
     },
     screenshot: function () {

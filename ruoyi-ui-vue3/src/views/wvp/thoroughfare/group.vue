@@ -50,6 +50,7 @@
             <el-button type="primary"
                        plain
                        icon="Plus"
+                       :disabled="addDisabled"
                        @click="handleAdd">新增
             </el-button>
           </el-col>
@@ -86,6 +87,11 @@
                 <el-tag v-if="scope.row.gbStatus === 'ON'">在线</el-tag>
                 <el-tag type="info" v-if="scope.row.gbStatus !== 'ON'">离线</el-tag>
               </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width" fixed="right">
+            <template #default="scope">
+              <el-button @click="onMap(scope.row)" type="text">设置位置</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -144,6 +150,7 @@
             <el-table-column prop="gbName" label="名称" align="center"/>
             <el-table-column prop="gbDeviceId" label="编号" align="center"/>
             <el-table-column prop="gbManufacturer" label="厂家" align="center"/>
+            <el-table-column prop="gbAddress" label="位置" align="center"/>
             <el-table-column label="类型" align="center">
               <template #default="scope">
                 <div slot="reference" class="name-wrapper">
@@ -173,16 +180,21 @@
         </el-dialog>
       </el-col>
     </el-row>
+
+    <el-dialog title="修改地址" v-model="showMap" width="800px" append-to-body>
+      <MapGaoDe ref="MapContainer" @update-value="updateDialogMap" :position="position" :toponym="formMap.gbAddress"/>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Group">
 import {queryForTree} from "../../../api/wvp/group.js";
+import MapGaoDe from "@/components/MapGaoDe/index.vue";
 import {
   addChannelToGroup,
   deleteChannelToGroup,
   queryListByCivilCode,
-  queryListByParentId
+  queryListByParentId, updateChannelData
 } from "../../../api/wvp/channel.js";
 
 const {proxy} = getCurrentInstance();
@@ -197,6 +209,7 @@ const groupDeviceId = ref('');
 const businessGroup = ref('');
 const selectionList = ref([]);
 const multiple = ref(true);
+const addDisabled = ref(true);
 const open = ref(false);
 const title = ref("");
 const dataType = ref('group');
@@ -232,6 +245,43 @@ const data = reactive({
 
 const {queryParams, form, rules, queryParamsSelect} = toRefs(data);
 
+/**
+ * map
+ * @type {*}
+ */
+const formMap = ref({});
+const toponym = ref('');
+const showMap = ref(false);
+const position = ref(null);
+const MapContainer = ref(null);
+function onMap(row) {
+  formMap.value = row;
+  position.value = [formMap.value.gbLongitude, formMap.value.gbLatitude];
+  toponym.value = form.value.gbAddress;
+  showMap.value = true;
+  Create();
+}
+const Create = () => {
+  MapContainer.value?.inGaDeMap();
+};
+const Destruction = () => {
+  MapContainer.value?.Destruction();
+};
+const updateDialogMap = (value) => {
+  formMap.value.gbAddress = value.address + value.detailedStreet;
+  formMap.value.gbLongitude = value.lng;
+  formMap.value.gbLatitude = value.lat;
+  position.value = [formMap.value.gbLongitude, formMap.value.gbLatitude];
+  toponym.value = formMap.value.gbAddress;
+  updateChannelData(formMap.value).then(res => {
+    showMap.value = false;
+    Destruction();
+    proxy.$modal.msgSuccess("操作成功");
+  }).catch(() => {
+    proxy.$modal.msgError("操作失败");
+  })
+}
+
 
 function getList() {
   loading.value = true
@@ -261,8 +311,12 @@ function resetQuery() {
 
 /** 选择条数  */
 function handleSelectionChange(selection) {
+  if(queryParams.value.groupDeviceId === null){
+    multiple.value = true
+  }else {
+    multiple.value = !selection.length;
+  }
   selectionList.value = selection
-  multiple.value = !selection.length;
 }
 
 function handleDelete() {
@@ -287,10 +341,12 @@ const filterNode = (value, data) => {
 
 /** 节点单击事件 */
 function handleNodeClick(data) {
-  if (data.deviceId) {
+  if (data.deviceId != null || data.deviceId != undefined)  {
     queryParams.value.groupDeviceId = data.deviceId;
+    addDisabled.value = false
   } else {
-    queryParams.value.groupDeviceId = ' ';
+    queryParams.value.groupDeviceId = null;
+    addDisabled.value = true
   }
 
   groupDeviceId.value = queryParams.value.groupDeviceId;

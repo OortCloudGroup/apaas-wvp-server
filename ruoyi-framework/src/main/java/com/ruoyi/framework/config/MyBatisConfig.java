@@ -6,6 +6,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import javax.sql.DataSource;
+
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -22,11 +27,13 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.ClassUtils;
+
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.ruoyi.common.utils.StringUtils;
 
 /**
  * Mybatis支持*匹配扫描包
- * 
+ *
  * @author ruoyi
  */
 @Configuration
@@ -114,19 +121,47 @@ public class MyBatisConfig
     }
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception
-    {
-        String typeAliasesPackage = env.getProperty("mybatis.typeAliasesPackage");
-        String mapperLocations = env.getProperty("mybatis.mapperLocations");
-        String configLocation = env.getProperty("mybatis.configLocation");
-        typeAliasesPackage = setTypeAliasesPackage(typeAliasesPackage);
-        VFS.addImplClass(SpringBootVFS.class);
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+        // 搜索指定包别名
+        String typeAliasesPackage = env.getProperty("mybatis-plus.type-aliases-package");
+        // 配置mapper的扫描，找到所有的mapper.xml映射文件
+        String mapperLocations = env.getProperty("mybatis-plus.mapper-locations");
+        // 加载全局的配置文件
+        String configLocation = env.getProperty("mybatis-plus.config-location");
 
-        final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        // final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        final MybatisSqlSessionFactoryBean sessionFactory = new MybatisSqlSessionFactoryBean();
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // 乐观锁（按需配置）
+        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+        // 分页插件
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        // 如果不在这里设置插件，在使用mybatis-plus分页功能时，sql不会拼接分页参数，总是查询所有数据
+        sessionFactory.setPlugins(interceptor);
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setTypeAliasesPackage(typeAliasesPackage);
-        sessionFactory.setMapperLocations(resolveMapperLocations(StringUtils.split(mapperLocations, ",")));
+        sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(mapperLocations));
         sessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(configLocation));
         return sessionFactory.getObject();
+    }
+
+    /**
+     * mybatis-plus分页插件配置
+     *
+     * @return PaginationInterceptor
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        /* MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;*/
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
+        paginationInnerInterceptor.setDbType(DbType.MYSQL);
+        paginationInnerInterceptor.setOverflow(true);
+        interceptor.addInnerInterceptor(paginationInnerInterceptor);
+        // 乐观锁
+        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+        return interceptor;
     }
 }

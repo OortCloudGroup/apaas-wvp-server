@@ -71,10 +71,10 @@
             <artifactId>ruoyi-isup</artifactId>
         </dependency>
 
-        <!-- goview模块-->
+        <!-- 大华模块-->
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-goview</artifactId>
+            <artifactId>ruoyi-dahua</artifactId>
         </dependency>
 
         <!-- onvif模块-->
@@ -92,6 +92,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+
+        <!--mybatis-plus-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
 
     </dependencies>

@@ -143,6 +143,7 @@ public interface CommonGBChannelMapper {
             ", gb_download_speed = #{gbDownloadSpeed}" +
             ", gb_svc_space_support_mod = #{gbSvcSpaceSupportMod}" +
             ", gb_svc_time_support_mode = #{gbSvcTimeSupportMode}" +
+            ", parent_id = #{gbBusinessGroupId}" +
             " WHERE id = #{gbId}"+
             " </script>"})
     int update(CommonGBChannel commonGBChannel);

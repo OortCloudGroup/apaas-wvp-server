@@ -597,4 +597,15 @@ public class StreamPushServiceImpl implements IStreamPushService {
         }
         gbChannelService.updateGpsByDeviceIdForStreamPush(channels);
     }
+
+    /**
+     * 根据流ID查询
+     *
+     * @param stream
+     * @return
+     */
+    @Override
+    public StreamPush selectByStream(String stream) {
+        return streamPushMapper.selectByStream(stream);
+    }
 }

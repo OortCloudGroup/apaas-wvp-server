@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.common.exception.SsrcTransactionNotFoundException;
+import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -41,6 +42,11 @@ public class GlobalExceptionHandler
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',权限校验失败'{}'", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.FORBIDDEN, "没有权限，请联系管理员授权");
+    }
+
+    @ExceptionHandler(ClientAbortException.class)
+    public void handleClientAbortException(ClientAbortException ex) {
+        log.debug("客户端连接已中断，请求被中止: {}", ex.getMessage());
     }
 
     /**

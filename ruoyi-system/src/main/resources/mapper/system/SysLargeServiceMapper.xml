@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="totalIsupNum"     column="totalIsupNum"     />
         <result property="totalRtspNum"   column="totalRtspNum"   />
         <result property="totalOnvifNum"    column="totalOnvifNum"    />
+        <result property="totalDahuaNum"    column="totalDahuaNum"    />
     </resultMap>
 
     <resultMap type="CountGbNum" id="CountGbNumResult">
@@ -33,7 +34,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 (SELECT COUNT(0) FROM wvp_device) AS totalGbNum,
                 (SELECT COUNT(0) FROM isup_device) AS totalIsupNum,
                 (SELECT COUNT(0) FROM rtsp_device) AS totalRtspNum,
-                (SELECT COUNT(0) FROM onvif_device) AS totalOnvifNum
+                (SELECT COUNT(0) FROM onvif_device) AS totalOnvifNum,
+                (SELECT COUNT(0) FROM dahua_device) AS totalDahuaNum
     </select>
 
     <select id="countGbNum" resultMap="CountGbNumResult">

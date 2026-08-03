@@ -71,7 +71,7 @@ public class CameraDetectionTool {
                 }
                 int frameWidth = (int) video.get(Videoio.CAP_PROP_FRAME_WIDTH);
                 int frameHeight = (int) video.get(Videoio.CAP_PROP_FRAME_HEIGHT);
-                String rtmpUrl = "rtmp://127.0.0.1:1935/live/" + bo.getMediaId() + "?sign=41db35390ddad33f83944f44b8b75ded";
+                String rtmpUrl = "rtmp://192.168.158.199:1935/live/" + bo.getMediaId() + "?sign=41db35390ddad33f83944f44b8b75ded";
                 ProcessBuilder processBuilder = new ProcessBuilder(
                         "ffmpeg",
                         "-y",

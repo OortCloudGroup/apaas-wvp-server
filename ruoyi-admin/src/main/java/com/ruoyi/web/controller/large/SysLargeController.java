@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.large;
 
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.service.ISysLargeService;
@@ -28,6 +29,7 @@ public class SysLargeController extends BaseController {
      *
      * @return
      */
+    @Anonymous
     @GetMapping("/countDeviceNum")
     public AjaxResult countDeviceNum(){
         return success(sysLargeService.countDeviceNum());
@@ -38,6 +40,7 @@ public class SysLargeController extends BaseController {
      *
      * @return
      */
+    @Anonymous
     @GetMapping("/countGbNum")
     public AjaxResult countGbNum() {
         return success(sysLargeService.countGbNum());
@@ -48,6 +51,7 @@ public class SysLargeController extends BaseController {
      *
      * @return
      */
+    @Anonymous
     @GetMapping("/leftGbDevice")
     public AjaxResult leftGbDevice() {
         return success(sysLargeService.leftGbDevice());

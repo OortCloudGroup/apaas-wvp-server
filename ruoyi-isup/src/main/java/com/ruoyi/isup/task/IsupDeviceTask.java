@@ -1,6 +1,7 @@
 package com.ruoyi.isup.task;
 
 
+import cn.hutool.core.util.ObjUtil;
 import com.ruoyi.isup.domain.IsupDevice;
 import com.ruoyi.isup.service.IIsupDeviceService;
 import com.ruoyi.isup.service.cmsService.CMS;
@@ -26,9 +27,14 @@ public class IsupDeviceTask {
     @Autowired
     private CMS cms;
 
-//    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/4 * * * ?")
     public void deviceTask() {
         log.info("isup设备状态定时任务开始执行");
+
+        if(ObjUtil.isNull(cms)){
+            return;
+        }
+
         // 查询所有设备列
         List<IsupDevice> isupDevices = isupDeviceService.selectAllIsupDeviceList();
 

@@ -481,9 +481,22 @@
           <el-row :gutter="10">
             <el-col :span="2"><span style="width: 80px; line-height: 40px; text-align: right;">播放地址：</span></el-col>
             <el-col :span="18">
-              <el-input v-model="streamInfo.flv" :disabled="true">
+              <el-input v-model="flvUrl" :disabled="true" v-show="activeName === 'flv'">
+                <template #prepend>flv地址</template>
                 <template #append>
-                  <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(streamInfo.flv)"/>
+                  <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(flvUrl)"/>
+                </template>
+              </el-input>
+              <el-input v-model="rtcUrl" :disabled="true" v-show="activeName === 'webRtc'">
+                <template #prepend>rtcUrl地址</template>
+                <template #append>
+                  <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(rtcUrl)"/>
+                </template>
+              </el-input>
+              <el-input v-model="wsUrl" :disabled="true" v-show="activeName === 'H265'">
+                <template #prepend>wsUrl地址</template>
+                <template #append>
+                  <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(wsUrl)"/>
                 </template>
               </el-input>
             </el-col>
@@ -514,6 +527,8 @@ import H265web from "@/components/H265web/index.vue";
 import StreamDropdown from "@/views/wvp/channel/components/streamDropdown.vue";
 import MediaInfo from "@/views/wvp/channel/components/mediaInfo.vue";
 import {DocumentCopy, Microphone} from '@element-plus/icons-vue'
+import useClipboard from "vue-clipboard3";
+const { toClipboard } = useClipboard()
 
 import router from "@/router";
 const {proxy} = getCurrentInstance();
@@ -559,30 +574,33 @@ const videoError = (e) => {
 
 const {queryParams, form, rules} = toRefs(data);
 
-const copyToClipboard = (text) => {
+const copyToClipboard = async (text) => {
   if (!text) {
     ElMessage.error('内容为空，无法复制');
     return;
   }
 
-  // 使用 Clipboard API
-  navigator.clipboard.writeText(text).then(
-      () => {
-        ElMessage.success('成功拷贝到粘贴板');
-      },
-      () => {
-        ElMessage.error('复制失败，请重试');
-      }
-  );
+  try {
+    await toClipboard(text)
+    ElMessage.success('成功拷贝到粘贴板');
+  } catch (e) {
+    console.error(e)
+  }
 };
 
 async function playPush(row) {
   try {
     const ans = await start({id: row.id});
     streamInfo.value = ans.data;
-    flvUrl.value = ans.data.flv;
-    rtcUrl.value = ans.data.rtc;
-    wsUrl.value = ans.data.ws_flv;
+    if (location.protocol === "https:") {
+      flvUrl.value = ans.data.https_flv;
+      rtcUrl.value = ans.data.rtcs;
+      wsUrl.value = ans.data.wss_flv;
+    } else {
+      flvUrl.value = ans.data.flv;
+      rtcUrl.value = ans.data.rtc;
+      wsUrl.value = ans.data.ws_flv;
+    }
     openView.value = true;
   } catch (e) {
     console.log(e)

@@ -27,6 +27,7 @@ import java.util.*;
 @Slf4j
 @Service
 @DS("master")
+@Transactional(rollbackFor = Exception.class)
 public class PlatformChannelServiceImpl implements IPlatformChannelService {
 
     @Autowired

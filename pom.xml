@@ -35,7 +35,7 @@
         <logback.version>1.2.13</logback.version>
         <spring-security.version>5.7.12</spring-security.version>
         <spring-framework.version>5.3.39</spring-framework.version>
-        <hutool.version>5.8.20</hutool.version>
+        <hutool.version>5.8.22</hutool.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -121,11 +121,28 @@
                 <version>${bitwalker.version}</version>
             </dependency>
 
+            <!--mybatis-plus-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>3.5.2</version>
+            </dependency>
+
             <!-- pagehelper 分页插件 -->
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.boot.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>mybatis-spring</artifactId>
+                        <groupId>org.mybatis</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>mybatis</artifactId>
+                        <groupId>org.mybatis</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- 获取系统信息 -->
@@ -250,13 +267,12 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
-            <!-- goview模块-->
+            <!-- 大华模块-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
-                <artifactId>ruoyi-goview</artifactId>
+                <artifactId>ruoyi-dahua</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
-
 
             <!-- 通用工具-->
             <dependency>
@@ -272,12 +288,6 @@
                 <version>1.18.30</version>
                 <scope>provided</scope>
             </dependency>
-
-            <dependency>
-                <groupId>me.zhyd.oauth</groupId>
-                <artifactId>JustAuth</artifactId>
-                <version>1.16.7</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -292,7 +302,7 @@
         <module>ruoyi-common</module>
         <module>ruoyi-onvif</module>
         <module>ruoyi-rtsp</module>
-        <module>ruoyi-goview</module>
+        <module>ruoyi-dahua</module>
     </modules>
     <packaging>pom</packaging>
 

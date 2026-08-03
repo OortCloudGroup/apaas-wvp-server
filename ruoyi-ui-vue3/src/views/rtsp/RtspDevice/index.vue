@@ -1,11 +1,10 @@
 <template>
   <div class="app-container">
-    <el-alert title="通道号要填写正确，用户名/密码就是后台登陆的用户名/密码" type="success"
-              style="margin-bottom: 10px;"/>
-
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
       <el-form-item label="所属部门" prop="deptId">
-        <el-tree-select style="width: 202px" v-model="queryParams.deptId" :data="enabledDeptOptions" :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id" placeholder="请选择归属部门" check-strictly />
+        <el-tree-select style="width: 202px" v-model="queryParams.deptId" :data="enabledDeptOptions"
+                        :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id"
+                        placeholder="请选择归属部门" check-strictly/>
       </el-form-item>
       <el-form-item label="ip" prop="ip">
         <el-input
@@ -38,6 +37,7 @@
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
@@ -83,6 +83,7 @@
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
+
     <el-table v-loading="loading" :data="RtspDeviceList" @selection-change="handleSelectionChange" border>
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="所属部门" align="center" prop="deptName"/>
@@ -107,6 +108,15 @@
           <dict-tag :options="rtsp_manufacturer" :value="scope.row.firm"/>
         </template>
       </el-table-column>
+      <el-table-column label="播放类型" align="center" prop="playType">
+        <template #default="scope">
+          <el-tag type="primary" v-if="scope.row.playType === '1'">本地</el-tag>
+          <el-tag type="primary" v-if="scope.row.playType === '2'">推流</el-tag>
+          <el-tag type="primary" v-if="scope.row.playType === '3'">EasyNTS</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column key="streamId" label="流id" prop="streamId" min-width="150" align="center"/>
+      <el-table-column key="remark" label="备注" prop="remark" min-width="150" align="center"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="250">
         <template #default="scope">
           <div style="display:flex; align-items: center;justify-content: center">
@@ -132,9 +142,13 @@
             </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="handleMap" v-if="checkPermi(['rtsp:RtspDevice:edit'])">修改位置</el-dropdown-item>
-                  <el-dropdown-item command="handleAI" v-if="checkPermi(['rtsp:RtspDevice:Avatar'])">AI播放</el-dropdown-item>
-                  <el-dropdown-item command="handleAlarmClock" v-if="checkPermi(['rtsp:RtspDevice:AlarmClock'])">历史播放</el-dropdown-item>
+                  <el-dropdown-item command="handleMap" v-if="checkPermi(['rtsp:RtspDevice:edit'])">修改位置
+                  </el-dropdown-item>
+                  <el-dropdown-item command="handleAI" v-if="checkPermi(['rtsp:RtspDevice:Avatar'])">AI播放
+                  </el-dropdown-item>
+                  <el-dropdown-item command="handleAlarmClock" v-if="checkPermi(['rtsp:RtspDevice:AlarmClock'])">
+                    历史播放
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -154,24 +168,17 @@
 
     <!-- 添加或修改rtsp设备对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <el-form ref="RtspDeviceRef" :model="form" :rules="rules" label-width="100px">
+      <el-form ref="RtspDeviceRef" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="所属部门" prop="deptId">
-          <el-tree-select v-model="form.deptId" :data="enabledDeptOptions" :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id" placeholder="请选择归属部门" check-strictly />
+          <el-tree-select v-model="form.deptId" :data="enabledDeptOptions"
+                          :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id"
+                          placeholder="请选择归属部门" check-strictly/>
         </el-form-item>
         <el-form-item label="ip" prop="ip">
-          <el-input v-model="form.ip" placeholder="请输入ip"/>
+          <el-input v-model="form.ip" placeholder="请输入ip" maxlength="50" show-word-limit/>
         </el-form-item>
         <el-form-item label="摄像头名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入摄像头名称"/>
-        </el-form-item>
-        <el-form-item label="用户名" prop="userName">
-          <el-input v-model="form.userName" placeholder="请输入用户名"/>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" placeholder="请输入密码"/>
-        </el-form-item>
-        <el-form-item label="通道号" prop="channel">
-          <el-input v-model="form.channel" placeholder="请输入通道号"/>
+          <el-input v-model="form.name" placeholder="请输入摄像头名称" maxlength="30" show-word-limit/>
         </el-form-item>
         <el-form-item label="设备厂商" prop="firm">
           <el-select v-model="form.firm" placeholder="请选择设备厂商">
@@ -183,8 +190,33 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="播放类型" prop="playType">
+          <el-radio-group v-model="form.playType">
+            <el-radio value="1">本地</el-radio>
+            <el-radio value="2">推流</el-radio>
+            <el-radio value="3">EasyNTS</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="流id" prop="streamId" v-if="form.playType === '2'">
+          <el-input v-model="form.streamId" placeholder="请输入流id" maxlength="100" show-word-limit/>
+        </el-form-item>
+        <el-form-item label="EasyNTS地址" prop="easyNTSUrl" v-if="form.playType === '3'">
+          <el-input v-model="form.easyNTSUrl" type="textarea" placeholder="请输入EasyNTS地址" maxlength="200"
+                    show-word-limit/>
+        </el-form-item>
+        <div v-if="form.playType === '1'">
+          <el-form-item label="用户名" prop="userName">
+            <el-input v-model="form.userName" placeholder="请输入用户名" maxlength="20" show-word-limit/>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="form.password" placeholder="请输入密码" maxlength="50"/>
+          </el-form-item>
+          <el-form-item label="通道号" prop="channel">
+            <el-input v-model="form.channel" placeholder="请输入通道号" maxlength="10" show-word-limit/>
+          </el-form-item>
+        </div>
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" maxlength="255" show-word-limit/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -198,7 +230,80 @@
     <!-- 播放弹窗 对话框 -->
     <el-dialog :title="title" v-model="showPaly" width="835px">
       <div>
-        <Hikvision :rtsp="rtspURL" v-if="showPaly"/>
+        <Hikvision :rtsp="rtspURL" v-if="showPaly && (playType === '1' || playType === '3') "/>
+
+        <el-row :gutter="10" style="margin-top: 20px" v-if="showPaly && (playType === '1' || playType === '3') ">
+          <el-col :span="4"><span style="width: 100px; line-height: 40px; text-align: right;">播放地址：</span></el-col>
+          <el-col :span="20">
+            <el-input v-model="rtspURL" :disabled="true">
+              <template #append>
+                <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(rtspURL)"/>
+              </template>
+            </el-input>
+          </el-col>
+        </el-row>
+
+        <div v-if="playType === '2'">
+          <el-tabs v-model="activeName" type="card" :stretch="true">
+            <el-tab-pane label="flv播放" name="flv">
+              <el-row>
+                <el-col :span="24">
+                  <div class="player" v-if="activeName === 'flv'">
+                    <Jessibuca v-if="activeName === 'flv'" ref="flv" :visible.sync="showVideoDialog"
+                               :videoUrl="flvUrl" :error="videoError" :message="videoError" height="100px"
+                               :hasAudio="hasAudio" fluent autoplay live></Jessibuca>
+                  </div>
+                </el-col>
+              </el-row>
+            </el-tab-pane>
+            <el-tab-pane label="webRtc" name="webRtc">
+              <RtcPlayer v-if="activeName === 'webRtc'" ref="webRTC" :visible.sync="showVideoDialog"
+                         :videoUrl="rtcUrl" :error="videoError" :message="videoError" height="100px"
+                         :hasAudio="hasAudio" fluent autoplay live></RtcPlayer>
+            </el-tab-pane>
+            <el-tab-pane label="H265" name="H265">
+              <H265web v-if="activeName === 'H265'" ref="h265web" :visible.sync="showVideoDialog"
+                       :videoUrl="wsUrl" :error="videoError" :message="videoError" height="100px"></H265web>
+            </el-tab-pane>
+          </el-tabs>
+
+          <el-tabs v-model="tabActiveName" type="card" :stretch="true" style="margin-top: 10px;">
+            <el-tab-pane label="实时视频" name="media">
+              <el-row :gutter="10">
+                <el-col :span="2"><span style="width: 80px; line-height: 40px; text-align: right;">播放地址：</span>
+                </el-col>
+                <el-col :span="18">
+                  <el-input v-model="flvUrl" :disabled="true" v-show="activeName === 'flv'">
+                    <template #prepend>flv地址</template>
+                    <template #append>
+                      <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(flvUrl)"/>
+                    </template>
+                  </el-input>
+                  <el-input v-model="rtcUrl" :disabled="true" v-show="activeName === 'webRtc'">
+                    <template #prepend>rtcUrl地址</template>
+                    <template #append>
+                      <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(rtcUrl)"/>
+                    </template>
+                  </el-input>
+                  <el-input v-model="wsUrl" :disabled="true" v-show="activeName === 'H265'">
+                    <template #prepend>wsUrl地址</template>
+                    <template #append>
+                      <el-button type="primary" :icon="DocumentCopy" @click="copyToClipboard(wsUrl)"/>
+                    </template>
+                  </el-input>
+                </el-col>
+                <el-col :span="2">
+                  <StreamDropdown :stream-info="streamInfo"/>
+                </el-col>
+              </el-row>
+            </el-tab-pane>
+
+            <el-tab-pane label="编码信息" name="codec">
+              <MediaInfo v-if="tabActiveName === 'codec'" ref="mediaInfo" :app="streamInfo.app"
+                         :stream="streamInfo.stream" :mediaServerId="streamInfo.mediaServerId"></MediaInfo>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
       </div>
     </el-dialog>
 
@@ -260,21 +365,31 @@
 
 <script setup name="RtspDevice">
 import {
-  listRtspDevice,
-  getRtspDevice,
-  delRtspDevice,
-  addRtspDevice,
-  updateRtspDevice,
   addDetection,
+  addRtspDevice,
+  alarmClockRtspDevice,
+  delRtspDevice,
+  getRtspDevice,
+  listRtspDevice,
   stopDetection,
-  alarmClockRtspDevice
+  updateRtspDevice
 } from "@/api/rtsp/RtspDevice";
 import Hikvision from "@/components/Hikvision/index.vue";
 import CusPlayer from "@/components/flv/CusPlayer.vue";
-import {ElLoading} from "element-plus";
+import {ElLoading, ElMessage} from "element-plus";
 import {deptTreeSelect} from "@/api/system/user";
 import MapGaoDe from "@/components/MapGaoDe/index.vue";
 import {checkPermi} from "@/utils/permission";
+import {startPlay} from "../../../api/wvp/push.js";
+import {DocumentCopy} from '@element-plus/icons-vue'
+
+import Jessibuca from "@/components/jessibuca/index.vue";
+import RtcPlayer from "@/components/rtcPlayer/index.vue";
+import H265web from "@/components/H265web/index.vue";
+import StreamDropdown from "@/views/wvp/channel/components/streamDropdown.vue";
+import MediaInfo from "@/views/wvp/channel/components/mediaInfo.vue";
+import useClipboard from "vue-clipboard3";
+const { toClipboard } = useClipboard()
 
 const {proxy} = getCurrentInstance();
 const {rtsp_manufacturer} = proxy.useDict('rtsp_manufacturer');
@@ -295,7 +410,6 @@ const showAIPaly = ref(false);
 const showAI = ref(false);
 const showMap = ref(false);
 const showAlarmClock = ref(false);
-const streamInfo = ref(null);
 const cusPlayer = ref(null);
 const alarmClockFormRef = ref(null);
 const position = ref(null);
@@ -304,6 +418,16 @@ const toponym = ref('');
 
 const deptOptions = ref(undefined);
 const enabledDeptOptions = ref(undefined);
+
+const rtcUrl = ref("");
+const flvUrl = ref("");
+const wsUrl = ref('');
+const playType = ref('');
+const showVideoDialog = ref(false);
+const activeName = ref('flv');
+const tabActiveName = ref('media');
+const streamInfo = ref({});
+const hasAudio = ref(false);
 
 const data = reactive({
   form: {},
@@ -316,7 +440,7 @@ const data = reactive({
     firm: null,
   },
   rules: {
-    deptId: [{ required: true, message: "请选择所属部门", trigger: 'blur' }],
+    deptId: [{required: true, message: "请选择所属部门", trigger: 'blur'}],
     ip: [
       {required: true, message: "ip不能为空", trigger: "blur"}
     ],
@@ -332,13 +456,36 @@ const data = reactive({
     channel: [
       {required: true, message: "通道号不能为空", trigger: "blur"}
     ],
-    firm: [
-      {required: true, message: "设备厂商不能为空", trigger: "change"}
+    streamId: [
+      {required: true, message: "流id不能为空", trigger: "blur"}
+    ],
+    easyNTSUrl: [
+      {required: true, message: "EasyNTS播放地址不能为空", trigger: "blur"}
     ],
   }
 });
 
 const {queryParams, form, rules} = toRefs(data);
+
+const videoError = (e) => {
+  console.log("播放器错误：" + JSON.stringify(e));
+}
+
+const copyToClipboard = async (text) => {
+  if (!text) {
+    ElMessage.error('内容为空，无法复制');
+    return;
+  }
+
+  try {
+    await toClipboard(text)
+    ElMessage.success('成功拷贝到粘贴板');
+  } catch (e) {
+    console.error(e)
+  }
+};
+
+
 
 function moreClick(command, itemData) {
   if (command === "handleMap") {
@@ -374,10 +521,10 @@ const passwordVisibility = ref({});
 
 const rulesAlarm = ref({
   startTime: [
-    { required: true, message: '请选择开始时间', trigger: 'change' }
+    {required: true, message: '请选择开始时间', trigger: 'change'}
   ],
   endTime: [
-    { required: true, message: '请选择结束时间', trigger: 'change' }
+    {required: true, message: '请选择结束时间', trigger: 'change'}
   ]
 });
 
@@ -492,10 +639,24 @@ const togglePasswordVisibility = (id) => {
   passwordVisibility.value[id] = !passwordVisibility.value[id];
 };
 
-const handleView = (row) => {
-  rtspURL.value = row.url;
-  title.value = row.name;
-  showPaly.value = true;
+const handleView = async (row) => {
+  playType.value = row.playType;
+  if (row.playType === '2') {
+    const ans = await startPlay(row.streamId);
+    streamInfo.value = ans.data;
+    flvUrl.value = ans.data.flv;
+    rtcUrl.value = ans.data.rtc;
+    wsUrl.value = ans.data.ws_flv;
+    showPaly.value = true;
+  } else if (row.playType === '1') {
+    rtspURL.value = row.url;
+    title.value = row.name;
+    showPaly.value = true;
+  } else if (row.playType === '3') {
+    rtspURL.value = row.easyNTSUrl;
+    title.value = row.name;
+    showPaly.value = true;
+  }
 }
 
 /** 查询rtsp设备列表 */
@@ -524,8 +685,11 @@ function reset() {
     userName: null,
     password: null,
     channel: null,
+    playType: '1',
     url: null,
-    firm: null,
+    streamId: null,
+    easyNTSUrl: null,
+    firm: '1',
     lat: null,
     lng: null,
     addressMap: null,

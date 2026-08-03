@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @DS("master")
+@Transactional(rollbackFor = Exception.class)
 public class DeviceServiceImpl implements IDeviceService {
 
     @Autowired
@@ -470,7 +471,6 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return
      */
     @Override
-    @Transactional
     public boolean delete(String deviceId) {
         Device device = getDeviceByDeviceIdFromDb(deviceId);
         if (device == null) {

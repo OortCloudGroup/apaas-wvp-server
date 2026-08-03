@@ -75,8 +75,14 @@ public class RtspDeviceController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('rtsp:RtspDevice:list')")
     @GetMapping("/rtspDeviceList")
-    public AjaxResult rtspDeviceList(RtspDevice rtspDevice) {
-        List<RtspDevice> list = rtspDeviceService.selectRtspDeviceList(rtspDevice);
+    public AjaxResult rtspDeviceList(RtspDevice rtspDevice, String mapType) {
+        List<RtspDevice> list = new ArrayList<>();
+        if ("map".equals(mapType)) {
+            list = rtspDeviceService.selectRtspDeviceListMap(rtspDevice);
+        } else {
+            list = rtspDeviceService.selectRtspDeviceList(rtspDevice);
+        }
+
         return success(list);
     }
 

@@ -6,12 +6,14 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.onvif.domain.FetchMainAndSubStreamUris;
+import com.ruoyi.onvif.domain.OnvifDevice;
 import com.ruoyi.onvif.domain.bo.AbsoluteMoveBo;
 import com.ruoyi.onvif.domain.bo.FetchMainAndSubStreamUrisBo;
+import com.ruoyi.onvif.domain.bo.OnvifPZT;
 import com.ruoyi.onvif.domain.bo.PresetsBo;
-import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,7 +32,6 @@ import java.util.regex.Pattern;
  * @Author: 陈江灿
  * @CreateTime: 2025-04-09
  */
-@Slf4j
 public class OnvifUtil {
 
     /**
@@ -113,7 +114,6 @@ public class OnvifUtil {
                 .header("Content-Type", "application/soap+xml; charset=utf-8")
                 .body(soapRequest)
                 .execute();
-        log.info("请求media_service错误：{}", response.body());
         if (response.getStatus() == 200) {
             try {
                 return parseSoapResponseGetPresets(response.body());
@@ -705,7 +705,7 @@ public class OnvifUtil {
 
     // 云台-删除预置点
     private static String RemovePresetRequest(String username, String nonce,
-                                                 String created, String passwordDigest, String profileToken, String presetToken) {
+                                              String created, String passwordDigest, String profileToken, String presetToken) {
         return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:tptz=\"http://www.onvif.org/ver20/ptz/wsdl\">\n" +
                 "  <s:Header>\n" +
@@ -728,10 +728,9 @@ public class OnvifUtil {
     }
 
 
-
     // 云台-添加预置点
     private static String SetPresetRequest(String username, String nonce,
-                                              String created, String passwordDigest, String profileToken, String presetToken) {
+                                           String created, String passwordDigest, String profileToken, String presetToken) {
         return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:tptz=\"http://www.onvif.org/ver20/ptz/wsdl\">\n" +
                 "  <s:Header>\n" +
@@ -753,4 +752,91 @@ public class OnvifUtil {
                 "</s:Envelope>";
     }
 
+    /**
+     * 云台-开始移动
+     *
+     * @param onvifDevice
+     * @param onvifPZT
+     */
+    public static void onvifPZTStart(OnvifDevice onvifDevice, OnvifPZT onvifPZT) {
+        byte[] nonceBytes = RandomUtil.randomBytes(16);
+        String nonce = Base64.encode(nonceBytes);
+        String created = Instant.now().toString();
+        String passwordDigest = calculatePasswordDigest(nonceBytes, created, onvifDevice.getPassword());
+
+        double x = 0.0;
+        double y = 0.0;
+
+        if ("upper".equals(onvifPZT.getDirection())) {
+            x = 0.0;
+            y = onvifPZT.getControSpeed();
+        } else if ("below".equals(onvifPZT.getDirection())) {
+            x = 0.0;
+            y = -onvifPZT.getControSpeed();
+        } else if ("left".equals(onvifPZT.getDirection())) {
+            x = onvifPZT.getControSpeed();
+            y = 0.0;
+        } else if ("right".equals(onvifPZT.getDirection())) {
+            x = -onvifPZT.getControSpeed();
+            y = 0.0;
+        }
+        String soapRequest = GenerateContinuousMoveRequest(
+                onvifDevice.getUserName(),
+                nonce,
+                created,
+                passwordDigest,
+                onvifDevice.getChannel(),
+                x,
+                y);
+        String url = "http://" + onvifDevice.getIp() + "/onvif/media_service";
+        HttpResponse response = HttpRequest.post(url)
+                .header("Content-Type", "application/soap+xml; charset=utf-8")
+                .body(soapRequest)
+                .execute();
+        String body = response.body();
+        JSONObject jsonObject = XmlToJsonUtils.xmlToJson(body);
+        JSONObject bodyJson = jsonObject.getJSONObject("Body");
+        JSONObject fault = bodyJson.getJSONObject("Fault");
+        JSONObject reason = fault.getJSONObject("Reason");
+        String reasonText = reason.getString("Text");
+        if (response.getStatus() == 200) {
+            return;
+        } else if (response.getStatus() == 500) {
+            throw new RuntimeException("该命名空间设备不支持");
+        } else {
+            throw new RuntimeException(reasonText);
+        }
+    }
+
+    /**
+     * 云台-停止移动
+     *
+     * @param onvifDevice
+     * @param onvifPZT
+     */
+    public static void onvifPZTEnd(OnvifDevice onvifDevice, OnvifPZT onvifPZT) {
+        byte[] nonceBytes = RandomUtil.randomBytes(16);
+        String nonce = Base64.encode(nonceBytes);
+        String created = Instant.now().toString();
+        String passwordDigest = calculatePasswordDigest(nonceBytes, created, onvifDevice.getPassword());
+        String soapRequest = GenerateStopRequest(onvifDevice.getUserName(), nonce, created, passwordDigest, onvifDevice.getChannel());
+        String url = "http://" + onvifDevice.getIp() + "/onvif/media_service";
+        HttpResponse response = HttpRequest.post(url)
+                .header("Content-Type", "application/soap+xml; charset=utf-8")
+                .body(soapRequest)
+                .execute();
+        String body = response.body();
+        JSONObject jsonObject = XmlToJsonUtils.xmlToJson(body);
+        JSONObject bodyJson = jsonObject.getJSONObject("Body");
+        JSONObject fault = bodyJson.getJSONObject("Fault");
+        JSONObject reason = fault.getJSONObject("Reason");
+        String reasonText = reason.getString("Text");
+        if (response.getStatus() == 200) {
+            return;
+        } else if (response.getStatus() == 500) {
+            throw new RuntimeException("该命名空间设备不支持");
+        } else {
+            throw new RuntimeException(reasonText);
+        }
+    }
 }

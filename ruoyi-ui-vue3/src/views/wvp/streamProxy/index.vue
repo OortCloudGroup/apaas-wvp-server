@@ -677,10 +677,16 @@ async function playPush(row) {
   try {
     const ans = await start({id: row.id});
     streamInfoData.value = ans;
-    flvUrl.value = ans.flv;
-    rtcUrl.value = ans.rtc;
-    wsUrl.value = ans.ws_flv;
-    console.log(ans)
+    console.log(streamInfoData.value)
+    if (location.protocol === "https:") {
+      flvUrl.value = ans.https_flv;
+      rtcUrl.value = ans.rtcs;
+      wsUrl.value = ans.wss_flv;
+    } else {
+      flvUrl.value = ans.flv;
+      rtcUrl.value = ans.rtc;
+      wsUrl.value = ans.ws_flv;
+    }
     row.playLoading = false;
     title.value = "播放视频";
     openView.value = true;
