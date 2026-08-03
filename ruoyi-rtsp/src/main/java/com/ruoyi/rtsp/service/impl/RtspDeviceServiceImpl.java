@@ -65,7 +65,7 @@ public class RtspDeviceServiceImpl implements IRtspDeviceService {
      * @return rtsp设备
      */
     @Override
-//    @DataScope(deptAlias = "d")
+    @DataScope(deptAlias = "d")
     public List<RtspDevice> selectRtspDeviceList(RtspDevice rtspDevice) {
         return rtspDeviceMapper.selectRtspDeviceList(rtspDevice);
     }
@@ -167,6 +167,17 @@ public class RtspDeviceServiceImpl implements IRtspDeviceService {
             return url;
         }
         throw new RuntimeException("暂不支持该厂商");
+    }
+
+    /**
+     * 查询地图rtsp设备列表
+     *
+     * @param rtspDevice
+     * @return
+     */
+    @Override
+    public List<RtspDevice> selectRtspDeviceListMap(RtspDevice rtspDevice) {
+        return rtspDeviceMapper.selectRtspDeviceListMap(rtspDevice);
     }
 
     /**

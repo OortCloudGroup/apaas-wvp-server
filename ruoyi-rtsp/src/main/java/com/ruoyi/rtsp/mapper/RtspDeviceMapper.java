@@ -60,4 +60,12 @@ public interface RtspDeviceMapper
      * @return 结果
      */
     public int deleteRtspDeviceByIds(Long[] ids);
+
+    /**
+     * 查询地图rtsp设备列表
+     *
+     * @param rtspDevice
+     * @return
+     */
+    List<RtspDevice> selectRtspDeviceListMap(RtspDevice rtspDevice);
 }

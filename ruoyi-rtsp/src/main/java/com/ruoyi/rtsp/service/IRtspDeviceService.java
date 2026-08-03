@@ -87,4 +87,12 @@ public interface IRtspDeviceService {
      * @return
      */
     String alarmClock(alarmClockBo bo);
+
+    /**
+     * 查询地图rtsp设备列表
+     *
+     * @param rtspDevice
+     * @return
+     */
+    List<RtspDevice> selectRtspDeviceListMap(RtspDevice rtspDevice);
 }

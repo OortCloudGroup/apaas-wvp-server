@@ -12,7 +12,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="userName"    column="user_name"    />
         <result property="password"    column="password"    />
         <result property="channel"    column="channel"    />
+        <result property="playType"    column="play_type"    />
         <result property="url"    column="url"    />
+        <result property="streamId"    column="stream_id"    />
+        <result property="easyNTSUrl"    column="easy_NTS_url"    />
         <result property="firm"    column="firm"    />
         <result property="lat"    column="lat"    />
         <result property="lng"    column="lng"    />
@@ -32,7 +35,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                r.user_name,
                r.password,
                r.channel,
+               r.play_type,
                r.url,
+               r.stream_id,
+               r.easy_NTS_url,
                r.firm,
                r.lat,
                r.lng,
@@ -66,6 +72,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </select>
 
+    <select id="selectRtspDeviceListMap" parameterType="RtspDevice" resultMap="RtspDeviceResult">
+        <include refid="selectRtspDeviceVo"/>
+        <where>
+            <if test="deptId != null">and (r.dept_id = #{deptId} OR r.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))</if>
+            <if test="ip != null  and ip != ''"> and r.ip = #{ip}</if>
+            <if test="name != null  and name != ''"> and r.name like concat('%', #{name}, '%')</if>
+            <if test="firm != null  and firm != ''"> and r.firm = #{firm}</if>
+            and lat IS NOT NULL AND lng IS NOT NULL
+
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+
+        order by r.create_time desc
+    </select>
+
     <insert id="insertRtspDevice" parameterType="RtspDevice" useGeneratedKeys="true" keyProperty="id">
         insert into rtsp_device
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -75,7 +97,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="userName != null and userName != ''">user_name,</if>
             <if test="password != null and password != ''">password,</if>
             <if test="channel != null and channel != ''">channel,</if>
+            <if test="playType != null">play_type,</if>
             <if test="url != null">url,</if>
+            <if test="streamId != null">stream_id,</if>
+            <if test="easyNTSUrl != null">easy_NTS_url,</if>
             <if test="firm != null">firm,</if>
             <if test="lat != null">lat,</if>
             <if test="lng != null">lng,</if>
@@ -93,7 +118,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="userName != null and userName != ''">#{userName},</if>
             <if test="password != null and password != ''">#{password},</if>
             <if test="channel != null and channel != ''">#{channel},</if>
+            <if test="playType != null">#{playType},</if>
             <if test="url != null">#{url},</if>
+            <if test="streamId != null">#{streamId},</if>
+            <if test="easyNTSUrl != null">#{easyNTSUrl},</if>
             <if test="firm != null">#{firm},</if>
             <if test="lat != null">#{lat},</if>
             <if test="lng != null">#{lng},</if>
@@ -115,7 +143,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="userName != null and userName != ''">user_name = #{userName},</if>
             <if test="password != null and password != ''">password = #{password},</if>
             <if test="channel != null and channel != ''">channel = #{channel},</if>
+            <if test="playType != null">play_type = #{playType},</if>
             <if test="url != null">url = #{url},</if>
+            <if test="streamId != null">stream_id = #{streamId},</if>
+            <if test="easyNTSUrl != null">easy_NTS_url = #{easyNTSUrl},</if>
             <if test="firm != null">firm = #{firm},</if>
             <if test="lat != null">lat = #{lat},</if>
             <if test="lng != null">lng = #{lng},</if>
