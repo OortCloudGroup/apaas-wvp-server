@@ -1,42 +1,8 @@
 <template>
   <div class="navbar">
     <hamburger id="hamburger-container" :is-active="appStore.sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-    <breadcrumb v-if="!settingsStore.topNav" id="breadcrumb-container" class="breadcrumb-container" />
-    <top-nav v-if="settingsStore.topNav" id="topmenu-container" class="topmenu-container" />
 
     <div class="right-menu">
-      <template v-if="appStore.device !== 'mobile'">
-        <header-search id="header-search" class="right-menu-item" />
-
-        <el-tooltip content="源码地址" effect="dark" placement="bottom">
-          <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-        <el-tooltip content="文档地址" effect="dark" placement="bottom">
-          <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-        <el-tooltip content="大屏可视化" effect="dark" placement="bottom">
-          <RuoYLarge id="ruoyi-large" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-        <el-tooltip content="goview" effect="dark" placement="bottom">
-          <RuoYGoView id="ruoyi-goview" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-        <screenfull id="screenfull" class="right-menu-item hover-effect" />
-
-        <el-tooltip content="主题模式" effect="dark" placement="bottom">
-          <div class="right-menu-item hover-effect theme-switch-wrapper" @click="toggleTheme">
-            <svg-icon v-if="settingsStore.isDark" icon-class="sunny" />
-            <svg-icon v-if="!settingsStore.isDark" icon-class="moon" />
-          </div>
-        </el-tooltip>
-
-        <el-tooltip content="布局大小" effect="dark" placement="bottom">
-          <size-select id="size-select" class="right-menu-item hover-effect" />
-        </el-tooltip>
-      </template>
       <div class="avatar-container">
         <el-dropdown @command="handleCommand" class="right-menu-item hover-effect" trigger="click">
           <div class="avatar-wrapper">
@@ -64,16 +30,7 @@
 
 <script setup>
 import { ElMessageBox } from 'element-plus'
-import Breadcrumb from '@/components/Breadcrumb'
-import TopNav from '@/components/TopNav'
 import Hamburger from '@/components/Hamburger'
-import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import HeaderSearch from '@/components/HeaderSearch'
-import RuoYiGit from '@/components/RuoYi/Git'
-import RuoYiDoc from '@/components/RuoYi/Doc'
-import RuoYLarge from '@/components/RuoYi/Large'
-import RuoYGoView from '@/components/RuoYi/GoView'
 import useAppStore from '@/store/modules/app'
 import useUserStore from '@/store/modules/user'
 import useSettingsStore from '@/store/modules/settings'
@@ -115,52 +72,36 @@ const emits = defineEmits(['setLayout'])
 function setLayout() {
   emits('setLayout');
 }
-
-function toggleTheme() {
-  settingsStore.toggleTheme()
-}
 </script>
 
 <style lang='scss' scoped>
 .navbar {
-  height: 50px;
+  height: 64px;
   overflow: hidden;
   position: relative;
-  background: var(--navbar-bg);
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  background: transparent;
 
   .hamburger-container {
-    line-height: 46px;
+    line-height: 64px;
     height: 100%;
     float: left;
     cursor: pointer;
     transition: background 0.3s;
     -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
 
     &:hover {
       background: rgba(0, 0, 0, 0.025);
     }
   }
 
-  .breadcrumb-container {
-    float: left;
-  }
-
-  .topmenu-container {
-    position: absolute;
-    left: 50px;
-  }
-
-  .errLog-container {
-    display: inline-block;
-    vertical-align: top;
-  }
-
   .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
+    line-height: 64px;
     display: flex;
+    align-items: center;
 
     &:focus {
       outline: none;
@@ -182,27 +123,16 @@ function toggleTheme() {
           background: rgba(0, 0, 0, 0.025);
         }
       }
-
-      &.theme-switch-wrapper {
-        display: flex;
-        align-items: center;
-
-        svg {
-          transition: transform 0.3s;
-
-          &:hover {
-            transform: scale(1.15);
-          }
-        }
-      }
     }
 
     .avatar-container {
       margin-right: 40px;
 
       .avatar-wrapper {
-        margin-top: 5px;
+        margin-top: 0;
         position: relative;
+        display: flex;
+        align-items: center;
 
         .user-avatar {
           cursor: pointer;

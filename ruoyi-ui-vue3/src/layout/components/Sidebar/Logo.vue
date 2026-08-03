@@ -29,13 +29,8 @@ const title = import.meta.env.VITE_APP_TITLE;
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 
-// 获取Logo背景色
-const getLogoBackground = computed(() => {
-  if (settingsStore.isDark) {
-    return 'var(--sidebar-bg)';
-  }
-  return sideTheme.value === 'theme-dark' ? variables.menuBg : variables.menuLightBg;
-});
+// Logo 背景透明，与页面背景一致
+const getLogoBackground = computed(() => 'transparent');
 
 // 获取Logo文字颜色
 const getLogoTextColor = computed(() => {
@@ -61,10 +56,12 @@ const getLogoTextColor = computed(() => {
 .sidebar-logo-container {
   position: relative;
   width: 100%;
-  height: 50px;
-  line-height: 50px;
+  height: 64px;
+  line-height: 64px;
   background: v-bind(getLogoBackground);
-  text-align: center;
+  text-align: left;
+  padding-left: 20px;
+  box-sizing: border-box;
   overflow: hidden;
 
   & .sidebar-logo-link {
@@ -72,10 +69,10 @@ const getLogoTextColor = computed(() => {
     width: 100%;
 
     & .sidebar-logo {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       vertical-align: middle;
-      margin-right: 12px;
+      margin-right: 9px;
     }
 
     & .sidebar-title {
@@ -83,14 +80,18 @@ const getLogoTextColor = computed(() => {
       margin: 0;
       color: v-bind(getLogoTextColor);
       font-weight: 600;
-      line-height: 50px;
-      font-size: 14px;
+      line-height: 64px;
+      font-size: 24px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
+      color: #333333;
     }
   }
 
   &.collapse {
+    padding-left: 0;
+    text-align: center;
+
     .sidebar-logo {
       margin-right: 0px;
     }
