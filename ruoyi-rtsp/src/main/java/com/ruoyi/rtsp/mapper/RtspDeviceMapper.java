@@ -2,6 +2,7 @@ package com.ruoyi.rtsp.mapper;
 
 import java.util.List;
 import com.ruoyi.rtsp.domain.RtspDevice;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * rtsp设备Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.rtsp.domain.RtspDevice;
  * @author 陈江灿
  * @date 2025-04-22
  */
+@Mapper
 public interface RtspDeviceMapper 
 {
     /**
