@@ -45,6 +45,7 @@ import ImagePreview from "@/components/ImagePreview"
 import DictTag from '@/components/DictTag'
 import SearchHeightBox from '@/components/SearchHeightBox'
 import ExportExcelPdf from '@/components/ExportExcelPdf'
+import ButtonGroup from '@/components/ButtonGroup'
 
 const app = createApp(App)
 
@@ -68,6 +69,7 @@ app.component('RightToolbar', RightToolbar)
 app.component('Editor', Editor)
 app.component('SearchHeightBox', SearchHeightBox)
 app.component('ExportExcelPdf', ExportExcelPdf)
+app.component('ButtonGroup', ButtonGroup)
 
 app.use(router)
 app.use(store)

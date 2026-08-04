@@ -21,21 +21,10 @@
       <el-col :span="20">
         <div class="toolbar-with-search">
           <div class="toolbar-left">
-            <el-button type="primary"
-                       plain
-                       icon="Plus"
-                       @click="handleAdd"
-                       v-hasPermi="['wvp:channel:addGroupChannel']">新增
-            </el-button>
-            <el-button
-                type="danger"
-                plain
-                icon="Delete"
-                :disabled="multiple"
-                @click="handleDelete"
-                v-hasPermi="['wvp:channel:deleteGroupChannel']">
-              删除
-            </el-button>
+            <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['wvp:channel:addGroupChannel']">
+              <el-icon class="BtnImg"><Plus /></el-icon>新增
+            </button>
+            <button-group :button-list="toolbarButtons" />
           </div>
           <div class="searchHeight_out flexRowAC">
             <search-height-box
@@ -172,6 +161,10 @@ const groupDeviceId = ref('');
 const businessGroup = ref('');
 const selectionList = ref([]);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['wvp:channel:deleteGroupChannel'], clickFn: () => handleDelete() }
+]);
 const open = ref(false);
 const title = ref("");
 const dataType = ref('group');

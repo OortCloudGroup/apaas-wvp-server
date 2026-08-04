@@ -3,9 +3,10 @@
    <div class="app-container">
       <div class="toolbar-with-search">
          <div class="toolbar-left">
-            <el-button type="primary" plain icon="Plus" @click="openSelectUser" v-hasPermi="['system:role:add']">添加用户</el-button>
-            <el-button type="danger" plain icon="CircleClose" :disabled="multiple" @click="cancelAuthUserAll" v-hasPermi="['system:role:remove']">批量取消授权</el-button>
-            <el-button type="warning" plain icon="Close" @click="handleClose">关闭</el-button>
+            <button type="button" class="exportBtn newBtn flexRowAC" @click="openSelectUser" v-hasPermi="['system:role:add']">
+               <el-icon class="BtnImg"><Plus /></el-icon>添加用户
+            </button>
+            <button-group :button-list="toolbarButtons" />
          </div>
          <div class="searchHeight_out flexRowAC">
             <search-height-box keyword="userName" placeholder="请输入用户名称等关键词" :data="searchData" @handle="searchResetFn" />
@@ -60,6 +61,11 @@ const loading = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const userIds = ref([]);
+
+const toolbarButtons = computed(() => [
+  { name: '批量取消授权', svg: 'delete', disabled: multiple.value, permi: ['system:role:remove'], clickFn: () => cancelAuthUserAll() },
+  { name: '关闭', svg: 'operate', clickFn: () => handleClose() }
+]);
 
 const queryParams = reactive({
   pageNum: 1,

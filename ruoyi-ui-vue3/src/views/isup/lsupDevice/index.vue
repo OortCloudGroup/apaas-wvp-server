@@ -2,24 +2,7 @@
   <div class="app-container">
     <div class="toolbar-with-search">
       <div class="toolbar-left">
-        <el-button
-            type="success"
-            plain
-            icon="Edit"
-            :disabled="single"
-            @click="handleUpdate"
-            v-hasPermi="['isup:lsupDevice:edit']"
-        >修改
-        </el-button>
-        <el-button
-            type="danger"
-            plain
-            icon="Delete"
-            :disabled="multiple"
-            @click="handleDelete"
-            v-hasPermi="['isup:lsupDevice:remove']"
-        >删除
-        </el-button>
+        <button-group :button-list="toolbarButtons" />
       </div>
       <div class="searchHeight_out flexRowAC">
         <search-height-box
@@ -251,6 +234,11 @@ const ids = ref([]);
 const searchData = ref([]);
 const single = ref(true);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '修改', svg: 'edit', disabled: single.value, permi: ['isup:lsupDevice:edit'], clickFn: () => handleUpdate() },
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['isup:lsupDevice:remove'], clickFn: () => handleDelete() }
+]);
 const total = ref(0);
 const title = ref("");
 const daterangeCreateTime = ref([]);
@@ -494,7 +482,7 @@ const updateDialogMap = (value) => {
 function handleUpdate(row) {
   reset();
   digitalChannelList.value = []
-  const _id = row.id || ids.value
+  const _id = row?.id || ids.value
 
   getLsupDevice(_id).then(response => {
     form.value = response.data;
@@ -548,7 +536,7 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const _ids = row.id || ids.value;
+  const _ids = row?.id || ids.value;
   proxy.$modal.confirm('是否确认删除isup设备编号为"' + _ids + '"的数据项？').then(function () {
     return delLsupDevice(_ids);
   }).then(() => {

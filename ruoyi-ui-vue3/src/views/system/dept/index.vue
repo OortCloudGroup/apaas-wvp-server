@@ -2,8 +2,10 @@
    <div class="app-container">
       <div class="toolbar-with-search">
          <div class="toolbar-left">
-            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:dept:add']">新增</el-button>
-            <el-button type="info" plain icon="Sort" @click="toggleExpandAll">展开/折叠</el-button>
+            <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['system:dept:add']">
+               <el-icon class="BtnImg"><Plus /></el-icon>新增
+            </button>
+            <button-group :button-list="toolbarButtons" />
          </div>
          <div class="searchHeight_out flexRowAC">
             <search-height-box keyword="deptName" placeholder="请输入部门名称" :data="searchData" @handle="searchResetFn" />
@@ -127,6 +129,10 @@ const title = ref("");
 const deptOptions = ref([]);
 const isExpandAll = ref(true);
 const refreshTable = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '展开/折叠', svg: 'list', clickFn: () => toggleExpandAll() }
+]);
 
 const data = reactive({
   form: {},

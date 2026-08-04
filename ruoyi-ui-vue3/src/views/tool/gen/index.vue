@@ -2,11 +2,10 @@
   <div class="app-container">
     <div class="toolbar-with-search">
       <div class="toolbar-left">
-        <el-button type="primary" plain icon="Download" :disabled="multiple" @click="handleGenTable" v-hasPermi="['tool:gen:code']">生成</el-button>
-        <el-button type="primary" plain icon="Plus" @click="openCreateTable" v-hasRole="['admin']">创建</el-button>
-        <el-button type="info" plain icon="Upload" @click="openImportTable" v-hasPermi="['tool:gen:import']">导入</el-button>
-        <el-button type="success" plain icon="Edit" :disabled="single" @click="handleEditTable" v-hasPermi="['tool:gen:edit']">修改</el-button>
-        <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['tool:gen:remove']">删除</el-button>
+        <button type="button" class="exportBtn newBtn flexRowAC" :disabled="multiple" @click="handleGenTable" v-hasPermi="['tool:gen:code']">
+          <el-icon class="BtnImg"><Download /></el-icon>生成
+        </button>
+        <button-group :button-list="toolbarButtons" />
       </div>
       <div class="searchHeight_out flexRowAC">
         <search-height-box keyword="tableName" placeholder="请输入表名称等关键词" :data="searchData" @handle="searchResetFn" />
@@ -77,6 +76,7 @@ import { listTable, previewTable, delTable, genCode, synchDb } from "@/api/tool/
 import router from "@/router";
 import importTable from "./importTable";
 import createTable from "./createTable";
+import { checkRole } from "@/utils/permission";
 
 const route = useRoute();
 const { proxy } = getCurrentInstance();
@@ -86,6 +86,13 @@ const loading = ref(true);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '创建', svg: 'edit', show: checkRole(['admin']), clickFn: () => openCreateTable() },
+  { name: '导入', svg: 'upload', permi: ['tool:gen:import'], clickFn: () => openImportTable() },
+  { name: '修改', svg: 'edit', disabled: single.value, permi: ['tool:gen:edit'], clickFn: () => handleEditTable() },
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['tool:gen:remove'], clickFn: () => handleDelete() }
+]);
 const total = ref(0);
 const tableNames = ref([]);
 const dateRange = ref([]);
@@ -160,12 +167,12 @@ function searchResetFn(val) {
 
 /** 生成代码操作 */
 function handleGenTable(row) {
-  const tbNames = row.tableName || tableNames.value;
+  const tbNames = row?.tableName || tableNames.value;
   if (tbNames == "") {
     proxy.$modal.msgError("请选择要生成的数据");
     return;
   }
-  if (row.genType === "1") {
+  if (row?.genType === "1") {
     genCode(row.tableName).then(response => {
       proxy.$modal.msgSuccess("成功生成到自定义路径：" + row.genPath);
     });
@@ -225,13 +232,13 @@ function handleSortChange(column, prop, order) {
 
 /** 修改按钮操作 */
 function handleEditTable(row) {
-  const tableId = row.tableId || ids.value[0];
+  const tableId = row?.tableId || ids.value[0];
   router.push({ path: "/tool/gen-edit/index/" + tableId, query: { pageNum: queryParams.value.pageNum } });
 }
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const tableIds = row.tableId || ids.value;
+  const tableIds = row?.tableId || ids.value;
   proxy.$modal.confirm('是否确认删除表编号为"' + tableIds + '"的数据项？').then(function () {
     return delTable(tableIds);
   }).then(() => {

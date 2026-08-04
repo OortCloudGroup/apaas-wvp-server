@@ -18,10 +18,10 @@
           <el-col>
             <div class="toolbar-with-search">
               <div class="toolbar-left">
-                <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:user:add']">新增</el-button>
-                <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:user:edit']">修改</el-button>
-                <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:user:remove']">删除</el-button>
-                <el-button type="info" plain icon="Upload" @click="handleImport" v-hasPermi="['system:user:import']">导入</el-button>
+                <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['system:user:add']">
+                  <el-icon class="BtnImg"><Plus /></el-icon>新增
+                </button>
+                <button-group :button-list="toolbarButtons" />
               </div>
               <div class="searchHeight_out flexRowAC">
                 <search-height-box
@@ -229,6 +229,12 @@ const searchData = computed(() => [
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '修改', svg: 'edit', disabled: single.value, permi: ['system:user:edit'], clickFn: () => handleUpdate() },
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['system:user:remove'], clickFn: () => handleDelete() },
+  { name: '导入', svg: 'upload', permi: ['system:user:import'], clickFn: () => handleImport() }
+]);
 const total = ref(0);
 const title = ref("");
 const dateRange = ref([]);
@@ -362,7 +368,7 @@ function resetQuery() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const userIds = row.userId || ids.value;
+  const userIds = row?.userId || ids.value;
   proxy.$modal.confirm('是否确认删除用户编号为"' + userIds + '"的数据项？').then(function () {
     return delUser(userIds);
   }).then(() => {
@@ -514,7 +520,7 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const userId = row.userId || ids.value;
+  const userId = row?.userId || ids.value;
   getUser(userId).then(response => {
     form.value = response.data;
     postOptions.value = response.posts;

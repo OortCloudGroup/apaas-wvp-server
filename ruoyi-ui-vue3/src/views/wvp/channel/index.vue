@@ -2,7 +2,9 @@
   <div class="app-container">
     <div class="toolbar-with-search">
       <div class="toolbar-left">
-        <el-button type="primary" plain icon="Back" @click="handleBack">返回</el-button>
+        <button type="button" class="exportBtn newBtn flexRowAC" @click="handleBack">
+          <el-icon class="BtnImg"><Back /></el-icon>返回
+        </button>
       </div>
       <div class="searchHeight_out flexRowAC">
         <search-height-box

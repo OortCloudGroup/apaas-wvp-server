@@ -2,10 +2,10 @@
    <div class="app-container">
       <div class="toolbar-with-search">
          <div class="toolbar-left">
-            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['monitor:job:add']">新增</el-button>
-            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['monitor:job:edit']">修改</el-button>
-            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['monitor:job:remove']">删除</el-button>
-            <el-button type="info" plain icon="Operation" @click="handleJobLog" v-hasPermi="['monitor:job:query']">日志</el-button>
+            <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['monitor:job:add']">
+               <el-icon class="BtnImg"><Plus /></el-icon>新增
+            </button>
+            <button-group :button-list="toolbarButtons" />
          </div>
          <div class="searchHeight_out flexRowAC">
             <search-height-box keyword="jobName" placeholder="请输入任务名称等关键词" :data="searchData" @handle="searchResetFn" />
@@ -246,6 +246,12 @@ const openView = ref(false);
 const openCron = ref(false);
 const expression = ref("");
 
+const toolbarButtons = computed(() => [
+  { name: '修改', svg: 'edit', disabled: single.value, permi: ['monitor:job:edit'], clickFn: () => handleUpdate() },
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['monitor:job:remove'], clickFn: () => handleDelete() },
+  { name: '日志', svg: 'operate', permi: ['monitor:job:query'], clickFn: () => handleJobLog() }
+]);
+
 const data = reactive({
   form: {},
   queryParams: {
@@ -401,7 +407,7 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const jobId = row.jobId || ids.value;
+  const jobId = row?.jobId || ids.value;
   getJob(jobId).then(response => {
     form.value = response.data;
     open.value = true;
@@ -432,7 +438,7 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const jobIds = row.jobId || ids.value;
+  const jobIds = row?.jobId || ids.value;
   proxy.$modal.confirm('是否确认删除定时任务编号为"' + jobIds + '"的数据项?').then(function () {
     return delJob(jobIds);
   }).then(() => {

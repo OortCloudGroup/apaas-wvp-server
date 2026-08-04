@@ -2,14 +2,9 @@
   <div class="app-container">
     <div class="toolbar-with-search">
       <div class="toolbar-left">
-        <el-button
-            type="primary"
-            plain
-            icon="InfoFilled"
-            @click="showInfo"
-            v-hasPermi="['wvp:server:configInfo']"
-        >平台信息
-        </el-button>
+        <button type="button" class="exportBtn newBtn flexRowAC" @click="showInfo" v-hasPermi="['wvp:server:configInfo']">
+          <el-icon class="BtnImg"><InfoFilled /></el-icon>平台信息
+        </button>
       </div>
       <div class="searchHeight_out flexRowAC">
         <search-height-box

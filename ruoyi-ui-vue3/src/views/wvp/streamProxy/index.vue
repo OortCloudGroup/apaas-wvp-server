@@ -2,14 +2,9 @@
   <div class="app-container">
     <div class="toolbar-with-search">
       <div class="toolbar-left">
-        <el-button
-            type="primary"
-            plain
-            icon="Plus"
-            @click="handleAdd"
-            v-hasPermi="['wvp:proxy:add']"
-        >新增
-        </el-button>
+        <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['wvp:proxy:add']">
+          <el-icon class="BtnImg"><Plus /></el-icon>新增
+        </button>
       </div>
       <div class="searchHeight_out flexRowAC">
         <search-height-box

@@ -2,10 +2,10 @@
    <div class="app-container">
       <div class="toolbar-with-search">
          <div class="toolbar-left">
-            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:config:add']">新增</el-button>
-            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:config:edit']">修改</el-button>
-            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:config:remove']">删除</el-button>
-            <el-button type="danger" plain icon="Refresh" @click="handleRefreshCache" v-hasPermi="['system:config:remove']">刷新缓存</el-button>
+            <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['system:config:add']">
+               <el-icon class="BtnImg"><Plus /></el-icon>新增
+            </button>
+            <button-group :button-list="toolbarButtons" />
          </div>
          <div class="searchHeight_out flexRowAC">
             <search-height-box keyword="configName" placeholder="请输入参数名称等关键词" :data="searchData" @handle="searchResetFn" />
@@ -113,6 +113,12 @@ const searchData = computed(() => [
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '修改', svg: 'edit', disabled: single.value, permi: ['system:config:edit'], clickFn: () => handleUpdate() },
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['system:config:remove'], clickFn: () => handleDelete() },
+  { name: '刷新缓存', svg: 'operate', permi: ['system:config:remove'], clickFn: () => handleRefreshCache() }
+]);
 const total = ref(0);
 const title = ref("");
 const dateRange = ref([]);
@@ -204,7 +210,7 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const configId = row.configId || ids.value;
+  const configId = row?.configId || ids.value;
   getConfig(configId).then(response => {
     form.value = response.data;
     open.value = true;
@@ -235,7 +241,7 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const configIds = row.configId || ids.value;
+  const configIds = row?.configId || ids.value;
   proxy.$modal.confirm('是否确认删除参数编号为"' + configIds + '"的数据项？').then(function () {
     return delConfig(configIds);
   }).then(() => {

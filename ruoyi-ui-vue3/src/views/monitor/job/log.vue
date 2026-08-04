@@ -2,9 +2,7 @@
    <div class="app-container">
       <div class="toolbar-with-search">
          <div class="toolbar-left">
-            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['monitor:job:remove']">删除</el-button>
-            <el-button type="danger" plain icon="Delete" @click="handleClean" v-hasPermi="['monitor:job:remove']">清空</el-button>
-            <el-button type="warning" plain icon="Close" @click="handleClose">关闭</el-button>
+            <button-group :button-list="toolbarButtons" />
          </div>
          <div class="searchHeight_out flexRowAC">
             <search-height-box keyword="jobName" placeholder="请输入任务名称等关键词" :data="searchData" @handle="searchResetFn" />
@@ -98,6 +96,12 @@ const open = ref(false);
 const loading = ref(true);
 const ids = ref([]);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['monitor:job:remove'], clickFn: () => handleDelete() },
+  { name: '清空', svg: 'delete', permi: ['monitor:job:remove'], clickFn: () => handleClean() },
+  { name: '关闭', svg: 'operate', clickFn: () => handleClose() }
+]);
 const total = ref(0);
 const dateRange = ref([]);
 const route = useRoute();

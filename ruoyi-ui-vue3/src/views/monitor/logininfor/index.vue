@@ -2,9 +2,7 @@
    <div class="app-container">
       <div class="toolbar-with-search">
          <div class="toolbar-left">
-            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['monitor:logininfor:remove']">删除</el-button>
-            <el-button type="danger" plain icon="Delete" @click="handleClean" v-hasPermi="['monitor:logininfor:remove']">清空</el-button>
-            <el-button type="primary" plain icon="Unlock" :disabled="single" @click="handleUnlock" v-hasPermi="['monitor:logininfor:unlock']">解锁</el-button>
+            <button-group :button-list="toolbarButtons" />
          </div>
          <div class="searchHeight_out flexRowAC">
             <search-height-box keyword="userName" placeholder="请输入用户名称、登录地址等关键词" :data="searchData" @handle="searchResetFn" />
@@ -74,6 +72,12 @@ const searchData = computed(() => [
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['monitor:logininfor:remove'], clickFn: () => handleDelete() },
+  { name: '清空', svg: 'delete', permi: ['monitor:logininfor:remove'], clickFn: () => handleClean() },
+  { name: '解锁', svg: 'lock', disabled: single.value, permi: ['monitor:logininfor:unlock'], clickFn: () => handleUnlock() }
+]);
 const selectName = ref("");
 const total = ref(0);
 const dateRange = ref([]);
@@ -140,7 +144,7 @@ function handleSortChange(column, prop, order) {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const infoIds = row.infoId || ids.value;
+  const infoIds = row?.infoId || ids.value;
   proxy.$modal.confirm('是否确认删除访问编号为"' + infoIds + '"的数据项?').then(function () {
     return delLogininfor(infoIds);
   }).then(() => {

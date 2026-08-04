@@ -2,10 +2,10 @@
    <div class="app-container">
       <div class="toolbar-with-search">
          <div class="toolbar-left">
-            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:dict:add']">新增</el-button>
-            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:dict:edit']">修改</el-button>
-            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:dict:remove']">删除</el-button>
-            <el-button type="warning" plain icon="Close" @click="handleClose">关闭</el-button>
+            <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['system:dict:add']">
+               <el-icon class="BtnImg"><Plus /></el-icon>新增
+            </button>
+            <button-group :button-list="toolbarButtons" />
          </div>
          <div class="searchHeight_out flexRowAC">
             <search-height-box keyword="dictLabel" placeholder="请输入字典标签等关键词" :data="searchData" @handle="searchResetFn" />
@@ -116,6 +116,12 @@ const loading = ref(true);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '修改', svg: 'edit', disabled: single.value, permi: ['system:dict:edit'], clickFn: () => handleUpdate() },
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['system:dict:remove'], clickFn: () => handleDelete() },
+  { name: '关闭', svg: 'operate', clickFn: () => handleClose() }
+]);
 const total = ref(0);
 const title = ref("");
 const defaultDictType = ref("");
@@ -257,7 +263,7 @@ function handleSelectionChange(selection) {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const dictCode = row.dictCode || ids.value;
+  const dictCode = row?.dictCode || ids.value;
   getData(dictCode).then(response => {
     form.value = response.data;
     open.value = true;
@@ -290,7 +296,7 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const dictCodes = row.dictCode || ids.value;
+  const dictCodes = row?.dictCode || ids.value;
   proxy.$modal.confirm('是否确认删除字典编码为"' + dictCodes + '"的数据项？').then(function() {
     return delData(dictCodes);
   }).then(() => {

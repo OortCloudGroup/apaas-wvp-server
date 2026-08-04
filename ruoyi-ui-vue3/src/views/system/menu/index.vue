@@ -2,8 +2,10 @@
    <div class="app-container">
       <div class="toolbar-with-search">
          <div class="toolbar-left">
-            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:menu:add']">新增</el-button>
-            <el-button type="info" plain icon="Sort" @click="toggleExpandAll">展开/折叠</el-button>
+            <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['system:menu:add']">
+               <el-icon class="BtnImg"><Plus /></el-icon>新增
+            </button>
+            <button-group :button-list="toolbarButtons" />
          </div>
          <div class="searchHeight_out flexRowAC">
             <search-height-box keyword="menuName" placeholder="请输入菜单名称" :data="searchData" @handle="searchResetFn" />
@@ -278,6 +280,10 @@ const menuOptions = ref([]);
 const isExpandAll = ref(false);
 const refreshTable = ref(true);
 const iconSelectRef = ref(null);
+
+const toolbarButtons = computed(() => [
+  { name: '展开/折叠', svg: 'list', clickFn: () => toggleExpandAll() }
+]);
 
 const data = reactive({
   form: {},

@@ -6,12 +6,27 @@
 
       <div class="toolbar-with-search">
         <div class="toolbar-left">
-          <el-button v-if="queryParams.hasLink !=='true'" type="primary" plain icon="Plus" :disabled="multiple" @click="handleAdd" v-hasPermi="['wvp:record:channelAdd']">新增</el-button>
-          <el-button v-if="queryParams.hasLink ==='true'" type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['wvp:record:channelDelete']">删除</el-button>
-          <el-button v-if="queryParams.hasLink !=='true'" type="primary" plain icon="Plus" @click="handleAddByDevice" v-hasPermi="['wvp:record:channelAdd']">按设备添加</el-button>
-          <el-button v-if="queryParams.hasLink ==='true'" type="danger" plain icon="Delete" @click="handleRemoveByDevice" v-hasPermi="['wvp:record:channelDelete']">按设备移除</el-button>
-          <el-button v-if="queryParams.hasLink !=='true'" type="primary" plain icon="Plus" @click="handleAddAll" v-hasPermi="['wvp:record:channelAdd']">添加所有通道</el-button>
-          <el-button v-if="queryParams.hasLink ==='true'" type="danger" plain icon="Delete" @click="handleRemoveAll" v-hasPermi="['wvp:record:channelDelete']">移除所有通道</el-button>
+          <button
+            v-if="queryParams.hasLink !== 'true'"
+            type="button"
+            class="exportBtn newBtn flexRowAC"
+            :disabled="multiple"
+            @click="handleAdd"
+            v-hasPermi="['wvp:record:channelAdd']"
+          >
+            <el-icon class="BtnImg"><Plus /></el-icon>新增
+          </button>
+          <button
+            v-else
+            type="button"
+            class="exportBtn newBtn flexRowAC"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['wvp:record:channelDelete']"
+          >
+            <el-icon class="BtnImg"><Delete /></el-icon>删除
+          </button>
+          <button-group :button-list="toolbarButtons" />
         </div>
         <div class="searchHeight_out flexRowAC">
           <search-height-box keyword="query" placeholder="请输入关键字" :data="searchData" @handle="searchResetFn" />
@@ -143,6 +158,19 @@ const data = reactive({
 });
 
 const {queryParams, form, rules, queryParamsDevice} = toRefs(data);
+
+const toolbarButtons = computed(() => {
+  if (queryParams.value.hasLink === 'true') {
+    return [
+      { name: '按设备移除', svg: 'delete', permi: ['wvp:record:channelDelete'], clickFn: () => handleRemoveByDevice() },
+      { name: '移除所有通道', svg: 'delete', permi: ['wvp:record:channelDelete'], clickFn: () => handleRemoveAll() }
+    ]
+  }
+  return [
+    { name: '按设备添加', svg: 'edit', permi: ['wvp:record:channelAdd'], clickFn: () => handleAddByDevice() },
+    { name: '添加所有通道', svg: 'edit', permi: ['wvp:record:channelAdd'], clickFn: () => handleAddAll() }
+  ]
+});
 
 const searchData = [
   {
