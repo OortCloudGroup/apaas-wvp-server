@@ -4,36 +4,18 @@
       <el-alert style="margin-bottom: 10px;" title="日期和时间不要选择太大要不然会很卡，解决方法：自行搭配el-table-v2" type="error" />
       <el-alert title="关于分页问题自行查看国标文件9.7，能否分页取决于厂家是否支持分页功能" type="error" />
     </div>
-    <el-form :model="queryParams" ref="queryRef" :inline="true" >
-      <el-form-item label="日期/时间" prop="startTime">
-        <el-date-picker
-            v-model="dataInterval"
-            type="datetimerange"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
-            :default-time="defaultTime"
-            style="width: 400px"
+    <div class="toolbar-with-search">
+      <div class="toolbar-left" />
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="query"
+          placeholder="请通过高级筛选选择时间与类型"
+          :data="searchData"
+          @handle="searchResetFn"
         />
-      </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select
-            v-model="queryParams.type"
-            placeholder="请选择录像类型"
-            style="width: 240px"
-        >
-          <el-option
-              v-for="item in optionsType"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
+        <export-excel-pdf />
+      </div>
+    </div>
     <el-table :data="detailFiles" border height="600">
       <el-table-column label="设备ID" align="center" prop="deviceId" />
       <el-table-column label="位置" align="center" prop="address">
@@ -118,8 +100,51 @@ const optionsType = ref([
   },
 ])
 
+function buildDefaultInterval() {
+  const now = new Date();
+  const currentHour = now.getHours();
+  let startHour = currentHour - 3;
+  let startDate = new Date(now);
+  if (startHour < 0) {
+    startDate.setDate(startDate.getDate() - 1);
+    startHour = 24 + startHour;
+  }
+  const startOfDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startHour, 0, 0);
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), currentHour, 59, 59);
+  return [startOfDay, endOfDay];
+}
+
+const searchData = computed(() => [
+  {
+    label: '日期/时间',
+    value: 'dataInterval',
+    type: 'datetimerange',
+    startP: '开始时间',
+    endP: '结束时间',
+    default: dataInterval.value?.length ? dataInterval.value : buildDefaultInterval(),
+    defaultTime: defaultTime.value
+  },
+  {
+    label: '类型',
+    value: 'type',
+    type: 'select',
+    option: optionsType.value,
+    default: 'alarm'
+  }
+]);
+
 const handleQuery = () => {
   dateChange()
+}
+
+function searchResetFn(val) {
+  if (val.dataInterval && val.dataInterval.length === 2) {
+    dataInterval.value = val.dataInterval;
+  } else {
+    getDefaultTime();
+  }
+  queryParams.value.type = val.type || 'alarm';
+  dateChange();
 }
 
 const resetQuery = () => {
@@ -145,17 +170,7 @@ const queryParams = ref({
 });
 
 function getDefaultTime(){
-  const now = new Date();
-  const currentHour = now.getHours();
-  let startHour = currentHour - 3;
-  let startDate = new Date(now);
-  if (startHour < 0) {
-    startDate.setDate(startDate.getDate() - 1);
-    startHour = 24 + startHour;
-  }
-  const startOfDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startHour, 0, 0);
-  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), currentHour, 59, 59);
-  dataInterval.value = [startOfDay, endOfDay];
+  dataInterval.value = buildDefaultInterval();
 }
 
 const playTime = ref(null);

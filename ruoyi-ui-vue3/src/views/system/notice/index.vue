@@ -1,72 +1,16 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-         <el-form-item label="公告标题" prop="noticeTitle">
-            <el-input
-               v-model="queryParams.noticeTitle"
-               placeholder="请输入公告标题"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="操作人员" prop="createBy">
-            <el-input
-               v-model="queryParams.createBy"
-               placeholder="请输入操作人员"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="类型" prop="noticeType">
-            <el-select v-model="queryParams.noticeType" placeholder="公告类型" clearable style="width: 200px">
-               <el-option
-                  v-for="dict in sys_notice_type"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
-
-      <el-row :gutter="10" class="mb8">
-         <el-col :span="1.5">
-            <el-button
-               type="primary"
-               plain
-               icon="Plus"
-               @click="handleAdd"
-               v-hasPermi="['system:notice:add']"
-            >新增</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="success"
-               plain
-               icon="Edit"
-               :disabled="single"
-               @click="handleUpdate"
-               v-hasPermi="['system:notice:edit']"
-            >修改</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               :disabled="multiple"
-               @click="handleDelete"
-               v-hasPermi="['system:notice:remove']"
-            >删除</el-button>
-         </el-col>
-         <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+      <div class="toolbar-with-search">
+         <div class="toolbar-left">
+            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:notice:add']">新增</el-button>
+            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:notice:edit']">修改</el-button>
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:notice:remove']">删除</el-button>
+         </div>
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box keyword="noticeTitle" placeholder="请输入公告标题等关键词" :data="searchData" @handle="searchResetFn" />
+            <export-excel-pdf />
+         </div>
+      </div>
 
       <el-table v-loading="loading" :data="noticeList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
@@ -168,6 +112,16 @@ const noticeList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
+const searchData = computed(() => [
+  { label: '操作人员', value: 'createBy', type: 'text', default: '' },
+  {
+    label: '类型',
+    value: 'noticeType',
+    type: 'select',
+    option: (sys_notice_type.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  }
+]);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
@@ -225,9 +179,18 @@ function handleQuery() {
   getList();
 }
 
-/** 重置按钮操作 */
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.noticeTitle = val.noticeTitle || undefined;
+  queryParams.value.createBy = val.createBy || undefined;
+  queryParams.value.noticeType = val.noticeType || undefined;
+  getList();
+}
+
 function resetQuery() {
-  proxy.resetForm("queryRef");
+  queryParams.value.noticeTitle = undefined;
+  queryParams.value.createBy = undefined;
+  queryParams.value.noticeType = undefined;
   handleQuery();
 }
 

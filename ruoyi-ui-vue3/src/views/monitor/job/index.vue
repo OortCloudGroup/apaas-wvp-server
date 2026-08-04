@@ -1,91 +1,17 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-         <el-form-item label="任务名称" prop="jobName">
-            <el-input
-               v-model="queryParams.jobName"
-               placeholder="请输入任务名称"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="任务组名" prop="jobGroup">
-            <el-select v-model="queryParams.jobGroup" placeholder="请选择任务组名" clearable style="width: 200px">
-               <el-option
-                  v-for="dict in sys_job_group"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item label="任务状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="请选择任务状态" clearable style="width: 200px">
-               <el-option
-                  v-for="dict in sys_job_status"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
-
-      <el-row :gutter="10" class="mb8">
-         <el-col :span="1.5">
-            <el-button
-               type="primary"
-               plain
-               icon="Plus"
-               @click="handleAdd"
-               v-hasPermi="['monitor:job:add']"
-            >新增</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="success"
-               plain
-               icon="Edit"
-               :disabled="single"
-               @click="handleUpdate"
-               v-hasPermi="['monitor:job:edit']"
-            >修改</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               :disabled="multiple"
-               @click="handleDelete"
-               v-hasPermi="['monitor:job:remove']"
-            >删除</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Download"
-               @click="handleExport"
-               v-hasPermi="['monitor:job:export']"
-            >导出</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="info"
-               plain
-               icon="Operation"
-               @click="handleJobLog"
-               v-hasPermi="['monitor:job:query']"
-            >日志</el-button>
-         </el-col>
-         <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+      <div class="toolbar-with-search">
+         <div class="toolbar-left">
+            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['monitor:job:add']">新增</el-button>
+            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['monitor:job:edit']">修改</el-button>
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['monitor:job:remove']">删除</el-button>
+            <el-button type="info" plain icon="Operation" @click="handleJobLog" v-hasPermi="['monitor:job:query']">日志</el-button>
+         </div>
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box keyword="jobName" placeholder="请输入任务名称等关键词" :data="searchData" @handle="searchResetFn" />
+            <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+         </div>
+      </div>
 
       <el-table v-loading="loading" :data="jobList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
@@ -295,6 +221,22 @@ const jobList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
+const searchData = computed(() => [
+  {
+    label: '任务组名',
+    value: 'jobGroup',
+    type: 'select',
+    option: (sys_job_group.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  },
+  {
+    label: '任务状态',
+    value: 'status',
+    type: 'select',
+    option: (sys_job_status.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  }
+]);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
@@ -364,9 +306,18 @@ function handleQuery() {
   getList();
 }
 
-/** 重置按钮操作 */
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.jobName = val.jobName || undefined;
+  queryParams.value.jobGroup = val.jobGroup || undefined;
+  queryParams.value.status = val.status || undefined;
+  getList();
+}
+
 function resetQuery() {
-  proxy.resetForm("queryRef");
+  queryParams.value.jobName = undefined;
+  queryParams.value.jobGroup = undefined;
+  queryParams.value.status = undefined;
   handleQuery();
 }
 
@@ -495,6 +446,12 @@ function handleExport() {
   proxy.download("monitor/job/export", {
     ...queryParams.value,
   }, `job_${new Date().getTime()}.xlsx`);
+}
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
 }
 
 getList();

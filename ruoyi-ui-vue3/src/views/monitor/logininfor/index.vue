@@ -1,97 +1,16 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-         <el-form-item label="登录地址" prop="ipaddr">
-            <el-input
-               v-model="queryParams.ipaddr"
-               placeholder="请输入登录地址"
-               clearable
-               style="width: 240px;"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="用户名称" prop="userName">
-            <el-input
-               v-model="queryParams.userName"
-               placeholder="请输入用户名称"
-               clearable
-               style="width: 240px;"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="状态" prop="status">
-            <el-select
-               v-model="queryParams.status"
-               placeholder="登录状态"
-               clearable
-               style="width: 240px"
-            >
-               <el-option
-                  v-for="dict in sys_common_status"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item label="登录时间" style="width: 308px">
-            <el-date-picker
-               v-model="dateRange"
-               value-format="YYYY-MM-DD HH:mm:ss"
-               type="daterange"
-               range-separator="-"
-               start-placeholder="开始日期"
-               end-placeholder="结束日期"
-               :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)]"
-            ></el-date-picker>
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
-
-      <el-row :gutter="10" class="mb8">
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               :disabled="multiple"
-               @click="handleDelete"
-               v-hasPermi="['monitor:logininfor:remove']"
-            >删除</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               @click="handleClean"
-               v-hasPermi="['monitor:logininfor:remove']"
-            >清空</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="primary"
-               plain
-               icon="Unlock"
-               :disabled="single"
-               @click="handleUnlock"
-               v-hasPermi="['monitor:logininfor:unlock']"
-            >解锁</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Download"
-               @click="handleExport"
-               v-hasPermi="['monitor:logininfor:export']"
-            >导出</el-button>
-         </el-col>
-         <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+      <div class="toolbar-with-search">
+         <div class="toolbar-left">
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['monitor:logininfor:remove']">删除</el-button>
+            <el-button type="danger" plain icon="Delete" @click="handleClean" v-hasPermi="['monitor:logininfor:remove']">清空</el-button>
+            <el-button type="primary" plain icon="Unlock" :disabled="single" @click="handleUnlock" v-hasPermi="['monitor:logininfor:unlock']">解锁</el-button>
+         </div>
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box keyword="userName" placeholder="请输入用户名称、登录地址等关键词" :data="searchData" @handle="searchResetFn" />
+            <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+         </div>
+      </div>
 
       <el-table ref="logininforRef" v-loading="loading" :data="logininforList" @selection-change="handleSelectionChange" :default-sort="defaultSort" @sort-change="handleSortChange">
          <el-table-column type="selection" width="55" align="center" />
@@ -133,6 +52,25 @@ const { sys_common_status } = proxy.useDict("sys_common_status");
 const logininforList = ref([]);
 const loading = ref(true);
 const showSearch = ref(true);
+const searchData = computed(() => [
+  { label: '登录地址', value: 'ipaddr', type: 'text', default: '' },
+  {
+    label: '状态',
+    value: 'status',
+    type: 'select',
+    option: (sys_common_status.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  },
+  {
+    label: '登录时间',
+    value: 'dateRange',
+    type: 'daterange',
+    startP: '开始日期',
+    endP: '结束日期',
+    format: 'YYYY-MM-DD HH:mm:ss',
+    default: []
+  }
+]);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
@@ -168,12 +106,21 @@ function handleQuery() {
   getList();
 }
 
-/** 重置按钮操作 */
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.userName = val.userName || undefined;
+  queryParams.value.ipaddr = val.ipaddr || undefined;
+  queryParams.value.status = val.status || undefined;
+  dateRange.value = val.dateRange && val.dateRange.length ? val.dateRange : [];
+  getList();
+}
+
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm("queryRef");
-  queryParams.value.pageNum = 1;
-  proxy.$refs["logininforRef"].sort(defaultSort.value.prop, defaultSort.value.order);
+  queryParams.value.ipaddr = undefined;
+  queryParams.value.userName = undefined;
+  queryParams.value.status = undefined;
+  handleQuery();
 }
 
 /** 多选框选中数据 */
@@ -227,6 +174,12 @@ function handleExport() {
   proxy.download("monitor/logininfor/export", {
     ...queryParams.value,
   }, `logininfor_${new Date().getTime()}.xlsx`);
+}
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
 }
 
 getList();

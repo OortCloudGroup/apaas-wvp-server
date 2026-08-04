@@ -3,43 +3,8 @@
     <el-alert title="通道号要填写正确，用户名/密码就是后台登陆的用户名/密码" type="success"
               style="margin-bottom: 10px;"/>
 
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-      <el-form-item label="所属部门" prop="deptId">
-        <el-tree-select style="width: 202px" v-model="queryParams.deptId" :data="enabledDeptOptions" :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id" placeholder="请选择归属部门" check-strictly />
-      </el-form-item>
-      <el-form-item label="ip" prop="ip">
-        <el-input
-            v-model="queryParams.ip"
-            placeholder="请输入ip"
-            clearable
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="摄像头名称" prop="name">
-        <el-input
-            v-model="queryParams.name"
-            placeholder="请输入摄像头名称"
-            clearable
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="设备厂商" prop="firm">
-        <el-select v-model="queryParams.firm" placeholder="请选择设备厂商" clearable style="width: 180px;">
-          <el-option
-              v-for="dict in rtsp_manufacturer"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
         <el-button
             type="primary"
             plain
@@ -48,8 +13,6 @@
             v-hasPermi="['rtsp:RtspDevice:add']"
         >新增
         </el-button>
-      </el-col>
-      <el-col :span="1.5">
         <el-button
             type="success"
             plain
@@ -59,8 +22,6 @@
             v-hasPermi="['rtsp:RtspDevice:edit']"
         >修改
         </el-button>
-      </el-col>
-      <el-col :span="1.5">
         <el-button
             type="danger"
             plain
@@ -70,19 +31,17 @@
             v-hasPermi="['rtsp:RtspDevice:remove']"
         >删除
         </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-            type="warning"
-            plain
-            icon="Download"
-            @click="handleExport"
-            v-hasPermi="['rtsp:RtspDevice:export']"
-        >导出
-        </el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="name"
+          placeholder="请输入摄像头名称等关键词"
+          :data="searchData"
+          @handle="searchResetFn"
+        />
+        <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+      </div>
+    </div>
     <el-table v-loading="loading" :data="RtspDeviceList" @selection-change="handleSelectionChange" border>
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="所属部门" align="center" prop="deptName"/>
@@ -282,9 +241,9 @@ const {rtsp_manufacturer} = proxy.useDict('rtsp_manufacturer');
 const RtspDeviceList = ref([]);
 const open = ref(false);
 const loading = ref(true);
-const showSearch = ref(true);
 const cusPlayerShow = ref(false);
 const ids = ref([]);
+const searchData = ref([]);
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -472,8 +431,29 @@ function getDeptTree() {
   deptTreeSelect().then(response => {
     deptOptions.value = response.data;
     enabledDeptOptions.value = filterDisabledDept(JSON.parse(JSON.stringify(response.data)));
+    initSearchData();
   });
 };
+
+function initSearchData() {
+  searchData.value = [
+    {
+      label: '所属部门',
+      value: 'deptId',
+      type: 'tree-select',
+      option: enabledDeptOptions.value || [],
+      default: undefined
+    },
+    { label: 'ip', value: 'ip', type: 'text', default: '' },
+    {
+      label: '设备厂商',
+      value: 'firm',
+      type: 'select',
+      option: (rtsp_manufacturer.value || []).map(d => ({ label: d.label, value: d.value })),
+      default: undefined
+    }
+  ];
+}
 
 /** 过滤禁用的部门 */
 function filterDisabledDept(deptList) {
@@ -539,15 +519,25 @@ function reset() {
 }
 
 /** 搜索按钮操作 */
-function handleQuery() {
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.name = val.name || null;
+  queryParams.value.deptId = val.deptId || null;
+  queryParams.value.ip = val.ip || null;
+  queryParams.value.firm = val.firm || null;
   getList();
 }
 
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
+function handleExport() {
+  proxy.download('rtsp/RtspDevice/export', {
+    ...queryParams.value
+  }, `RtspDevice_${new Date().getTime()}.xlsx`)
+}
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
 }
 
 // 多选框选中数据
@@ -606,13 +596,6 @@ function handleDelete(row) {
     proxy.$modal.msgSuccess("删除成功");
   }).catch(() => {
   });
-}
-
-/** 导出按钮操作 */
-function handleExport() {
-  proxy.download('rtsp/RtspDevice/export', {
-    ...queryParams.value
-  }, `RtspDevice_${new Date().getTime()}.xlsx`)
 }
 
 getDeptTree();

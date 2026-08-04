@@ -43,6 +43,8 @@ import ImageUpload from "@/components/ImageUpload"
 import ImagePreview from "@/components/ImagePreview"
 // 字典标签组件
 import DictTag from '@/components/DictTag'
+import SearchHeightBox from '@/components/SearchHeightBox'
+import ExportExcelPdf from '@/components/ExportExcelPdf'
 
 const app = createApp(App)
 
@@ -64,6 +66,8 @@ app.component('ImageUpload', ImageUpload)
 app.component('ImagePreview', ImagePreview)
 app.component('RightToolbar', RightToolbar)
 app.component('Editor', Editor)
+app.component('SearchHeightBox', SearchHeightBox)
+app.component('ExportExcelPdf', ExportExcelPdf)
 
 app.use(router)
 app.use(store)

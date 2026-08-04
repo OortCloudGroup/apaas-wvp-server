@@ -1,100 +1,16 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-         <el-form-item label="任务名称" prop="jobName">
-            <el-input
-               v-model="queryParams.jobName"
-               placeholder="请输入任务名称"
-               clearable
-               style="width: 240px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="任务组名" prop="jobGroup">
-            <el-select
-               v-model="queryParams.jobGroup"
-               placeholder="请选择任务组名"
-               clearable
-               style="width: 240px"
-            >
-               <el-option
-                  v-for="dict in sys_job_group"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item label="执行状态" prop="status">
-            <el-select
-               v-model="queryParams.status"
-               placeholder="请选择执行状态"
-               clearable
-               style="width: 240px"
-            >
-               <el-option
-                  v-for="dict in sys_common_status"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item label="执行时间" style="width: 308px">
-            <el-date-picker
-               v-model="dateRange"
-               value-format="YYYY-MM-DD"
-               type="daterange"
-               range-separator="-"
-               start-placeholder="开始日期"
-               end-placeholder="结束日期"
-            ></el-date-picker>
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
-
-      <el-row :gutter="10" class="mb8">
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               :disabled="multiple"
-               @click="handleDelete"
-               v-hasPermi="['monitor:job:remove']"
-            >删除</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               @click="handleClean"
-               v-hasPermi="['monitor:job:remove']"
-            >清空</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Download"
-               @click="handleExport"
-               v-hasPermi="['monitor:job:export']"
-            >导出</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button 
-               type="warning" 
-               plain 
-               icon="Close"
-               @click="handleClose"
-            >关闭</el-button>
-         </el-col>
-         <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+      <div class="toolbar-with-search">
+         <div class="toolbar-left">
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['monitor:job:remove']">删除</el-button>
+            <el-button type="danger" plain icon="Delete" @click="handleClean" v-hasPermi="['monitor:job:remove']">清空</el-button>
+            <el-button type="warning" plain icon="Close" @click="handleClose">关闭</el-button>
+         </div>
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box keyword="jobName" placeholder="请输入任务名称等关键词" :data="searchData" @handle="searchResetFn" />
+            <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+         </div>
+      </div>
 
       <el-table v-loading="loading" :data="jobLogList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
@@ -180,7 +96,6 @@ const { sys_common_status, sys_job_group } = proxy.useDict("sys_common_status", 
 const jobLogList = ref([]);
 const open = ref(false);
 const loading = ref(true);
-const showSearch = ref(true);
 const ids = ref([]);
 const multiple = ref(true);
 const total = ref(0);
@@ -192,13 +107,39 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    dictName: undefined,
-    dictType: undefined,
+    jobName: undefined,
+    jobGroup: undefined,
     status: undefined
   }
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+const searchData = computed(() => [
+  {
+    label: '任务组名',
+    value: 'jobGroup',
+    type: 'select',
+    option: (sys_job_group.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  },
+  {
+    label: '执行状态',
+    value: 'status',
+    type: 'select',
+    option: (sys_common_status.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  },
+  {
+    label: '执行时间',
+    value: 'dateRange',
+    type: 'daterange',
+    startP: '开始日期',
+    endP: '结束日期',
+    format: 'YYYY-MM-DD',
+    default: []
+  }
+]);
 
 /** 查询调度日志列表 */
 function getList() {
@@ -222,11 +163,19 @@ function handleQuery() {
   getList();
 }
 
-/** 重置按钮操作 */
-function resetQuery() {
-  dateRange.value = [];
-  proxy.resetForm("queryRef");
-  handleQuery();
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.jobName = val.jobName || undefined;
+  queryParams.value.jobGroup = val.jobGroup || undefined;
+  queryParams.value.status = val.status || undefined;
+  dateRange.value = val.dateRange && val.dateRange.length ? val.dateRange : [];
+  getList();
+}
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
 }
 
 // 多选框选中数据

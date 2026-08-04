@@ -1,44 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="关键字" prop="query">
-        <el-input
-            v-model="queryParams.query"
-            placeholder="请输入关键字"
-            clearable
-            style="width: 240px"
-
-        />
-      </el-form-item>
-
-      <el-form-item label="流媒体" prop="mediaServerId">
-        <el-select style="width: 250px;" v-model="queryParams.mediaServerId"
-                   placeholder="请选择流媒体" default-first-option>
-          <el-option
-              v-for="item in mediaServerList"
-              :key="item.id"
-              :label="item.id"
-              :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="拉流状态" prop="pulling">
-        <el-select style="width: 250px;" v-model="queryParams.pulling" placeholder="请选择拉流状态"
-                   default-first-option>
-          <el-option label="正在拉流" value="true"></el-option>
-          <el-option label="尚未拉流" value="false"></el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
         <el-button
             type="primary"
             plain
@@ -47,9 +10,17 @@
             v-hasPermi="['wvp:proxy:add']"
         >新增
         </el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getStreamProxyList"></right-toolbar>
-    </el-row>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="query"
+          placeholder="请输入关键字"
+          :data="searchData"
+          @handle="searchResetFn"
+        />
+        <export-excel-pdf />
+      </div>
+    </div>
 
     <el-table v-loading="loading" :data="streamProxyList" border>
       <el-table-column prop="app" label="流应用名" min-width="120" show-overflow-tooltip align="center" fixed/>
@@ -615,7 +586,25 @@ const {proxy} = getCurrentInstance();
 const streamProxyList = ref([]);
 const mediaServerList = ref([]);
 const loading = ref(false);
-const showSearch = ref(true);
+const searchData = ref([
+  {
+    label: '流媒体',
+    value: 'mediaServerId',
+    type: 'select',
+    option: [],
+    default: undefined
+  },
+  {
+    label: '拉流状态',
+    value: 'pulling',
+    type: 'select',
+    option: [
+      { label: '正在拉流', value: 'true' },
+      { label: '尚未拉流', value: 'false' }
+    ],
+    default: undefined
+  }
+]);
 const total = ref(0);
 const title = ref("");
 const rtcUrl = ref("");
@@ -706,19 +695,35 @@ function initData() {
   getStreamProxyList();
   getOnlineMediaServerList().then((res) => {
     mediaServerList.value = res.data;
+    searchData.value = [
+      {
+        label: '流媒体',
+        value: 'mediaServerId',
+        type: 'select',
+        option: (mediaServerList.value || []).map(item => ({ label: item.id, value: item.id })),
+        default: undefined
+      },
+      {
+        label: '拉流状态',
+        value: 'pulling',
+        type: 'select',
+        option: [
+          { label: '正在拉流', value: 'true' },
+          { label: '尚未拉流', value: 'false' }
+        ],
+        default: undefined
+      }
+    ];
   })
 }
 
 /** 搜索按钮操作 */
-function handleQuery() {
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.query = val.query || undefined;
+  queryParams.value.mediaServerId = val.mediaServerId || undefined;
+  queryParams.value.pulling = val.pulling || undefined;
   getStreamProxyList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 /** 表单重置 */

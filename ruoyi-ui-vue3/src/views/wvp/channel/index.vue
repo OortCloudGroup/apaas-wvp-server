@@ -1,46 +1,19 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="关键字" prop="searchSrt">
-        <el-input
-            v-model="queryParams.searchSrt"
-            placeholder="请输入设备名称"
-            clearable
-            style="width: 240px"
-            @keyup.enter="handleQuery"
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
+        <el-button type="primary" plain icon="Back" @click="handleBack">返回</el-button>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="searchSrt"
+          placeholder="请输入设备名称等关键词"
+          :data="searchData"
+          @handle="searchResetFn"
         />
-      </el-form-item>
-      <el-form-item label="通道类型" prop="channelType">
-        <el-select v-model="queryParams.channelType" placeholder="请选择通道类型" style="width: 250px;"
-                   default-first-option>
-          <el-option label="设备" value="false"></el-option>
-          <el-option label="子目录" value="true"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="在线状态" prop="online">
-        <el-select v-model="queryParams.online" placeholder="请选择在线状态" style="width: 250px;"
-                   default-first-option>
-          <el-option label="在线" value="true"></el-option>
-          <el-option label="离线" value="false"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-            type="primary"
-            plain
-            icon="Back"
-            @click="handleBack"
-        >返回</el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="initData"></right-toolbar>
-    </el-row>
+        <export-excel-pdf />
+      </div>
+    </div>
 
     <el-table v-loading="loading" :data="channelList" ref="channelListTable" border>
       <el-table-column prop="name" label="名称" min-width="180" align="center"/>
@@ -710,6 +683,28 @@ const open = ref(false);
 const openPlay = ref(false);
 const deviceChannelList = ref([])
 const showSearch = ref(true);
+const searchData = ref([
+  {
+    label: '通道类型',
+    value: 'channelType',
+    type: 'select',
+    option: [
+      { label: '设备', value: 'false' },
+      { label: '子目录', value: 'true' }
+    ],
+    default: undefined
+  },
+  {
+    label: '在线状态',
+    value: 'online',
+    type: 'select',
+    option: [
+      { label: '在线', value: 'true' },
+      { label: '离线', value: 'false' }
+    ],
+    default: undefined
+  }
+]);
 const loadSnap = ref({});
 const channelListTable = ref(null);
 const channelCode = ref(null);
@@ -947,9 +942,18 @@ function handleQuery() {
   initData();
 }
 
-/** 重置按钮操作 */
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.searchSrt = val.searchSrt || undefined;
+  queryParams.value.channelType = val.channelType || undefined;
+  queryParams.value.online = val.online || undefined;
+  initData();
+}
+
 function resetQuery() {
-  proxy.resetForm("queryRef");
+  queryParams.value.searchSrt = undefined;
+  queryParams.value.channelType = undefined;
+  queryParams.value.online = undefined;
   handleQuery();
 }
 

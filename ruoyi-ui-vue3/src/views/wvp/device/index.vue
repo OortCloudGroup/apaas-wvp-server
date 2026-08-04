@@ -1,51 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="所属部门" prop="deptId">
-        <el-tree-select style="width: 202px" v-model="queryParams.deptId" :data="enabledDeptOptions" :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id" placeholder="请选择归属部门" check-strictly />
-      </el-form-item>
-      <el-form-item label="设备名称" prop="name">
-        <el-input
-            v-model="queryParams.name"
-            placeholder="请输入设备名称"
-            clearable
-            style="width: 240px"
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="地址" prop="ip">
-        <el-input
-            v-model="queryParams.ip"
-            placeholder="请输入地址"
-            clearable
-            style="width: 240px"
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="厂家" prop="manufacturer">
-        <el-input
-            v-model="queryParams.manufacturer"
-            placeholder="请输入厂家"
-            clearable
-            style="width: 240px"
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="在线状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择在线状态" style="width: 250px;"
-                   default-first-option>
-          <el-option label="在线" value="1"></el-option>
-          <el-option label="离线" value="0"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
         <el-button
             type="primary"
             plain
@@ -54,9 +10,17 @@
             v-hasPermi="['wvp:server:configInfo']"
         >平台信息
         </el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="name"
+          placeholder="请输入设备名称等关键词"
+          :data="searchData"
+          @handle="searchResetFn"
+        />
+        <export-excel-pdf />
+      </div>
+    </div>
 
     <el-table v-loading="loading" :data="deviceList" border>
       <el-table-column type="index" label="编号" width="80" align="center"/>
@@ -302,7 +266,7 @@ const {proxy} = getCurrentInstance();
 const deviceList = ref([]);
 const open = ref(false);
 const loading = ref(true);
-const showSearch = ref(true);
+const searchData = ref([]);
 const total = ref(0);
 const title = ref("");
 const msg = ref("");
@@ -363,8 +327,33 @@ function getDeptTree() {
   deptTreeSelect().then(response => {
     deptOptions.value = response.data;
     enabledDeptOptions.value = filterDisabledDept(JSON.parse(JSON.stringify(response.data)));
+    initSearchData();
   });
 };
+
+function initSearchData() {
+  searchData.value = [
+    {
+      label: '所属部门',
+      value: 'deptId',
+      type: 'tree-select',
+      option: enabledDeptOptions.value || [],
+      default: undefined
+    },
+    { label: '地址', value: 'ip', type: 'text', default: '' },
+    { label: '厂家', value: 'manufacturer', type: 'text', default: '' },
+    {
+      label: '在线状态',
+      value: 'status',
+      type: 'select',
+      option: [
+        { label: '在线', value: '1' },
+        { label: '离线', value: '0' }
+      ],
+      default: undefined
+    }
+  ];
+}
 
 /** 过滤禁用的部门 */
 function filterDisabledDept(deptList) {
@@ -405,15 +394,14 @@ function reset() {
 }
 
 /** 搜索按钮操作 */
-function handleQuery() {
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.name = val.name || undefined;
+  queryParams.value.deptId = val.deptId || undefined;
+  queryParams.value.ip = val.ip || undefined;
+  queryParams.value.manufacturer = val.manufacturer || undefined;
+  queryParams.value.status = val.status || undefined;
   getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 /** 修改按钮操作 */

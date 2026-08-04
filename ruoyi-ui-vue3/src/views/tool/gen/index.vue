@@ -1,91 +1,18 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-      <el-form-item label="表名称" prop="tableName">
-        <el-input
-          v-model="queryParams.tableName"
-          placeholder="请输入表名称"
-          clearable
-          style="width: 200px"
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="表描述" prop="tableComment">
-        <el-input
-          v-model="queryParams.tableComment"
-          placeholder="请输入表描述"
-          clearable
-          style="width: 200px"
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建时间" style="width: 308px">
-        <el-date-picker
-          v-model="dateRange"
-          value-format="YYYY-MM-DD"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="Download"
-          :disabled="multiple"
-          @click="handleGenTable"
-          v-hasPermi="['tool:gen:code']"
-        >生成</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="openCreateTable"
-          v-hasRole="['admin']"
-        >创建</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="Upload"
-          @click="openImportTable"
-          v-hasPermi="['tool:gen:import']"
-        >导入</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="Edit"
-          :disabled="single"
-          @click="handleEditTable"
-          v-hasPermi="['tool:gen:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['tool:gen:remove']"
-        >删除</el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
+        <el-button type="primary" plain icon="Download" :disabled="multiple" @click="handleGenTable" v-hasPermi="['tool:gen:code']">生成</el-button>
+        <el-button type="primary" plain icon="Plus" @click="openCreateTable" v-hasRole="['admin']">创建</el-button>
+        <el-button type="info" plain icon="Upload" @click="openImportTable" v-hasPermi="['tool:gen:import']">导入</el-button>
+        <el-button type="success" plain icon="Edit" :disabled="single" @click="handleEditTable" v-hasPermi="['tool:gen:edit']">修改</el-button>
+        <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['tool:gen:remove']">删除</el-button>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box keyword="tableName" placeholder="请输入表名称等关键词" :data="searchData" @handle="searchResetFn" />
+        <export-excel-pdf />
+      </div>
+    </div>
 
     <el-table ref="genRef" v-loading="loading" :data="tableList" @selection-change="handleSelectionChange" :default-sort="defaultSort" @sort-change="handleSortChange">
       <el-table-column type="selection" align="center" width="55"></el-table-column>
@@ -156,7 +83,6 @@ const { proxy } = getCurrentInstance();
 
 const tableList = ref([]);
 const loading = ref(true);
-const showSearch = ref(true);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
@@ -185,13 +111,25 @@ const data = reactive({
 
 const { queryParams, preview } = toRefs(data);
 
+const searchData = [
+  { label: '表描述', value: 'tableComment', type: 'text', default: '' },
+  {
+    label: '创建时间',
+    value: 'dateRange',
+    type: 'daterange',
+    startP: '开始日期',
+    endP: '结束日期',
+    format: 'YYYY-MM-DD',
+    default: []
+  }
+];
+
 onActivated(() => {
   const time = route.query.t;
   if (time != null && time != uniqueId.value) {
     uniqueId.value = time;
     queryParams.value.pageNum = Number(route.query.pageNum);
     dateRange.value = [];
-    proxy.resetForm("queryForm");
     getList();
   }
 })
@@ -209,6 +147,14 @@ function getList() {
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNum = 1;
+  getList();
+}
+
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.tableName = val.tableName || undefined;
+  queryParams.value.tableComment = val.tableComment || undefined;
+  dateRange.value = val.dateRange && val.dateRange.length ? val.dateRange : [];
   getList();
 }
 
@@ -246,14 +192,6 @@ function openImportTable() {
 /** 打开创建表弹窗 */
 function openCreateTable() {
   proxy.$refs["createRef"].show();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  dateRange.value = [];
-  proxy.resetForm("queryRef");
-  queryParams.value.pageNum = 1;
-  proxy.$refs["genRef"].sort(defaultSort.value.prop, defaultSort.value.order);
 }
 
 /** 预览按钮 */

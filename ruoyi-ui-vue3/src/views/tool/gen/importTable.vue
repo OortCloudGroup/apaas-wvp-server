@@ -1,30 +1,10 @@
 <template>
   <!-- 导入表 -->
   <el-dialog title="导入表" v-model="visible" width="800px" top="5vh" append-to-body>
-    <el-form :model="queryParams" ref="queryRef" :inline="true">
-      <el-form-item label="表名称" prop="tableName">
-        <el-input
-          v-model="queryParams.tableName"
-          placeholder="请输入表名称"
-          clearable
-          style="width: 180px"
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="表描述" prop="tableComment">
-        <el-input
-          v-model="queryParams.tableComment"
-          placeholder="请输入表描述"
-          clearable
-          style="width: 180px"
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
+    <div class="searchHeight_out flexRowAC" style="margin-bottom: 12px; justify-content: flex-end;">
+      <search-height-box keyword="tableName" placeholder="请输入表名称等关键词" :data="searchData" @handle="searchResetFn" />
+      <export-excel-pdf />
+    </div>
     <el-row>
       <el-table @row-click="clickRow" ref="table" :data="dbTableList" @selection-change="handleSelectionChange" height="260px">
         <el-table-column type="selection" width="55"></el-table-column>
@@ -66,6 +46,10 @@ const queryParams = reactive({
   tableComment: undefined
 });
 
+const searchData = [
+  { label: '表描述', value: 'tableComment', type: 'text', default: '' }
+];
+
 const emit = defineEmits(["ok"]);
 
 /** 查询参数列表 */
@@ -98,10 +82,11 @@ function handleQuery() {
   getList();
 }
 
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
+function searchResetFn(val) {
+  queryParams.pageNum = 1;
+  queryParams.tableName = val.tableName || undefined;
+  queryParams.tableComment = val.tableComment || undefined;
+  getList();
 }
 
 /** 导入按钮操作 */

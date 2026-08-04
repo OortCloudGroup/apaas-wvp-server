@@ -1,23 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="关键字" prop="query">
-        <el-input
-            v-model="queryParams.query"
-            placeholder="请输入关键字"
-            clearable
-            style="width: 240px"
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
         <el-button
             type="primary"
             plain
@@ -26,9 +10,17 @@
             v-hasPermi="['wvp:record:add']"
         >新增
         </el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="query"
+          placeholder="请输入关键字"
+          :data="searchData"
+          @handle="searchResetFn"
+        />
+        <export-excel-pdf />
+      </div>
+    </div>
 
     <el-table v-loading="loading" :data="recordList" border>
       <el-table-column prop="name" label="名称" align="center"/>
@@ -81,7 +73,7 @@ const {proxy} = getCurrentInstance();
 const loading = ref(false);
 const total = ref(0);
 const recordList = ref([]);
-const showSearch = ref(true);
+const searchData = ref([]);
 const title = ref("");
 const open = ref(false);
 const byteTime = ref("");
@@ -111,15 +103,10 @@ function getList() {
 }
 
 /** 搜索按钮操作 */
-function handleQuery() {
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.query = val.query || undefined;
   getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 /** 表单重置 */

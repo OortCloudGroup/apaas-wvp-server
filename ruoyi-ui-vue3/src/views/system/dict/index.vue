@@ -1,105 +1,17 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-         <el-form-item label="字典名称" prop="dictName">
-            <el-input
-               v-model="queryParams.dictName"
-               placeholder="请输入字典名称"
-               clearable
-               style="width: 240px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="字典类型" prop="dictType">
-            <el-input
-               v-model="queryParams.dictType"
-               placeholder="请输入字典类型"
-               clearable
-               style="width: 240px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="状态" prop="status">
-            <el-select
-               v-model="queryParams.status"
-               placeholder="字典状态"
-               clearable
-               style="width: 240px"
-            >
-               <el-option
-                  v-for="dict in sys_normal_disable"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item label="创建时间" style="width: 308px">
-            <el-date-picker
-               v-model="dateRange"
-               value-format="YYYY-MM-DD"
-               type="daterange"
-               range-separator="-"
-               start-placeholder="开始日期"
-               end-placeholder="结束日期"
-            ></el-date-picker>
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
-
-      <el-row :gutter="10" class="mb8">
-         <el-col :span="1.5">
-            <el-button
-               type="primary"
-               plain
-               icon="Plus"
-               @click="handleAdd"
-               v-hasPermi="['system:dict:add']"
-            >新增</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="success"
-               plain
-               icon="Edit"
-               :disabled="single"
-               @click="handleUpdate"
-               v-hasPermi="['system:dict:edit']"
-            >修改</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               :disabled="multiple"
-               @click="handleDelete"
-               v-hasPermi="['system:dict:remove']"
-            >删除</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Download"
-               @click="handleExport"
-               v-hasPermi="['system:dict:export']"
-            >导出</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Refresh"
-               @click="handleRefreshCache"
-               v-hasPermi="['system:dict:remove']"
-            >刷新缓存</el-button>
-         </el-col>
-         <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+      <div class="toolbar-with-search">
+         <div class="toolbar-left">
+            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:dict:add']">新增</el-button>
+            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:dict:edit']">修改</el-button>
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:dict:remove']">删除</el-button>
+            <el-button type="danger" plain icon="Refresh" @click="handleRefreshCache" v-hasPermi="['system:dict:remove']">刷新缓存</el-button>
+         </div>
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box keyword="dictName" placeholder="请输入字典名称等关键词" :data="searchData" @handle="searchResetFn" />
+            <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+         </div>
+      </div>
 
       <el-table v-loading="loading" :data="typeList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
@@ -182,6 +94,25 @@ const typeList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
+const searchData = computed(() => [
+  { label: '字典类型', value: 'dictType', type: 'text', default: '' },
+  {
+    label: '状态',
+    value: 'status',
+    type: 'select',
+    option: (sys_normal_disable.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  },
+  {
+    label: '创建时间',
+    value: 'dateRange',
+    type: 'daterange',
+    startP: '开始日期',
+    endP: '结束日期',
+    format: 'YYYY-MM-DD',
+    default: []
+  }
+]);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
@@ -240,10 +171,21 @@ function handleQuery() {
   getList();
 }
 
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.dictName = val.dictName || undefined;
+  queryParams.value.dictType = val.dictType || undefined;
+  queryParams.value.status = val.status || undefined;
+  dateRange.value = val.dateRange && val.dateRange.length ? val.dateRange : [];
+  getList();
+}
+
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm("queryRef");
+  queryParams.value.dictName = undefined;
+  queryParams.value.dictType = undefined;
+  queryParams.value.status = undefined;
   handleQuery();
 }
 
@@ -309,6 +251,12 @@ function handleExport() {
   proxy.download("system/dict/type/export", {
     ...queryParams.value
   }, `dict_${new Date().getTime()}.xlsx`);
+}
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
 }
 
 /** 刷新缓存按钮操作 */

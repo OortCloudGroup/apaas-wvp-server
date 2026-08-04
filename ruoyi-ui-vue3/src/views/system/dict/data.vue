@@ -1,90 +1,17 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-         <el-form-item label="字典名称" prop="dictType">
-            <el-select v-model="queryParams.dictType" style="width: 200px">
-               <el-option
-                  v-for="item in typeOptions"
-                  :key="item.dictId"
-                  :label="item.dictName"
-                  :value="item.dictType"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item label="字典标签" prop="dictLabel">
-            <el-input
-               v-model="queryParams.dictLabel"
-               placeholder="请输入字典标签"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="数据状态" clearable style="width: 200px">
-               <el-option
-                  v-for="dict in sys_normal_disable"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
-
-      <el-row :gutter="10" class="mb8">
-         <el-col :span="1.5">
-            <el-button
-               type="primary"
-               plain
-               icon="Plus"
-               @click="handleAdd"
-               v-hasPermi="['system:dict:add']"
-            >新增</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="success"
-               plain
-               icon="Edit"
-               :disabled="single"
-               @click="handleUpdate"
-               v-hasPermi="['system:dict:edit']"
-            >修改</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               :disabled="multiple"
-               @click="handleDelete"
-               v-hasPermi="['system:dict:remove']"
-            >删除</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Download"
-               @click="handleExport"
-               v-hasPermi="['system:dict:export']"
-            >导出</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Close"
-               @click="handleClose"
-            >关闭</el-button>
-         </el-col>
-         <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+      <div class="toolbar-with-search">
+         <div class="toolbar-left">
+            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:dict:add']">新增</el-button>
+            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:dict:edit']">修改</el-button>
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:dict:remove']">删除</el-button>
+            <el-button type="warning" plain icon="Close" @click="handleClose">关闭</el-button>
+         </div>
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box keyword="dictLabel" placeholder="请输入字典标签等关键词" :data="searchData" @handle="searchResetFn" />
+            <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+         </div>
+      </div>
 
       <el-table v-loading="loading" :data="dataList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
@@ -186,7 +113,6 @@ const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 const dataList = ref([]);
 const open = ref(false);
 const loading = ref(true);
-const showSearch = ref(true);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
@@ -222,6 +148,23 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+const searchData = computed(() => [
+  {
+    label: '字典名称',
+    value: 'dictType',
+    type: 'select',
+    option: (typeOptions.value || []).map(item => ({ label: item.dictName, value: item.dictType })),
+    default: queryParams.value.dictType
+  },
+  {
+    label: '状态',
+    value: 'status',
+    type: 'select',
+    option: (sys_normal_disable.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  }
+]);
 
 /** 查询字典类型详细 */
 function getTypes(dictId) {
@@ -276,17 +219,24 @@ function handleQuery() {
   getList();
 }
 
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.dictLabel = val.dictLabel || undefined;
+  queryParams.value.dictType = val.dictType || defaultDictType.value;
+  queryParams.value.status = val.status || undefined;
+  getList();
+}
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
+}
+
 /** 返回按钮操作 */
 function handleClose() {
   const obj = { path: "/system/dict" };
   proxy.$tab.closeOpenPage(obj);
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  queryParams.value.dictType = defaultDictType.value;
-  handleQuery();
 }
 
 /** 新增按钮操作 */

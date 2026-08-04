@@ -1,56 +1,7 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="所属部门" prop="deptId">
-        <el-tree-select style="width: 202px" v-model="queryParams.deptId" :data="enabledDeptOptions" :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id" placeholder="请选择归属部门" check-strictly />
-      </el-form-item>
-      <el-form-item label="设备ID" prop="deviceId">
-        <el-input
-            v-model="queryParams.deviceId"
-            placeholder="请输入设备ID"
-            clearable
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="设备名称" prop="name">
-        <el-input
-            v-model="queryParams.name"
-            placeholder="请输入设备名称"
-            clearable
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="IP地址" prop="ipAddress">
-        <el-input
-            v-model="queryParams.ipAddress"
-            placeholder="请输入设备的IP地址"
-            clearable
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="序列号" prop="deviceSerial">
-        <el-input
-            v-model="queryParams.deviceSerial"
-            placeholder="请输入设备的序列号"
-            clearable
-            @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择在线状态" style="width: 196px;"
-                   default-first-option>
-          <el-option label="在线" value="ON"></el-option>
-          <el-option label="离线" value="OFFLINE"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
         <el-button
             type="success"
             plain
@@ -60,8 +11,6 @@
             v-hasPermi="['isup:lsupDevice:edit']"
         >修改
         </el-button>
-      </el-col>
-      <el-col :span="1.5">
         <el-button
             type="danger"
             plain
@@ -71,9 +20,17 @@
             v-hasPermi="['isup:lsupDevice:remove']"
         >删除
         </el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="name"
+          placeholder="请输入设备名称等关键词"
+          :data="searchData"
+          @handle="searchResetFn"
+        />
+        <export-excel-pdf />
+      </div>
+    </div>
 
     <el-table v-loading="loading" :data="lsupDeviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
@@ -290,8 +247,8 @@ const {proxy} = getCurrentInstance();
 const lsupDeviceList = ref([]);
 const open = ref(false);
 const loading = ref(true);
-const showSearch = ref(true);
 const ids = ref([]);
+const searchData = ref([]);
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -366,11 +323,38 @@ function getList() {
   });
 }
 
+/** 高级搜索配置 */
+function initSearchData() {
+  searchData.value = [
+    {
+      label: '所属部门',
+      value: 'deptId',
+      type: 'tree-select',
+      option: enabledDeptOptions.value || [],
+      default: undefined
+    },
+    { label: '设备ID', value: 'deviceId', type: 'text', default: '' },
+    { label: 'IP地址', value: 'ipAddress', type: 'text', default: '' },
+    { label: '序列号', value: 'deviceSerial', type: 'text', default: '' },
+    {
+      label: '状态',
+      value: 'status',
+      type: 'select',
+      option: [
+        { label: '在线', value: 'ON' },
+        { label: '离线', value: 'OFFLINE' }
+      ],
+      default: undefined
+    }
+  ];
+}
+
 /** 查询部门下拉树结构 */
 function getDeptTree() {
   deptTreeSelect().then(response => {
     deptOptions.value = response.data;
     enabledDeptOptions.value = filterDisabledDept(JSON.parse(JSON.stringify(response.data)));
+    initSearchData();
   });
 };
 
@@ -436,18 +420,20 @@ function reset() {
   proxy.resetForm("lsupDeviceRef");
 }
 
-/** 搜索按钮操作 */
-function handleQuery() {
+/** 高级搜索 / 重置 */
+function searchResetFn(val, reset) {
   queryParams.value.pageNum = 1;
+  queryParams.value.name = val.name || null;
+  queryParams.value.deptId = val.deptId || null;
+  queryParams.value.deviceId = val.deviceId || null;
+  queryParams.value.ipAddress = val.ipAddress || null;
+  queryParams.value.deviceSerial = val.deviceSerial || null;
+  queryParams.value.status = val.status || null;
+  if (reset) {
+    daterangeCreateTime.value = [];
+    daterangeUpdateTime.value = [];
+  }
   getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  daterangeCreateTime.value = [];
-  daterangeUpdateTime.value = [];
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 // 多选框选中数据

@@ -19,52 +19,34 @@
         </div>
       </el-col>
       <el-col :span="20">
-        <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-          <el-form-item label="关键字" prop="query">
-            <el-input v-model="queryParams.query" placeholder="请输入关键字" clearable style="width: 240px"
-                      @keyup.enter="handleQuery"/>
-          </el-form-item>
-          <el-form-item label="类型" prop="channelType">
-            <el-select v-model="queryParams.channelType" placeholder="请选择类型" style="width: 250px;"
-                       default-first-option>
-              <el-option label="国标设备" :value="1"></el-option>
-              <el-option label="推流设备" :value="2"></el-option>
-              <el-option label="拉流代理" :value="3"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="在线状态" prop="online">
-            <el-select v-model="queryParams.online" placeholder="请选择在线状态" style="width: 250px;"
-                       default-first-option>
-              <el-option label="在线" value="true"></el-option>
-              <el-option label="离线" value="false"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-          </el-form-item>
-        </el-form>
-
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5" v-hasPermi="['wvp:channel:addGroupChannel']">
+        <div class="toolbar-with-search">
+          <div class="toolbar-left">
             <el-button type="primary"
                        plain
                        icon="Plus"
-                       @click="handleAdd">新增
+                       @click="handleAdd"
+                       v-hasPermi="['wvp:channel:addGroupChannel']">新增
             </el-button>
-          </el-col>
-          <el-col :span="1.5" v-hasPermi="['wvp:channel:deleteGroupChannel']">
             <el-button
                 type="danger"
                 plain
                 icon="Delete"
                 :disabled="multiple"
-                @click="handleDelete">
+                @click="handleDelete"
+                v-hasPermi="['wvp:channel:deleteGroupChannel']">
               删除
             </el-button>
-          </el-col>
-          <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-        </el-row>
+          </div>
+          <div class="searchHeight_out flexRowAC">
+            <search-height-box
+              keyword="query"
+              placeholder="请输入关键字"
+              :data="searchData"
+              @handle="searchResetFn"
+            />
+            <export-excel-pdf />
+          </div>
+        </div>
 
         <el-table v-loading="loading" :data="channelList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center"/>
@@ -99,44 +81,14 @@
         />
 
         <el-dialog :title="title" v-model="open" width="1100px" append-to-body>
-          <el-form :model="queryParamsSelect" ref="querySelectRef" :inline="true" v-show="showSearchSelect"
-                   label-width="68px">
-            <el-form-item label="关键字" prop="query">
-              <el-input v-model="queryParamsSelect.query" placeholder="请输入关键字" clearable style="width: 240px"
-                        @keyup.enter="handleSelectQuery"/>
-            </el-form-item>
-            <el-form-item label="类型" prop="channelType">
-              <el-select v-model="queryParamsSelect.channelType" placeholder="请选择类型" style="width: 250px;"
-                         default-first-option>
-                <el-option label="国标设备" :value="1"></el-option>
-                <el-option label="推流设备" :value="2"></el-option>
-                <el-option label="拉流代理" :value="3"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="在线状态" prop="online">
-              <el-select v-model="queryParamsSelect.online" placeholder="请选择在线状态" style="width: 250px;"
-                         default-first-option>
-                <el-option label="在线" value="true"></el-option>
-                <el-option label="离线" value="false"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" icon="Search" @click="handleSelectQuery">搜索</el-button>
-              <el-button icon="Refresh" @click="resetSelectQuery">重置</el-button>
-            </el-form-item>
-          </el-form>
-
+          <div class="searchHeight_out flexRowAC" style="margin-bottom: 12px; justify-content: flex-end;">
+            <search-height-box keyword="query" placeholder="请输入关键字" :data="selectSearchData" @handle="selectSearchResetFn" />
+            <export-excel-pdf />
+          </div>
           <el-row :gutter="10" class="mb8">
             <el-col :span="1.5">
-              <el-button type="primary"
-                         plain
-                         icon="Select"
-                         :disabled="multipleSelect"
-                         @click="handleSelect">
-                选择
-              </el-button>
+              <el-button type="primary" plain icon="Select" :disabled="multipleSelect" @click="handleSelect">选择</el-button>
             </el-col>
-            <right-toolbar v-model:showSearch="showSearchSelect" @queryTable="getChannelList"></right-toolbar>
           </el-row>
 
           <el-table v-loading="loadingSelect" :data="channelSelectList" @selection-change="handleSelectionSelectChange">
@@ -193,6 +145,29 @@ const channelList = ref([]);
 const loading = ref(true);
 const total = ref(0);
 const showSearch = ref(true);
+const searchData = ref([
+  {
+    label: '类型',
+    value: 'channelType',
+    type: 'select',
+    option: [
+      { label: '国标设备', value: 1 },
+      { label: '推流设备', value: 2 },
+      { label: '拉流代理', value: 3 }
+    ],
+    default: undefined
+  },
+  {
+    label: '在线状态',
+    value: 'online',
+    type: 'select',
+    option: [
+      { label: '在线', value: 'true' },
+      { label: '离线', value: 'false' }
+    ],
+    default: undefined
+  }
+]);
 const groupDeviceId = ref('');
 const businessGroup = ref('');
 const selectionList = ref([]);
@@ -232,6 +207,29 @@ const data = reactive({
 
 const {queryParams, form, rules, queryParamsSelect} = toRefs(data);
 
+const selectSearchData = [
+  {
+    label: '类型',
+    value: 'channelType',
+    type: 'select',
+    option: [
+      { label: '国标设备', value: 1 },
+      { label: '推流设备', value: 2 },
+      { label: '拉流代理', value: 3 }
+    ],
+    default: undefined
+  },
+  {
+    label: '在线状态',
+    value: 'online',
+    type: 'select',
+    option: [
+      { label: '在线', value: 'true' },
+      { label: '离线', value: 'false' }
+    ],
+    default: undefined
+  }
+];
 
 function getList() {
   loading.value = true
@@ -248,15 +246,12 @@ watch(groupName, val => {
 });
 
 /** 搜索按钮操作 */
-function handleQuery() {
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.query = val.query || undefined;
+  queryParams.value.channelType = val.channelType || undefined;
+  queryParams.value.online = val.online || undefined;
   getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 /** 选择条数  */
@@ -295,7 +290,7 @@ function handleNodeClick(data) {
 
   groupDeviceId.value = queryParams.value.groupDeviceId;
   businessGroup.value = data.businessGroup;
-  handleQuery();
+  getList();
 }
 
 /** 新增按钮操作 */
@@ -329,16 +324,13 @@ function getChannelList() {
   }
 }
 
-/** 搜索按钮操作 */
-function handleSelectQuery() {
-  queryParams.value.pageNum = 1;
+/** 弹窗搜索 */
+function selectSearchResetFn(val) {
+  queryParamsSelect.value.pageNum = 1;
+  queryParamsSelect.value.query = val.query || undefined;
+  queryParamsSelect.value.channelType = val.channelType || undefined;
+  queryParamsSelect.value.online = val.online || undefined;
   getChannelList();
-}
-
-/** 重置按钮操作 */
-function resetSelectQuery() {
-  proxy.resetForm("querySelectRef");
-  handleSelectQuery();
 }
 
 function handleSelectionSelectChange(selection) {

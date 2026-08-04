@@ -16,45 +16,23 @@
         <!--用户数据-->
         <pane size="84">
           <el-col>
-            <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-              <el-form-item label="用户名称" prop="userName">
-                <el-input v-model="queryParams.userName" placeholder="请输入用户名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
-              </el-form-item>
-              <el-form-item label="手机号码" prop="phonenumber">
-                <el-input v-model="queryParams.phonenumber" placeholder="请输入手机号码" clearable style="width: 240px" @keyup.enter="handleQuery" />
-              </el-form-item>
-              <el-form-item label="状态" prop="status">
-                <el-select v-model="queryParams.status" placeholder="用户状态" clearable style="width: 240px">
-                  <el-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label" :value="dict.value" />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="创建时间" style="width: 308px">
-                <el-date-picker v-model="dateRange" value-format="YYYY-MM-DD" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-                <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-              </el-form-item>
-            </el-form>
-
-            <el-row :gutter="10" class="mb8">
-              <el-col :span="1.5">
+            <div class="toolbar-with-search">
+              <div class="toolbar-left">
                 <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:user:add']">新增</el-button>
-              </el-col>
-              <el-col :span="1.5">
                 <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:user:edit']">修改</el-button>
-              </el-col>
-              <el-col :span="1.5">
                 <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:user:remove']">删除</el-button>
-              </el-col>
-              <el-col :span="1.5">
                 <el-button type="info" plain icon="Upload" @click="handleImport" v-hasPermi="['system:user:import']">导入</el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['system:user:export']">导出</el-button>
-              </el-col>
-              <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
-            </el-row>
+              </div>
+              <div class="searchHeight_out flexRowAC">
+                <search-height-box
+                  keyword="userName"
+                  placeholder="请输入用户名称等关键词"
+                  :data="searchData"
+                  @handle="searchResetFn"
+                />
+                <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+              </div>
+            </div>
 
             <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
               <el-table-column type="selection" width="50" align="center" />
@@ -229,6 +207,25 @@ const userList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
+const searchData = computed(() => [
+  { label: '手机号码', value: 'phonenumber', type: 'text', default: '' },
+  {
+    label: '状态',
+    value: 'status',
+    type: 'select',
+    option: (sys_normal_disable.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  },
+  {
+    label: '创建时间',
+    value: 'dateRange',
+    type: 'daterange',
+    startP: '开始日期',
+    endP: '结束日期',
+    format: 'YYYY-MM-DD',
+    default: []
+  }
+]);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
@@ -342,10 +339,22 @@ function handleQuery() {
   getList();
 };
 
+/** 高级搜索 / 重置 */
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.userName = val.userName || undefined;
+  queryParams.value.phonenumber = val.phonenumber || undefined;
+  queryParams.value.status = val.status || undefined;
+  dateRange.value = val.dateRange && val.dateRange.length ? val.dateRange : [];
+  getList();
+}
+
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm("queryRef");
+  queryParams.value.userName = undefined;
+  queryParams.value.phonenumber = undefined;
+  queryParams.value.status = undefined;
   queryParams.value.deptId = undefined;
   proxy.$refs.deptTreeRef.setCurrentKey(null);
   handleQuery();
@@ -368,6 +377,12 @@ function handleExport() {
     ...queryParams.value,
   },`user_${new Date().getTime()}.xlsx`);
 };
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
+}
 
 /** 用户状态修改  */
 function handleStatusChange(row) {

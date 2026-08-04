@@ -1,81 +1,16 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-         <el-form-item label="岗位编码" prop="postCode">
-            <el-input
-               v-model="queryParams.postCode"
-               placeholder="请输入岗位编码"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="岗位名称" prop="postName">
-            <el-input
-               v-model="queryParams.postName"
-               placeholder="请输入岗位名称"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="岗位状态" clearable style="width: 200px">
-               <el-option
-                  v-for="dict in sys_normal_disable"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-               />
-            </el-select>
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
-
-      <el-row :gutter="10" class="mb8">
-         <el-col :span="1.5">
-            <el-button
-               type="primary"
-               plain
-               icon="Plus"
-               @click="handleAdd"
-               v-hasPermi="['system:post:add']"
-            >新增</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="success"
-               plain
-               icon="Edit"
-               :disabled="single"
-               @click="handleUpdate"
-               v-hasPermi="['system:post:edit']"
-            >修改</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="danger"
-               plain
-               icon="Delete"
-               :disabled="multiple"
-               @click="handleDelete"
-               v-hasPermi="['system:post:remove']"
-            >删除</el-button>
-         </el-col>
-         <el-col :span="1.5">
-            <el-button
-               type="warning"
-               plain
-               icon="Download"
-               @click="handleExport"
-               v-hasPermi="['system:post:export']"
-            >导出</el-button>
-         </el-col>
-         <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+      <div class="toolbar-with-search">
+         <div class="toolbar-left">
+            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:post:add']">新增</el-button>
+            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:post:edit']">修改</el-button>
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:post:remove']">删除</el-button>
+         </div>
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box keyword="postName" placeholder="请输入岗位名称等关键词" :data="searchData" @handle="searchResetFn" />
+            <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+         </div>
+      </div>
 
       <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
@@ -154,6 +89,16 @@ const postList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
+const searchData = computed(() => [
+  { label: '岗位编码', value: 'postCode', type: 'text', default: '' },
+  {
+    label: '状态',
+    value: 'status',
+    type: 'select',
+    option: (sys_normal_disable.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  }
+]);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
@@ -213,9 +158,18 @@ function handleQuery() {
   getList();
 }
 
-/** 重置按钮操作 */
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.postName = val.postName || undefined;
+  queryParams.value.postCode = val.postCode || undefined;
+  queryParams.value.status = val.status || undefined;
+  getList();
+}
+
 function resetQuery() {
-  proxy.resetForm("queryRef");
+  queryParams.value.postName = undefined;
+  queryParams.value.postCode = undefined;
+  queryParams.value.status = undefined;
   handleQuery();
 }
 
@@ -281,6 +235,12 @@ function handleExport() {
   proxy.download("system/post/export", {
     ...queryParams.value
   }, `post_${new Date().getTime()}.xlsx`);
+}
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
 }
 
 getList();

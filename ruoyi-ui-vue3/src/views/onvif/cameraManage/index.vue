@@ -4,44 +4,9 @@
       <el-alert title="onvif云台需要咨询厂商确定设备是否支持！" type="success"/>
     </div>
 
-    <el-card>
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-        <el-form-item label="所属部门" prop="deptId">
-          <el-tree-select style="width: 202px" v-model="queryParams.deptId" :data="enabledDeptOptions" :props="{ value: 'id', label: 'label', children: 'children' }" value-key="id" placeholder="请选择归属部门" check-strictly />
-        </el-form-item>
-        <el-form-item label="ip" prop="ip">
-          <el-input
-              v-model="queryParams.ip"
-              placeholder="请输入ip"
-              clearable
-              @keyup.enter="handleQuery"
-          />
-        </el-form-item>
-        <el-form-item label="名称" prop="name">
-          <el-input
-              v-model="queryParams.name"
-              placeholder="请输入名称"
-              clearable
-              @keyup.enter="handleQuery"
-          />
-        </el-form-item>
-        <el-form-item label="设备厂商" prop="firm">
-          <el-input
-              v-model="queryParams.firm"
-              placeholder="请输入设备厂商"
-              clearable
-              @keyup.enter="handleQuery"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-          <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
     <el-card class="m-1">
-      <el-row :gutter="10" class="mb8">
-        <el-col :span="1.5">
+      <div class="toolbar-with-search">
+        <div class="toolbar-left">
           <el-button
               type="primary"
               plain
@@ -50,8 +15,6 @@
               v-hasPermi="['onvif:device:add']"
           >新增
           </el-button>
-        </el-col>
-        <el-col :span="1.5">
           <el-button
               type="success"
               plain
@@ -61,8 +24,6 @@
               v-hasPermi="['onvif:device:edit']"
           >修改
           </el-button>
-        </el-col>
-        <el-col :span="1.5">
           <el-button
               type="danger"
               plain
@@ -72,19 +33,17 @@
               v-hasPermi="['onvif:device:remove']"
           >删除
           </el-button>
-        </el-col>
-        <el-col :span="1.5">
-          <el-button
-              type="warning"
-              plain
-              icon="Download"
-              @click="handleExport"
-              v-hasPermi="['onvif:device:export']"
-          >导出
-          </el-button>
-        </el-col>
-        <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
+        </div>
+        <div class="searchHeight_out flexRowAC">
+          <search-height-box
+            keyword="name"
+            placeholder="请输入名称、IP等关键词"
+            :data="searchData"
+            @handle="searchResetFn"
+          />
+          <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+        </div>
+      </div>
 
       <el-table v-loading="loading" :data="deviceList" @selection-change="handleSelectionChange" border>
         <el-table-column type="selection" width="55" align="center"/>
@@ -412,8 +371,8 @@ const deviceList = ref([]);
 const open = ref(false);
 const openAdd = ref(false);
 const loading = ref(true);
-const showSearch = ref(true);
 const ids = ref([]);
+const searchData = ref([]);
 const single = ref(true);
 const multiple = ref(true);
 const showPresets = ref(false);
@@ -446,6 +405,7 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     deptId: null,
+    name: null,
     ip: null,
     userName: null,
     password: null,
@@ -544,8 +504,24 @@ function getDeptTree() {
   deptTreeSelect().then(response => {
     deptOptions.value = response.data;
     enabledDeptOptions.value = filterDisabledDept(JSON.parse(JSON.stringify(response.data)));
+    initSearchData();
   });
 };
+
+/** 高级搜索配置 */
+function initSearchData() {
+  searchData.value = [
+    {
+      label: '所属部门',
+      value: 'deptId',
+      type: 'tree-select',
+      option: enabledDeptOptions.value || [],
+      default: undefined
+    },
+    { label: 'ip', value: 'ip', type: 'text', default: '' },
+    { label: '设备厂商', value: 'firm', type: 'text', default: '' }
+  ];
+}
 
 /** 过滤禁用的部门 */
 function filterDisabledDept(deptList) {
@@ -794,15 +770,14 @@ function reset() {
 }
 
 /** 搜索按钮操作 */
-function handleQuery() {
+/** 高级搜索 / 重置 */
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.name = val.name || null;
+  queryParams.value.deptId = val.deptId || null;
+  queryParams.value.ip = val.ip || null;
+  queryParams.value.firm = val.firm || null;
   getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 // 多选框选中数据
@@ -870,6 +845,12 @@ function handleExport() {
   proxy.download('onvif /device/export', {
     ...queryParams.value
   }, `device_${new Date().getTime()}.xlsx`)
+}
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
 }
 
 getDeptTree();

@@ -1,29 +1,17 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true">
-         <el-form-item label="登录地址" prop="ipaddr">
-            <el-input
-               v-model="queryParams.ipaddr"
-               placeholder="请输入登录地址"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
+      <div class="toolbar-with-search">
+         <div class="toolbar-left" />
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box
+               keyword="userName"
+               placeholder="请输入用户名称、登录地址等关键词"
+               :data="searchData"
+               @handle="searchResetFn"
             />
-         </el-form-item>
-         <el-form-item label="用户名称" prop="userName">
-            <el-input
-               v-model="queryParams.userName"
-               placeholder="请输入用户名称"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
+            <export-excel-pdf />
+         </div>
+      </div>
       <el-table
          v-loading="loading"
          :data="onlineList.slice((pageNum - 1) * pageSize, pageNum * pageSize)"
@@ -73,6 +61,10 @@ const queryParams = ref({
   userName: undefined
 });
 
+const searchData = ref([
+  { label: '登录地址', value: 'ipaddr', type: 'text', default: '' }
+]);
+
 /** 查询登录日志列表 */
 function getList() {
   loading.value = true;
@@ -83,16 +75,12 @@ function getList() {
   });
 }
 
-/** 搜索按钮操作 */
-function handleQuery() {
+/** 高级搜索 / 重置 */
+function searchResetFn(val) {
   pageNum.value = 1;
+  queryParams.value.userName = val.userName || undefined;
+  queryParams.value.ipaddr = val.ipaddr || undefined;
   getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 /** 强退按钮操作 */
