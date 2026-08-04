@@ -1,241 +1,165 @@
 <template>
-  <div class="app-container">
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+  <div class="workbench_Page">
+    <div class="workbench_header flexRowAC">
+      <el-tabs v-model="activeName" class="work-tabs" @tab-click="handleClick">
+        <el-tab-pane label="GB28181" name="GB" />
+        <el-tab-pane label="ONVIF" name="ONVIF" />
+        <el-tab-pane label="RTSP" name="RTSP" />
+        <el-tab-pane label="ISUP" name="ISUP" />
+      </el-tabs>
+      <div class="workbench_actions flexRowAC">
         <el-switch v-model="closeDevice" active-text="开启" inactive-text="关闭" />
-      </el-col>
+        <el-button type="success" plain @click="handleSave">保存</el-button>
+        <el-button type="danger" plain @click="handleCleanUp">清除</el-button>
+      </div>
+    </div>
 
-      <el-col :span="1.5">
-        <el-button
-            type="success"
-            plain
-            @click="handleSave"
-        >保存
-        </el-button>
-      </el-col>
-      <el-button
-          type="danger"
-          plain
-          @click="handleCleanUp"
-      >清除
-      </el-button>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :span="24" :xs="24" :sm="24" :md="6" :lg="6" :xl="6" v-show="closeDevice">
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <span>监控列表</span>
-            </div>
-          </template>
-          <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-            <el-tab-pane label="GB" name="GB">
-              <div class="head-container">
-                <el-input v-model="deviceName" placeholder="请输入设备名称" clearable prefix-icon="Search" style="margin-bottom: 20px" />
-              </div>
-              <div class="top">
-                <div>通道列表</div>
-                <div>
-                  <el-switch
-                      v-model="activeValue"
-                      active-text="行政区划"
-                      inactive-text="业务分组"
-                      @change="onSwitch"
-                  />
-                </div>
-              </div>
-              <div>
-                <el-tree
-                    v-if="activeValue"
-                    ref="deviceTreeRef"
-                    :data="treeData"
-                    :props="defaultProps"
-                    lazy
-                    :load="loadNode"
-                    @node-click="handleNodeClick"
-                    :expand-on-click-node="false"
-                    :filter-node-method="filterNode"
-                >
-                  <template #default="{ node, data }">
-                    <div class="custom-tree-node">
-                      <div v-if="!data.dataType">{{ node.label }}</div>
-                      <div v-if="data.dataType" style="display:flex;">
-                        <svg-icon icon-class="camera" style="margin-right: 6px"/>
-                        <div>{{ node.label }}</div>
-                      </div>
-                      <div v-if="data.dataType" style="display:flex;">
-                        <div>
-                          {{data.gbIpAddress}}
-                        </div>
-                        <div style="margin-left: 6px">
-                          <el-icon v-if="data.gbStatus === 'ON'" color="#67C23A"><CircleCheckFilled /></el-icon>
-                          <el-icon v-if="data.gbStatus !== 'ON'" color="#F56C6C"><WarningFilled /></el-icon>
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-                </el-tree>
-
-                <el-tree
-                    v-if="!activeValue"
-                    ref="deviceTreeRef"
-                    :data="treeData"
-                    :props="defaultProps"
-                    lazy
-                    :load="groupLoadNode"
-                    @node-click="handleNodeClick"
-                    :expand-on-click-node="false"
-                    :filter-node-method="filterNode"
-                >
-                  <template #default="{ node, data }">
-                    <div class="custom-tree-node">
-                      <div v-if="!data.dataType">{{ node.label }}</div>
-                      <div v-if="data.dataType" style="display:flex;">
-                        <svg-icon icon-class="camera" style="margin-right: 6px"/>
-                        <div>{{ node.label }}</div>
-                      </div>
-                      <div v-if="data.dataType" style="display:flex;">
-                        <div>
-                          {{data.gbIpAddress}}
-                        </div>
-                        <div style="margin-left: 6px">
-                          <el-icon v-if="data.gbStatus === 'ON'" color="#67C23A"><CircleCheckFilled /></el-icon>
-                          <el-icon v-if="data.gbStatus !== 'ON'" color="#F56C6C"><WarningFilled /></el-icon>
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-                </el-tree>
-              </div>
-            </el-tab-pane>
-
-            <el-tab-pane label="ONVIF" name="ONVIF">
-              <div class="head-container">
-                <el-input v-model="deviceName" placeholder="请输入设备名称" clearable prefix-icon="Search" style="margin-bottom: 20px" @change="deviceChange"/>
-              </div>
-              <InfiniteList
-                  v-if="listDevice.length >0"
-                  :data="listDevice"
-                  :width="'100%'"
-                  :height="'100%'"
-                  :itemSize="40"
-                  v-slot="{ item, index }"
-              >
-                <div style="cursor: pointer">
-                  <el-tag @click="deviceClick(item)" style="width: 100%;" size="large"
-                          :type="selectDeviceId === item.id ? 'success' : ''">
-                    <svg-icon icon-class="camera" style="margin-right: 6px"/>
-                    {{ item.name }}
-                  </el-tag>
-                </div>
-              </InfiniteList>
-
-              <el-empty v-if="listDevice.length === 0" :image-size="50" description="暂无数据"/>
-            </el-tab-pane>
-
-            <el-tab-pane label="RTSP" name="RTSP">
-              <div class="head-container">
-                <el-input v-model="deviceName" placeholder="请输入设备名称" clearable prefix-icon="Search" style="margin-bottom: 20px" @change="deviceChange"/>
-              </div>
-              <InfiniteList
-                  v-if="listDevice.length >0"
-                  :data="listDevice"
-                  :width="'100%'"
-                  :height="'100%'"
-                  :itemSize="40"
-                  v-slot="{ item, index }"
-              >
-                <div style="cursor: pointer">
-                  <el-tag @click="deviceClick(item)" style="width: 100%;" size="large"
-                          :type="selectDeviceId === item.id ? 'success' : ''">
-                    <svg-icon icon-class="camera" style="margin-right: 6px"/>
-                    {{ item.name }}
-                  </el-tag>
-                </div>
-              </InfiniteList>
-
-              <el-empty v-if="listDevice.length === 0" :image-size="50" description="暂无数据"/>
-            </el-tab-pane>
-
-            <el-tab-pane label="ISUP" name="ISUP">
-              <div class="head-container">
-                <el-input v-model="deviceName" placeholder="请输入设备名称" clearable prefix-icon="Search" style="margin-bottom: 20px" @change="deviceChange"/>
-              </div>
-              <InfiniteList
-                  v-if="listDevice.length >0"
-                  :data="listDevice"
-                  :width="'100%'"
-                  :height="'100%'"
-                  :itemSize="40"
-                  v-slot="{ item, index }"
-              >
-                <div style="cursor: pointer">
-                  <el-tag @click="deviceClick(item)" style="width: 100%;" size="large"
-                          :type="selectDeviceId === item.deviceId ? 'success' : ''">
-                    <svg-icon icon-class="camera" style="margin-right: 6px"/>
-                    {{ item.name }}
-                  </el-tag>
-                </div>
-              </InfiniteList>
-
-              <el-empty v-if="listDevice.length === 0" :image-size="50" description="暂无数据"/>
-            </el-tab-pane>
-          </el-tabs>
-        </el-card>
-      </el-col>
-      <el-col :span="24" :xs="24" :sm="24" :md="!closeDevice? 24:18" :lg="!closeDevice? 24:18" :xl="!closeDevice? 24:18">
-        <el-card>
-          <template #header>
-            <div class="flex">
-              分屏:
-              <svg-icon :class="['flex-icon', { active: model === 1 }]"
-                        icon-class="splitOne" @click="spiltIndex(1)" class="flex-icon"/>
-              <svg-icon :class="['flex-icon', { active: model === 4 }]"
-                        icon-class="splitFour" @click="spiltIndex(4)" class="flex-icon"/>
-              <svg-icon :class="['flex-icon', { active: model === 6 }]"
-                        icon-class="splitSix" @click="spiltIndex(6)" class="flex-icon"/>
-              <svg-icon :class="['flex-icon', { active: model === 9 }]"
-                        icon-class="splitNine" @click="spiltIndex(9)" class="flex-icon"/>
-            </div>
-          </template>
-          <div style="display: flex; flex-wrap: wrap;position: relative">
-            <div
-                :id="'video' + index"
-                v-for="(item, index) in splitLayouts[splitShow]"
-                :key="index"
-                :style="getCellStyle(splitShow)"
-                style="border: 3px solid #409EFF;margin: 1px;"
-                :class="['player-cell', { active: activePlayerIndex === index }]"
-                @click="setActivePlayer(index)">
-              <div v-if="item.data" style="position: absolute;z-index: 999;top: 5px;right: 20px;color: #F56C6C;">
-                <el-icon @click="deleteVideo(index)"><Delete /></el-icon>
-              </div>
-              <div v-if="item.type === 'GB'" style="width: 100%;height: 100%">
-                  <Jessibuca v-show="vUrls[index]" :ref="'video' + index" :videoUrl="vUrls[index]" fluent autoplay live :key="'jessibuca-'+index"  />
-              </div>
-              <video v-if="item.type === 'ONVIF'" :id="'rtspVideo' + index"
-                     muted
-                     playsinline
-                     controls
-                     :style="'width:'+item.data.width+'px;height:'+item.data.height+'px'"></video>
-              <video v-if="item.type === 'RTSP'" :id="'rtspVideo' + index"
-                     muted
-                     playsinline
-                     controls
-                     :style="'width:'+item.data.width+'px;height:'+item.data.height+'px'"></video>
-              <video v-if="item.type === 'ISUP'" :id="'rtspVideo' + index"
-                     muted
-                     playsinline
-                     controls
-                     :style="'width:'+item.data.width+'px;height:'+item.data.height+'px'"></video>
-            </div>
+    <div class="workbench_content">
+      <div class="workBox flexRowAC">
+        <div v-show="closeDevice" class="work_aside">
+          <div class="treeTitle">监控列表</div>
+          <div class="tree_search_content">
+            <el-input
+              v-model="deviceName"
+              placeholder="请输入设备名称"
+              clearable
+              prefix-icon="Search"
+              @change="onDeviceSearch"
+            />
           </div>
 
-        </el-card>
-      </el-col>
-    </el-row>
+          <template v-if="activeName === 'GB'">
+            <div class="channel_top flexRowAC">
+              <span>通道列表</span>
+              <el-switch
+                v-model="activeValue"
+                active-text="行政区划"
+                inactive-text="业务分组"
+                @change="onSwitch"
+              />
+            </div>
+            <el-tree
+              v-if="activeValue"
+              ref="deviceTreeRef"
+              class="device-tree"
+              :data="treeData"
+              :props="defaultProps"
+              lazy
+              :load="loadNode"
+              @node-click="handleNodeClick"
+              :expand-on-click-node="false"
+              :filter-node-method="filterNode"
+            >
+              <template #default="{ node, data }">
+                <div class="custom-tree-node">
+                  <div v-if="!data.dataType">{{ node.label }}</div>
+                  <div v-if="data.dataType" style="display:flex;">
+                    <svg-icon icon-class="camera" style="margin-right: 6px"/>
+                    <div>{{ node.label }}</div>
+                  </div>
+                  <div v-if="data.dataType" style="display:flex;">
+                    <div>{{ data.gbIpAddress }}</div>
+                    <div style="margin-left: 6px">
+                      <el-icon v-if="data.gbStatus === 'ON'" color="#67C23A"><CircleCheckFilled /></el-icon>
+                      <el-icon v-if="data.gbStatus !== 'ON'" color="#F56C6C"><WarningFilled /></el-icon>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </el-tree>
+            <el-tree
+              v-if="!activeValue"
+              ref="deviceTreeRef"
+              class="device-tree"
+              :data="treeData"
+              :props="defaultProps"
+              lazy
+              :load="groupLoadNode"
+              @node-click="handleNodeClick"
+              :expand-on-click-node="false"
+              :filter-node-method="filterNode"
+            >
+              <template #default="{ node, data }">
+                <div class="custom-tree-node">
+                  <div v-if="!data.dataType">{{ node.label }}</div>
+                  <div v-if="data.dataType" style="display:flex;">
+                    <svg-icon icon-class="camera" style="margin-right: 6px"/>
+                    <div>{{ node.label }}</div>
+                  </div>
+                  <div v-if="data.dataType" style="display:flex;">
+                    <div>{{ data.gbIpAddress }}</div>
+                    <div style="margin-left: 6px">
+                      <el-icon v-if="data.gbStatus === 'ON'" color="#67C23A"><CircleCheckFilled /></el-icon>
+                      <el-icon v-if="data.gbStatus !== 'ON'" color="#F56C6C"><WarningFilled /></el-icon>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </el-tree>
+          </template>
+
+          <template v-else>
+            <div class="device-list">
+              <InfiniteList
+                v-if="listDevice.length > 0"
+                :data="listDevice"
+                :width="'100%'"
+                :height="'100%'"
+                :itemSize="40"
+                v-slot="{ item }"
+              >
+                <div style="cursor: pointer; margin-bottom: 6px;">
+                  <el-tag
+                    @click="deviceClick(item)"
+                    style="width: 100%;"
+                    size="large"
+                    :type="(activeName === 'ISUP' ? selectDeviceId === item.deviceId : selectDeviceId === item.id) ? 'success' : ''"
+                  >
+                    <svg-icon icon-class="camera" style="margin-right: 6px"/>
+                    {{ item.name }}
+                  </el-tag>
+                </div>
+              </InfiniteList>
+              <el-empty v-if="listDevice.length === 0" :image-size="50" description="暂无数据"/>
+            </div>
+          </template>
+        </div>
+
+        <div class="work_main" :class="{ 'is-full': !closeDevice }">
+          <div class="split_toolbar flexRowAC">
+            <span class="split_label">分屏：</span>
+            <svg-icon :class="['flex-icon', { active: model === 1 }]" icon-class="splitOne" @click="spiltIndex(1)" />
+            <svg-icon :class="['flex-icon', { active: model === 4 }]" icon-class="splitFour" @click="spiltIndex(4)" />
+            <svg-icon :class="['flex-icon', { active: model === 6 }]" icon-class="splitSix" @click="spiltIndex(6)" />
+            <svg-icon :class="['flex-icon', { active: model === 9 }]" icon-class="splitNine" @click="spiltIndex(9)" />
+          </div>
+          <div class="split_grid">
+            <div
+              :id="'video' + index"
+              v-for="(item, index) in splitLayouts[splitShow]"
+              :key="index"
+              :style="getCellStyle(splitShow)"
+              class="player-cell"
+              :class="{ active: activePlayerIndex === index }"
+              @click="setActivePlayer(index)"
+            >
+              <div v-if="item.data" class="player-close">
+                <el-icon @click.stop="deleteVideo(index)"><Delete /></el-icon>
+              </div>
+              <div v-if="item.type === 'GB'" style="width: 100%;height: 100%">
+                <Jessibuca v-show="vUrls[index]" :ref="'video' + index" :videoUrl="vUrls[index]" fluent autoplay live :key="'jessibuca-'+index" />
+              </div>
+              <video v-if="item.type === 'ONVIF'" :id="'rtspVideo' + index" muted playsinline controls :style="'width:'+item.data.width+'px;height:'+item.data.height+'px'"></video>
+              <video v-if="item.type === 'RTSP'" :id="'rtspVideo' + index" muted playsinline controls :style="'width:'+item.data.width+'px;height:'+item.data.height+'px'"></video>
+              <video v-if="item.type === 'ISUP'" :id="'rtspVideo' + index" muted playsinline controls :style="'width:'+item.data.width+'px;height:'+item.data.height+'px'"></video>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
 
 <script setup name="WVPLive">
 import {queryForTree} from "@/api/wvp/region";
@@ -697,13 +621,20 @@ function deleteVideo(index){
 
 /** 根据名称筛选部门树 */
 watch(deviceName, val => {
-  proxy.$refs["deviceTreeRef"].filter(val);
+  if (activeName.value !== 'GB') return;
+  const tree = proxy.$refs["deviceTreeRef"];
+  if (tree && tree.filter) tree.filter(val);
 });
 
 /** 通过条件过滤节点  */
 const filterNode = (value, data) => {
   if (!value) return true;
   return data.name.indexOf(value) !== -1;
+};
+
+const onDeviceSearch = () => {
+  if (activeName.value === 'GB') return;
+  getList();
 };
 
 const deviceChange = () => {
@@ -718,23 +649,188 @@ onMounted(async () => {
 
 </script>
 
-<style scoped>
-.top {
-  width: 100%;
+<style scoped lang="scss">
+.flexRowAC {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
 }
 
-.flex {
+.workbench_Page {
   width: 100%;
+  min-height: calc(100vh - 120px);
+  background: #fff;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.workbench_header {
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 8px 20px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.workbench_actions {
+  gap: 12px;
+  flex-shrink: 0;
+  padding-bottom: 8px;
+}
+
+:deep(.work-tabs) {
+  flex: 1;
+  min-width: 0;
+  --el-tabs-header-height: 32px;
+
+  .el-tabs__header {
+    margin: 0;
+    border-bottom: none;
+  }
+
+  .el-tabs__nav-wrap::after {
+    display: none;
+  }
+
+  .el-tabs__item {
+    width: 96px;
+    height: 32px;
+    padding: 0;
+    line-height: 32px;
+    text-align: center;
+    color: #333;
+    font-size: 14px;
+    font-weight: 400;
+    box-sizing: border-box;
+  }
+
+  .el-tabs__item.is-active {
+    color: var(--el-color-primary);
+  }
+
+  .el-tabs__item:hover {
+    color: var(--el-color-primary);
+  }
+
+  .el-tabs__active-bar {
+    height: 2px;
+    background-color: var(--el-color-primary);
+  }
+}
+
+.workbench_content {
+  flex: 1;
+  min-height: 0;
+}
+
+.workBox {
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 180px);
+  padding: 20px;
+  gap: 0;
+  background: #fff;
+}
+
+.work_aside {
+  width: 300px;
+  flex-shrink: 0;
+  height: 100%;
+  min-height: calc(100vh - 220px);
+  padding-right: 20px;
+  border-right: 1px solid #e7eaef;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.treeTitle {
+  color: var(--el-color-primary);
+  padding-bottom: 16px;
   display: flex;
   align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+
+  &::before {
+    content: '';
+    width: 3px;
+    height: 18px;
+    background-color: var(--el-color-primary);
+  }
+}
+
+.tree_search_content {
+  padding-bottom: 12px;
+}
+
+.channel_top {
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.device-tree {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.device-list {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.work_aside :deep(.el-tree-node__content) {
+  height: 38px;
+  font-size: 14px;
+  color: #333;
+}
+
+.work_main {
+  flex: 1;
+  min-width: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+
+  &.is-full {
+    padding-left: 0;
+  }
+}
+
+.split_toolbar {
+  margin-bottom: 12px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.split_label {
+  font-size: 14px;
+  color: #333;
+  margin-right: 4px;
+}
+
+.split_grid {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #e4e7ed;
 }
 
 .player-cell {
   position: relative;
   transition: border-color 0.3s ease;
+  border: 2px solid #409eff;
+  box-sizing: border-box;
 }
 
 .player-cell:hover {
@@ -742,11 +838,16 @@ onMounted(async () => {
 }
 
 .player-cell.active {
-  border-color:  #67C23A !important;
+  border-color: #67c23a !important;
 }
 
-.flex-icon {
-  margin-left: 10px;
+.player-close {
+  position: absolute;
+  z-index: 9;
+  top: 5px;
+  right: 12px;
+  color: #f56c6c;
+  cursor: pointer;
 }
 
 .flex-icon {
@@ -757,7 +858,7 @@ onMounted(async () => {
 }
 
 .flex-icon.active {
-  color: #409EFF;
+  color: #409eff;
   transform: scale(1.2);
 }
 
@@ -770,5 +871,3 @@ onMounted(async () => {
   padding-right: 8px;
 }
 </style>
-
-
