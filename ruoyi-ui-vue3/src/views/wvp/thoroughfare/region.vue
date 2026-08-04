@@ -1,24 +1,23 @@
 <template>
-  <div>
-    <el-row :gutter="20">
-      <el-col :span="4">
-        <div class="head-container">
-          <el-input v-model="regionName" placeholder="请输入区域名称" clearable prefix-icon="Search"
-                    style="margin-bottom: 20px"/>
-        </div>
-        <div class="head-container">
-          <el-tree :data="regionOptions"
-                   :props="{label: 'name', children: 'children'}"
-                   :expand-on-click-node="false"
-                   :filter-node-method="filterNode"
-                   ref="regionTreeRef"
-                   node-key="id"
-                   highlight-current
-                   default-expand-all
-                   @node-click="handleNodeClick"/>
-        </div>
-      </el-col>
-      <el-col :span="20">
+  <div class="channel_layout flexRowAC">
+    <div v-yResize class="police_aside">
+      <div class="head-container">
+        <el-input v-model="regionName" placeholder="请输入区域名称" clearable prefix-icon="Search"
+                  style="margin-bottom: 20px"/>
+      </div>
+      <div class="head-container">
+        <el-tree :data="regionOptions"
+                 :props="{label: 'name', children: 'children'}"
+                 :expand-on-click-node="false"
+                 :filter-node-method="filterNode"
+                 ref="regionTreeRef"
+                 node-key="id"
+                 highlight-current
+                 default-expand-all
+                 @node-click="handleNodeClick"/>
+      </div>
+    </div>
+    <div class="channel_main">
         <div class="toolbar-with-search">
           <div class="toolbar-left">
             <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['wvp:channel:addRegionChannel']">
@@ -112,8 +111,7 @@
               @pagination="getChannelList"
           />
         </el-dialog>
-      </el-col>
-    </el-row>
+    </div>
   </div>
 </template>
 
@@ -362,6 +360,22 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.channel_layout {
+  align-items: flex-start;
+  width: 100%;
+}
 
+.police_aside {
+  width: 260px;
+  padding-right: 20px;
+  flex-shrink: 0;
+  min-height: 400px;
+}
+
+.channel_main {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+}
 </style>
