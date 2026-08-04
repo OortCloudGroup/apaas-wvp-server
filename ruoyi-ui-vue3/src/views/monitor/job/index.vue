@@ -13,9 +13,17 @@
          </div>
       </div>
 
-      <el-table v-loading="loading" :data="jobList" @selection-change="handleSelectionChange">
-         <el-table-column type="selection" width="55" align="center" />
-         <el-table-column label="任务编号" width="100" align="center" prop="jobId" />
+      <table-self
+         class="new_table"
+         header-cell-class-name="header_tenant_cell"
+         stripe
+         v-loading="loading"
+         :data="jobList"
+         current-row-key="jobId"
+         @selection-change="handleSelectionChange"
+      >
+         <el-table-column type="selection" :width="clacPXToVW(55)" align="center" />
+         <el-table-column label="任务编号" :width="clacPXToVW(100)" align="center" prop="jobId" />
          <el-table-column label="任务名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
          <el-table-column label="任务组名" align="center" prop="jobGroup">
             <template #default="scope">
@@ -24,7 +32,7 @@
          </el-table-column>
          <el-table-column label="调用目标字符串" align="center" prop="invokeTarget" :show-overflow-tooltip="true" />
          <el-table-column label="cron执行表达式" align="center" prop="cronExpression" :show-overflow-tooltip="true" />
-         <el-table-column label="状态" align="center">
+         <el-table-column label="状态" align="center" :width="clacPXToVW(100)">
             <template #default="scope">
                <el-switch
                   v-model="scope.row.status"
@@ -34,26 +42,34 @@
                ></el-switch>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
             <template #default="scope">
-               <el-tooltip content="修改" placement="top">
-                  <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['monitor:job:edit']"></el-button>
-               </el-tooltip>
-               <el-tooltip content="删除" placement="top">
-                  <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['monitor:job:remove']"></el-button>
-               </el-tooltip>
-               <el-tooltip content="执行一次" placement="top">
-                  <el-button link type="primary" icon="CaretRight" @click="handleRun(scope.row)" v-hasPermi="['monitor:job:changeStatus']"></el-button>
-               </el-tooltip>
-               <el-tooltip content="任务详细" placement="top">
-                  <el-button link type="primary" icon="View" @click="handleView(scope.row)" v-hasPermi="['monitor:job:query']"></el-button>
-               </el-tooltip>
-               <el-tooltip content="调度日志" placement="top">
-                  <el-button link type="primary" icon="Operation" @click="handleJobLog(scope.row)" v-hasPermi="['monitor:job:query']"></el-button>
-               </el-tooltip>
+               <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                  <div class="new_table_svg_group" @click.stop="handleUpdate(scope.row)" v-hasPermi="['monitor:job:edit']">
+                     <el-icon><Edit /></el-icon>
+                     <span>修改</span>
+                  </div>
+                  <div class="new_table_svg_group" @click.stop="handleDelete(scope.row)" v-hasPermi="['monitor:job:remove']">
+                     <el-icon><Delete /></el-icon>
+                     <span>删除</span>
+                  </div>
+                  <el-dropdown @command="(command)=>{jobMoreClick(command, scope.row)}">
+                     <div class="new_table_svg_group" @click.stop>
+                        <span>更多</span>
+                        <el-icon><ArrowDown /></el-icon>
+                     </div>
+                     <template #dropdown>
+                        <el-dropdown-menu>
+                           <el-dropdown-item command="handleRun" v-if="checkPermi(['monitor:job:changeStatus'])">执行一次</el-dropdown-item>
+                           <el-dropdown-item command="handleView" v-if="checkPermi(['monitor:job:query'])">任务详细</el-dropdown-item>
+                           <el-dropdown-item command="handleJobLog" v-if="checkPermi(['monitor:job:query'])">调度日志</el-dropdown-item>
+                        </el-dropdown-menu>
+                     </template>
+                  </el-dropdown>
+               </div>
             </template>
          </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination
          v-show="total > 0"
@@ -213,6 +229,8 @@
 <script setup name="Job">
 import { listJob, getJob, delJob, addJob, updateJob, runJob, changeJobStatus } from "@/api/monitor/job";
 import Crontab from '@/components/Crontab'
+import { checkPermi } from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 const router = useRouter();
 const { proxy } = getCurrentInstance();
 const { sys_job_group, sys_job_status } = proxy.useDict("sys_job_group", "sys_job_status");
@@ -395,6 +413,16 @@ function crontabFill(value) {
 function handleJobLog(row) {
   const jobId = row.jobId || 0;
   router.push('/monitor/job-log/index/' + jobId)
+}
+
+function jobMoreClick(command, row) {
+  if (command === "handleRun") {
+    handleRun(row);
+  } else if (command === "handleView") {
+    handleView(row);
+  } else if (command === "handleJobLog") {
+    handleJobLog(row);
+  }
 }
 
 /** 新增按钮操作 */

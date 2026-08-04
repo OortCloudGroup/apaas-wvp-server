@@ -6,13 +6,13 @@
       <export-excel-pdf />
     </div>
     <el-row>
-      <el-table @row-click="clickRow" ref="table" :data="dbTableList" @selection-change="handleSelectionChange" height="260px">
-        <el-table-column type="selection" width="55"></el-table-column>
+      <table-self @row-click="clickRow" ref="table" :data="dbTableList" @selection-change="handleSelectionChange" height="260px" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+        <el-table-column type="selection" :width="clacPXToVW(55)"></el-table-column>
         <el-table-column prop="tableName" label="表名称" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="tableComment" label="表描述" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="createTime" label="创建时间"></el-table-column>
         <el-table-column prop="updateTime" label="更新时间"></el-table-column>
-      </el-table>
+      </table-self>
       <pagination
         v-show="total>0"
         :total="total"
@@ -31,6 +31,7 @@
 </template>
 
 <script setup>
+import { clacPXToVW } from "@/utils/index";
 import { listDbTable, importTable } from "@/api/tool/gen";
 
 const total = ref(0);

@@ -14,13 +14,21 @@
       </div>
 
       <!-- 表格数据 -->
-      <el-table v-loading="loading" :data="roleList" @selection-change="handleSelectionChange">
-         <el-table-column type="selection" width="55" align="center" />
-         <el-table-column label="角色编号" prop="roleId" width="120" />
-         <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" width="150" />
-         <el-table-column label="权限字符" prop="roleKey" :show-overflow-tooltip="true" width="150" />
-         <el-table-column label="显示顺序" prop="roleSort" width="100" />
-         <el-table-column label="状态" align="center" width="100">
+      <table-self
+         class="new_table"
+         header-cell-class-name="header_tenant_cell"
+         stripe
+         v-loading="loading"
+         :data="roleList"
+         current-row-key="roleId"
+         @selection-change="handleSelectionChange"
+      >
+         <el-table-column type="selection" :width="clacPXToVW(55)" align="center" />
+         <el-table-column label="角色编号" prop="roleId" :width="clacPXToVW(120)" />
+         <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" />
+         <el-table-column label="权限字符" prop="roleKey" :show-overflow-tooltip="true" />
+         <el-table-column label="显示顺序" prop="roleSort" :width="clacPXToVW(100)" />
+         <el-table-column label="状态" align="center" :width="clacPXToVW(100)">
             <template #default="scope">
                <el-switch
                   v-model="scope.row.status"
@@ -30,28 +38,38 @@
                ></el-switch>
             </template>
          </el-table-column>
-         <el-table-column label="创建时间" align="center" prop="createTime">
+         <el-table-column label="创建时间" align="center" prop="createTime" :width="clacPXToVW(180)">
             <template #default="scope">
                <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
             <template #default="scope">
-              <el-tooltip content="修改" placement="top" v-if="scope.row.roleId !== 1">
-                <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:role:edit']"></el-button>
-              </el-tooltip>
-              <el-tooltip content="删除" placement="top" v-if="scope.row.roleId !== 1">
-                <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:role:remove']"></el-button>
-              </el-tooltip>
-              <el-tooltip content="数据权限" placement="top" v-if="scope.row.roleId !== 1">
-                <el-button link type="primary" icon="CircleCheck" @click="handleDataScope(scope.row)" v-hasPermi="['system:role:edit']"></el-button>
-              </el-tooltip>
-              <el-tooltip content="分配用户" placement="top" v-if="scope.row.roleId !== 1">
-                <el-button link type="primary" icon="User" @click="handleAuthUser(scope.row)" v-hasPermi="['system:role:edit']"></el-button>
-              </el-tooltip>
+               <div class="operateAppBox flexRowAC" style="justify-content: flex-end;" v-if="scope.row.roleId !== 1">
+                  <div class="new_table_svg_group" @click.stop="handleUpdate(scope.row)" v-hasPermi="['system:role:edit']">
+                     <el-icon><Edit /></el-icon>
+                     <span>修改</span>
+                  </div>
+                  <div class="new_table_svg_group" @click.stop="handleDelete(scope.row)" v-hasPermi="['system:role:remove']">
+                     <el-icon><Delete /></el-icon>
+                     <span>删除</span>
+                  </div>
+                  <el-dropdown @command="(command)=>{roleMoreClick(command, scope.row)}" v-if="checkPermi(['system:role:edit'])">
+                     <div class="new_table_svg_group" @click.stop>
+                        <span>更多</span>
+                        <el-icon><ArrowDown /></el-icon>
+                     </div>
+                     <template #dropdown>
+                        <el-dropdown-menu>
+                           <el-dropdown-item command="handleDataScope">数据权限</el-dropdown-item>
+                           <el-dropdown-item command="handleAuthUser">分配用户</el-dropdown-item>
+                        </el-dropdown-menu>
+                     </template>
+                  </el-dropdown>
+               </div>
             </template>
          </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination
          v-show="total > 0"
@@ -166,6 +184,8 @@
 <script setup name="Role">
 import { addRole, changeRoleStatus, dataScope, delRole, getRole, listRole, updateRole, deptTreeSelect } from "@/api/system/role";
 import { roleMenuTreeselect, treeselect as menuTreeselect } from "@/api/system/menu";
+import { checkPermi } from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
@@ -335,6 +355,14 @@ function handleCommand(command, row) {
 /** 分配用户 */
 function handleAuthUser(row) {
   router.push("/system/role-auth/user/" + row.roleId);
+}
+
+function roleMoreClick(command, row) {
+  if (command === "handleDataScope") {
+    handleDataScope(row);
+  } else if (command === "handleAuthUser") {
+    handleAuthUser(row);
+  }
 }
 
 /** 查询菜单树结构 */

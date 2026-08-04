@@ -137,16 +137,16 @@
     </el-dialog>
 
     <el-dialog v-model="dialogChannel" title="通道列表" width="835px" append-to-body draggable>
-      <el-table v-loading="loading" :data="channelList" ref="channelListTable" border>
-        <el-table-column prop="name" label="名称" min-width="180" align="center"/>
-        <el-table-column prop="deviceId" label="编号" min-width="180" align="center"/>
-        <el-table-column prop="manufacturer" label="厂家" min-width="100" align="center"/>
-        <el-table-column prop="ptzType" label="云台类型" min-width="100" align="center">
+      <table-self v-loading="loading" :data="channelList" ref="channelListTable" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+        <el-table-column prop="name" label="名称" :min-width="clacPXToVW(180)" align="center"/>
+        <el-table-column prop="deviceId" label="编号" :min-width="clacPXToVW(180)" align="center"/>
+        <el-table-column prop="manufacturer" label="厂家" :min-width="clacPXToVW(100)" align="center"/>
+        <el-table-column prop="ptzType" label="云台类型" :min-width="clacPXToVW(100)" align="center">
           <template #default="scope">
             <div>{{ scope.row.ptzTypeText }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="状态" min-width="100" align="center">
+        <el-table-column label="状态" :min-width="clacPXToVW(100)" align="center">
           <template #default="scope">
             <div slot="reference" class="name-wrapper">
               <el-tag v-if="scope.row.status === 'ON'">在线</el-tag>
@@ -154,15 +154,22 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width" fixed="right">
+        <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(100)">
           <template #default="scope">
-            <el-button v-if="checkPermi(['wvp:play:start'])"
-                       type="text" @click="start(scope.row)">播放
-            </el-button>
+            <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+              <div
+                v-if="checkPermi(['wvp:play:start'])"
+                class="new_table_svg_group"
+                @click.stop="start(scope.row)"
+              >
+                <el-icon><View /></el-icon>
+                <span>播放</span>
+              </div>
+            </div>
           </template>
         </el-table-column>
 
-      </el-table>
+      </table-self>
 
       <pagination
           v-show="total > 0"
@@ -202,6 +209,7 @@
 </template>
 
 <script setup name="GIsMap">
+import { clacPXToVW } from "@/utils/index";
 import {checkPermi} from "@/utils/permission";
 import {onMounted, onUnmounted} from "vue";
 import AMapLoader from "@amap/amap-jsapi-loader";

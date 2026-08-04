@@ -13,8 +13,16 @@
          </div>
       </div>
 
-      <el-table v-loading="loading" :data="configList" @selection-change="handleSelectionChange">
-         <el-table-column type="selection" width="55" align="center" />
+      <table-self
+         class="new_table"
+         header-cell-class-name="header_tenant_cell"
+         stripe
+         v-loading="loading"
+         :data="configList"
+         current-row-key="configId"
+         @selection-change="handleSelectionChange"
+      >
+         <el-table-column type="selection" :width="clacPXToVW(55)" align="center" />
          <el-table-column label="参数主键" align="center" prop="configId" />
          <el-table-column label="参数名称" align="center" prop="configName" :show-overflow-tooltip="true" />
          <el-table-column label="参数键名" align="center" prop="configKey" :show-overflow-tooltip="true" />
@@ -25,18 +33,26 @@
             </template>
          </el-table-column>
          <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
-         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+         <el-table-column label="创建时间" align="center" prop="createTime" :width="clacPXToVW(180)">
             <template #default="scope">
                <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(160)">
             <template #default="scope">
-               <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:config:edit']" >修改</el-button>
-               <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:config:remove']">删除</el-button>
+               <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                  <div class="new_table_svg_group" @click.stop="handleUpdate(scope.row)" v-hasPermi="['system:config:edit']">
+                     <el-icon><Edit /></el-icon>
+                     <span>修改</span>
+                  </div>
+                  <div class="new_table_svg_group" @click.stop="handleDelete(scope.row)" v-hasPermi="['system:config:remove']">
+                     <el-icon><Delete /></el-icon>
+                     <span>删除</span>
+                  </div>
+               </div>
             </template>
          </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination
          v-show="total > 0"
@@ -83,6 +99,7 @@
 
 <script setup name="Config">
 import { listConfig, getConfig, delConfig, addConfig, updateConfig, refreshCache } from "@/api/system/config";
+import { clacPXToVW } from "@/utils/index";
 
 const { proxy } = getCurrentInstance();
 const { sys_yes_no } = proxy.useDict("sys_yes_no");

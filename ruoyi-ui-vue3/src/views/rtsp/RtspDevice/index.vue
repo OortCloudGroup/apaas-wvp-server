@@ -20,19 +20,27 @@
         <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
       </div>
     </div>
-    <el-table v-loading="loading" :data="RtspDeviceList" @selection-change="handleSelectionChange" border>
-      <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="所属部门" align="center" prop="deptName"/>
-      <el-table-column label="ip" align="center" prop="ip"/>
-      <el-table-column label="摄像头名称" align="center" prop="name"/>
-      <el-table-column label="地址" align="center" prop="addressMap"/>
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="RtspDeviceList"
+      current-row-key="id"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" :width="clacPXToVW(55)" align="center"/>
+      <el-table-column label="所属部门" align="center" prop="deptName" show-overflow-tooltip/>
+      <el-table-column label="ip" align="center" prop="ip" show-overflow-tooltip/>
+      <el-table-column label="摄像头名称" align="center" prop="name" show-overflow-tooltip/>
+      <el-table-column label="地址" align="center" prop="addressMap" show-overflow-tooltip/>
       <el-table-column label="用户名" align="center" prop="userName"/>
       <el-table-column label="密码" align="center" prop="password">
         <template #default="scope">
           <div class="password-container">
             <span v-if="!passwordVisibility[scope.row.id]">******</span>
             <span v-else>{{ scope.row.password }}</span>
-            <el-icon class="eye-icon" @click="togglePasswordVisibility(scope.row.id)">
+            <el-icon class="eye-icon" @click.stop="togglePasswordVisibility(scope.row.id)">
               <component :is="passwordVisibility[scope.row.id] ? 'Hide' : 'View'"/>
             </el-icon>
           </div>
@@ -44,31 +52,36 @@
           <dict-tag :options="rtsp_manufacturer" :value="scope.row.firm"/>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="250">
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <div style="display:flex; align-items: center;justify-content: center">
-            <el-button link type="primary" icon="View" @click="handleView(scope.row)"
-                       v-hasPermi="['rtsp:RtspDevice:view']">播放
-            </el-button>
-            <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
-                       v-hasPermi="['rtsp:RtspDevice:edit']">修改
-            </el-button>
-            <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
-                       v-hasPermi="['rtsp:RtspDevice:remove']">删除
-            </el-button>
-
-            <el-dropdown @command="(command)=>{moreClick(command, scope.row)}"
-                         v-if="checkPermi(['rtsp:RtspDevice:edit', 'rtsp:RtspDevice:Avatar', 'rtsp:RtspDevice:AlarmClock'])">
-             <span class="el-dropdown-link">
-              <el-button type="text">
-                更多
-                <el-icon>
-                  <arrow-down/>
-                </el-icon>
-              </el-button>
-            </span>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div
+              v-hasPermi="['rtsp:RtspDevice:view']"
+              class="new_table_svg_group"
+              @click.stop="handleView(scope.row)"
+            >
+              <el-icon><View /></el-icon>
+              <span>播放</span>
+            </div>
+            <div
+              v-hasPermi="['rtsp:RtspDevice:edit']"
+              class="new_table_svg_group"
+              @click.stop="handleUpdate(scope.row)"
+            >
+              <el-icon><Edit /></el-icon>
+              <span>修改</span>
+            </div>
+            <el-dropdown
+              @command="(command)=>{moreClick(command, scope.row)}"
+              v-if="checkPermi(['rtsp:RtspDevice:remove', 'rtsp:RtspDevice:edit', 'rtsp:RtspDevice:Avatar', 'rtsp:RtspDevice:AlarmClock'])"
+            >
+              <div class="new_table_svg_group" @click.stop>
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
               <template #dropdown>
                 <el-dropdown-menu>
+                  <el-dropdown-item command="handleDelete" v-if="checkPermi(['rtsp:RtspDevice:remove'])">删除</el-dropdown-item>
                   <el-dropdown-item command="handleMap" v-if="checkPermi(['rtsp:RtspDevice:edit'])">修改位置</el-dropdown-item>
                   <el-dropdown-item command="handleAI" v-if="checkPermi(['rtsp:RtspDevice:Avatar'])">AI播放</el-dropdown-item>
                   <el-dropdown-item command="handleAlarmClock" v-if="checkPermi(['rtsp:RtspDevice:AlarmClock'])">历史播放</el-dropdown-item>
@@ -76,10 +89,9 @@
               </template>
             </el-dropdown>
           </div>
-
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total>0"
@@ -212,6 +224,7 @@ import {ElLoading} from "element-plus";
 import {deptTreeSelect} from "@/api/system/user";
 import MapGaoDe from "@/components/MapGaoDe/index.vue";
 import {checkPermi} from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 
 const {proxy} = getCurrentInstance();
 const {rtsp_manufacturer} = proxy.useDict('rtsp_manufacturer');
@@ -283,7 +296,9 @@ const data = reactive({
 const {queryParams, form, rules} = toRefs(data);
 
 function moreClick(command, itemData) {
-  if (command === "handleMap") {
+  if (command === "handleDelete") {
+    handleDelete(itemData)
+  } else if (command === "handleMap") {
     handleMap(itemData)
   } else if (command === "handleAI") {
     handleAI(itemData)

@@ -17,14 +17,20 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="deviceList" border>
-      <el-table-column type="index" label="编号" width="80" align="center"/>
-      <el-table-column label="所属部门" align="center" prop="deptName"/>
-      <el-table-column prop="name" label="名称" width="100" align="center"/>
-      <el-table-column prop="deviceId" label="设备编号" align="center" width="150">
-      </el-table-column>
-      <el-table-column label="地址" align="center" prop="addressMap" width="150"/>
-      <el-table-column label="IP地址" width="160" align="center">
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="deviceList"
+      current-row-key="deviceId"
+    >
+      <el-table-column type="index" label="编号" :width="clacPXToVW(80)" align="center"/>
+      <el-table-column label="所属部门" align="center" prop="deptName" show-overflow-tooltip/>
+      <el-table-column prop="name" label="名称" align="center" show-overflow-tooltip/>
+      <el-table-column prop="deviceId" label="设备编号" align="center" show-overflow-tooltip/>
+      <el-table-column label="地址" align="center" prop="addressMap" show-overflow-tooltip/>
+      <el-table-column label="IP地址" align="center">
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag v-if="scope.row.hostAddress">{{ scope.row.hostAddress }}</el-tag>
@@ -32,11 +38,9 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="manufacturer" label="厂家" width="80" align="center">
-      </el-table-column>
-      <el-table-column prop="transport" label="信令传输模式" width="110" align="center">
-      </el-table-column>
-      <el-table-column label="流传输模式" width="150" align="center">
+      <el-table-column prop="manufacturer" label="厂家" align="center"/>
+      <el-table-column prop="transport" label="信令传输模式" align="center"/>
+      <el-table-column label="流传输模式" :min-width="clacPXToVW(150)" align="center">
         <template #default="scope">
           <el-select @change="transportChange(scope.row)" v-model="scope.row.streamMode"
                      placeholder="请选择" style="width: 120px" v-if="checkPermi(['wvp:device:updateTransport'])">
@@ -52,12 +56,12 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="通道数" min-width="70" align="center">
+      <el-table-column label="通道数" align="center">
         <template #default="scope">
           <span style="font-size: 1rem">{{ scope.row.channelCount }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" min-width="70" align="center">
+      <el-table-column label="状态" align="center">
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag v-if="scope.row.onLine">在线</el-tag>
@@ -65,7 +69,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="订阅" min-width="240" align="center">
+      <el-table-column label="订阅" :min-width="clacPXToVW(240)" align="center">
         <template #default="scope">
           <el-checkbox v-if="checkPermi(['wvp:device:subscribeCatalog'])" label="目录"
                        :checked="scope.row.subscribeCycleForCatalog > 0"
@@ -86,53 +90,62 @@
           <el-checkbox label="报警" disabled :checked="scope.row.subscribeCycleForAlarm > 0"></el-checkbox>
         </template>
       </el-table-column>
-      <el-table-column prop="keepaliveTime" label="最近心跳" width="150" align="center">
-      </el-table-column>
-      <el-table-column prop="registerTime" label="最近注册" width="150" align="center">
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column prop="keepaliveTime" label="最近心跳" align="center" show-overflow-tooltip/>
+      <el-table-column prop="registerTime" label="最近注册" align="center" show-overflow-tooltip/>
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <el-button link type="primary" :disabled="scope.row.online===0" v-hasPermi="['wvp:device:sync']"
-                     @click="refDevice(scope.row)">刷新
-          </el-button>
-          <el-button type="text" v-if="checkPermi(['wvp:device:channels'])"
-                     @click="showChannelList(scope.row)">通道
-          </el-button>
-          <el-button link type="primary" @click="handleUpdate(scope.row)" v-if="checkPermi(['wvp:device:edit'])">修改
-          </el-button>
-
-          <el-dropdown @command="(command)=>{moreClick(command, scope.row)}" v-if="checkPermi(['wvp:device:remove','wvp:control:guardApi','wvp:config:cdownloadApi','wvp:device:edit'])">
-             <span class="el-dropdown-link">
-              <el-button type="text">
-                更多
-                <el-icon>
-                  <arrow-down/>
-                </el-icon>
-              </el-button>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="handleMap" v-if="checkPermi(['wvp:device:edit'])">
-                  修改位置
-                </el-dropdown-item>
-                <el-dropdown-item command="delete" style="color: #f56c6c" v-if="checkPermi(['wvp:device:remove'])">
-                  删除
-                </el-dropdown-item>
-                <el-dropdown-item command="setGuard" v-bind:disabled="!scope.row.onLine" v-if="checkPermi(['wvp:control:guardApi'])">
-                  布防
-                </el-dropdown-item>
-                <el-dropdown-item command="resetGuard" v-bind:disabled="!scope.row.onLine" v-if="checkPermi(['wvp:control:guardApi'])">
-                  撤防
-                </el-dropdown-item>
-                <el-dropdown-item command="syncBasicParam" v-bind:disabled="!scope.row.onLine" v-if="checkPermi(['wvp:config:cdownloadApi'])">
-                  基础配置同步
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div
+              class="new_table_svg_group"
+              :class="{ 'is-disabled': scope.row.online === 0 }"
+              @click.stop="scope.row.online !== 0 && refDevice(scope.row)"
+              v-hasPermi="['wvp:device:sync']"
+            >
+              <el-icon><Refresh /></el-icon>
+              <span>刷新</span>
+            </div>
+            <div
+              class="new_table_svg_group"
+              @click.stop="showChannelList(scope.row)"
+              v-if="checkPermi(['wvp:device:channels'])"
+            >
+              <span>通道</span>
+            </div>
+            <el-dropdown
+              @command="(command)=>{moreClick(command, scope.row)}"
+              v-if="checkPermi(['wvp:device:remove','wvp:control:guardApi','wvp:config:cdownloadApi','wvp:device:edit'])"
+            >
+              <div class="new_table_svg_group" @click.stop>
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="handleUpdate" v-if="checkPermi(['wvp:device:edit'])">
+                    修改
+                  </el-dropdown-item>
+                  <el-dropdown-item command="handleMap" v-if="checkPermi(['wvp:device:edit'])">
+                    修改位置
+                  </el-dropdown-item>
+                  <el-dropdown-item command="delete" style="color: #f56c6c" v-if="checkPermi(['wvp:device:remove'])">
+                    删除
+                  </el-dropdown-item>
+                  <el-dropdown-item command="setGuard" v-bind:disabled="!scope.row.onLine" v-if="checkPermi(['wvp:control:guardApi'])">
+                    布防
+                  </el-dropdown-item>
+                  <el-dropdown-item command="resetGuard" v-bind:disabled="!scope.row.onLine" v-if="checkPermi(['wvp:control:guardApi'])">
+                    撤防
+                  </el-dropdown-item>
+                  <el-dropdown-item command="syncBasicParam" v-bind:disabled="!scope.row.onLine" v-if="checkPermi(['wvp:config:cdownloadApi'])">
+                    基础配置同步
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total > 0"
@@ -237,6 +250,7 @@
 
 <script setup name="Device">
 import {checkPermi} from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 import MapGaoDe from "@/components/MapGaoDe/index.vue";
 import {
   deleteDevice,
@@ -541,7 +555,9 @@ async function getTooltipContent(deviceId) {
 }
 
 function moreClick(command, itemData) {
-  if (command === "setGuard") {
+  if (command === "handleUpdate") {
+    handleUpdate(itemData)
+  } else if (command === "setGuard") {
     setGuard(itemData)
   } else if (command === "resetGuard") {
     resetGuard(itemData)
@@ -549,7 +565,7 @@ function moreClick(command, itemData) {
     handleDelete(itemData)
   } else if (command === "syncBasicParam") {
     syncBasicParam(itemData)
-  }else if(command === "handleMap"){
+  } else if (command === "handleMap") {
     handleMap(itemData)
   }
 }
@@ -645,5 +661,10 @@ getList();
   color: var(--el-color-primary);
   display: flex;
   align-items: center;
+}
+
+.new_table_svg_group.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

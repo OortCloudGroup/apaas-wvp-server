@@ -13,38 +13,54 @@
          </div>
       </div>
 
-      <el-table v-loading="loading" :data="noticeList" @selection-change="handleSelectionChange">
-         <el-table-column type="selection" width="55" align="center" />
-         <el-table-column label="序号" align="center" prop="noticeId" width="100" />
+      <table-self
+         class="new_table"
+         header-cell-class-name="header_tenant_cell"
+         stripe
+         v-loading="loading"
+         :data="noticeList"
+         current-row-key="noticeId"
+         @selection-change="handleSelectionChange"
+      >
+         <el-table-column type="selection" :width="clacPXToVW(55)" align="center" />
+         <el-table-column label="序号" align="center" prop="noticeId" :width="clacPXToVW(100)" />
          <el-table-column
             label="公告标题"
             align="center"
             prop="noticeTitle"
             :show-overflow-tooltip="true"
          />
-         <el-table-column label="公告类型" align="center" prop="noticeType" width="100">
+         <el-table-column label="公告类型" align="center" prop="noticeType" :width="clacPXToVW(100)">
             <template #default="scope">
                <dict-tag :options="sys_notice_type" :value="scope.row.noticeType" />
             </template>
          </el-table-column>
-         <el-table-column label="状态" align="center" prop="status" width="100">
+         <el-table-column label="状态" align="center" prop="status" :width="clacPXToVW(100)">
             <template #default="scope">
                <dict-tag :options="sys_notice_status" :value="scope.row.status" />
             </template>
          </el-table-column>
-         <el-table-column label="创建者" align="center" prop="createBy" width="100" />
-         <el-table-column label="创建时间" align="center" prop="createTime" width="100">
+         <el-table-column label="创建者" align="center" prop="createBy" :width="clacPXToVW(100)" />
+         <el-table-column label="创建时间" align="center" prop="createTime" :width="clacPXToVW(120)">
             <template #default="scope">
                <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(160)">
             <template #default="scope">
-               <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:notice:edit']">修改</el-button>
-               <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:notice:remove']" >删除</el-button>
+               <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                  <div class="new_table_svg_group" @click.stop="handleUpdate(scope.row)" v-hasPermi="['system:notice:edit']">
+                     <el-icon><Edit /></el-icon>
+                     <span>修改</span>
+                  </div>
+                  <div class="new_table_svg_group" @click.stop="handleDelete(scope.row)" v-hasPermi="['system:notice:remove']">
+                     <el-icon><Delete /></el-icon>
+                     <span>删除</span>
+                  </div>
+               </div>
             </template>
          </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination
          v-show="total > 0"
@@ -105,6 +121,7 @@
 
 <script setup name="Notice">
 import { listNotice, getNotice, delNotice, addNotice, updateNotice } from "@/api/system/notice";
+import { clacPXToVW } from "@/utils/index";
 
 const { proxy } = getCurrentInstance();
 const { sys_notice_status, sys_notice_type } = proxy.useDict("sys_notice_status", "sys_notice_type");

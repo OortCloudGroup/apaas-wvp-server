@@ -17,10 +17,17 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="platformList" border>
-      <el-table-column prop="name" label="名称" align="center"></el-table-column>
-      <el-table-column prop="serverGBId" label="平台编号" min-width="200" align="center"></el-table-column>
-      <el-table-column label="是否启用" min-width="80" align="center">
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="platformList"
+      current-row-key="id"
+    >
+      <el-table-column prop="name" label="名称" align="center" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="serverGBId" label="平台编号" align="center" show-overflow-tooltip></el-table-column>
+      <el-table-column label="是否启用" align="center">
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag v-if="scope.row.enable">已启用</el-tag>
@@ -28,7 +35,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="状态" min-width="80" align="center">
+      <el-table-column label="状态" align="center">
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag v-if="scope.row.status">在线</el-tag>
@@ -36,17 +43,17 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="地址" min-width="160" align="center">
+      <el-table-column label="地址" align="center" show-overflow-tooltip>
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag>{{ scope.row.serverIp }}:{{ scope.row.serverPort }}</el-tag>
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="deviceGBId" label="设备国标编号" min-width="200" align="center"></el-table-column>
-      <el-table-column prop="transport" label="信令传输模式" min-width="120" align="center"></el-table-column>
-      <el-table-column prop="channelCount" label="通道数" min-width="120" align="center"></el-table-column>
-      <el-table-column label="订阅信息" min-width="120" fixed="right" align="center">
+      <el-table-column prop="deviceGBId" label="设备国标编号" align="center" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="transport" label="信令传输模式" align="center"></el-table-column>
+      <el-table-column prop="channelCount" label="通道数" align="center"></el-table-column>
+      <el-table-column label="订阅信息" :width="clacPXToVW(120)" align="center">
         <template #default="scope">
           <i v-if="scope.row.alarmSubscribe" style="font-size: 20px" title="报警订阅"
              class="iconfont icon-gbaojings subscribe-on "></i>
@@ -60,23 +67,33 @@
              class="iconfont icon-gxunjians subscribe-off"></i>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <el-button type="text" @click="handleEdit(scope.row)" v-hasPermi="['wvp:platform:edit']">
-            编辑
-          </el-button>
-          <el-button type="text"
-                     @click="chooseChannel(scope.row)" v-hasPermi="['wvp:platform:channelList']">通道共享
-          </el-button>
-          <el-button type="text"
-                     @click="pushChannelFun(scope.row)" v-hasPermi="['wvp:platform:push']">推送通道
-          </el-button>
-          <el-button type="text" @click="handleDelete(scope.row)" v-hasPermi="['wvp:platform:delete']">
-            删除
-          </el-button>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div class="new_table_svg_group" @click.stop="handleEdit(scope.row)" v-hasPermi="['wvp:platform:edit']">
+              <el-icon><Edit /></el-icon>
+              <span>编辑</span>
+            </div>
+            <el-dropdown
+              @command="(command)=>{moreClick(command, scope.row)}"
+              v-if="checkPermi(['wvp:platform:channelList', 'wvp:platform:push', 'wvp:platform:delete'])"
+            >
+              <div class="new_table_svg_group" @click.stop>
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="chooseChannel" v-if="checkPermi(['wvp:platform:channelList'])">通道共享</el-dropdown-item>
+                  <el-dropdown-item command="pushChannelFun" v-if="checkPermi(['wvp:platform:push'])">推送通道</el-dropdown-item>
+                  <el-dropdown-item command="handleDelete" v-if="checkPermi(['wvp:platform:delete'])">删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total > 0"
@@ -300,6 +317,8 @@ import {
   updatePlatform
 } from "../../../api/wvp/platform.js";
 import router from "@/router";
+import { checkPermi } from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 
 const {proxy} = getCurrentInstance();
 
@@ -433,6 +452,16 @@ function handleDelete(row) {
     getList();
   }).catch(() => {
   });
+}
+
+function moreClick(command, row) {
+  if (command === "chooseChannel") {
+    chooseChannel(row);
+  } else if (command === "pushChannelFun") {
+    pushChannelFun(row);
+  } else if (command === "handleDelete") {
+    handleDelete(row);
+  }
 }
 
 /** 提交按钮 */

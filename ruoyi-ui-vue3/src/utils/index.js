@@ -387,4 +387,13 @@ export function camelCase(str) {
 export function isNumberStr(str) {
   return /^[+-]?(0|([1-9]\d*))(\.\d+)?$/g.test(str)
 }
+
+/** px 按视口宽度换算，用于表格列宽 */
+export function clacPXToVW(data, baseWidth = 1920) {
+  const retV = (window.innerWidth * data) / baseWidth
+  if (retV < data) {
+    return retV + ''
+  }
+  return (window.innerWidth * data) / baseWidth + ''
+}
  

@@ -14,8 +14,16 @@
          </div>
       </div>
 
-      <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
-         <el-table-column type="selection" width="55" align="center" />
+      <table-self
+         class="new_table"
+         header-cell-class-name="header_tenant_cell"
+         stripe
+         v-loading="loading"
+         :data="userList"
+         current-row-key="userId"
+         @selection-change="handleSelectionChange"
+      >
+         <el-table-column type="selection" :width="clacPXToVW(55)" align="center" />
          <el-table-column label="用户名称" prop="userName" :show-overflow-tooltip="true" />
          <el-table-column label="用户昵称" prop="nickName" :show-overflow-tooltip="true" />
          <el-table-column label="邮箱" prop="email" :show-overflow-tooltip="true" />
@@ -25,17 +33,21 @@
                <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
             </template>
          </el-table-column>
-         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+         <el-table-column label="创建时间" align="center" prop="createTime" :width="clacPXToVW(180)">
             <template #default="scope">
                <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(140)">
             <template #default="scope">
-               <el-button link type="primary" icon="CircleClose" @click="cancelAuthUser(scope.row)" v-hasPermi="['system:role:remove']">取消授权</el-button>
+               <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                  <div class="new_table_svg_group" @click.stop="cancelAuthUser(scope.row)" v-hasPermi="['system:role:remove']">
+                     <span>取消授权</span>
+                  </div>
+               </div>
             </template>
          </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination
          v-show="total > 0"
@@ -51,6 +63,7 @@
 <script setup name="AuthUser">
 import selectUser from "./selectUser";
 import { allocatedUserList, authUserCancel, authUserCancelAll } from "@/api/system/role";
+import { clacPXToVW } from "@/utils/index";
 
 const route = useRoute();
 const { proxy } = getCurrentInstance();

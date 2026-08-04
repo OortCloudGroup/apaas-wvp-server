@@ -6,8 +6,8 @@
          <export-excel-pdf />
       </div>
       <el-row>
-         <el-table @row-click="clickRow" ref="refTable" :data="userList" @selection-change="handleSelectionChange" height="260px">
-            <el-table-column type="selection" width="55"></el-table-column>
+         <table-self @row-click="clickRow" ref="refTable" :data="userList" @selection-change="handleSelectionChange" height="260px" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+            <el-table-column type="selection" :width="clacPXToVW(55)"></el-table-column>
             <el-table-column label="用户名称" prop="userName" :show-overflow-tooltip="true" />
             <el-table-column label="用户昵称" prop="nickName" :show-overflow-tooltip="true" />
             <el-table-column label="邮箱" prop="email" :show-overflow-tooltip="true" />
@@ -17,12 +17,12 @@
                   <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
                </template>
             </el-table-column>
-            <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+            <el-table-column label="创建时间" align="center" prop="createTime" :width="clacPXToVW(180)">
                <template #default="scope">
                   <span>{{ parseTime(scope.row.createTime) }}</span>
                </template>
             </el-table-column>
-         </el-table>
+         </table-self>
          <pagination
             v-show="total > 0"
             :total="total"
@@ -41,6 +41,7 @@
 </template>
 
 <script setup name="SelectUser">
+import { clacPXToVW } from "@/utils/index";
 import { authUserSelectAll, unallocatedUserList } from "@/api/system/role";
 
 const props = defineProps({

@@ -17,18 +17,26 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="pushList" border :row-key="(row)=> row.app + row.stream">
-      <el-table-column prop="gbName" label="名称" min-width="150" align="center"/>
-      <el-table-column prop="app" label="应用名" min-width="100" align="center"/>
-      <el-table-column prop="stream" label="流ID" min-width="100" align="center"/>
-      <el-table-column label="推流状态" min-width="100" align="center">
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="pushList"
+      :row-key="(row)=> row.app + row.stream"
+      current-row-key="id"
+    >
+      <el-table-column prop="gbName" label="名称" align="center" show-overflow-tooltip/>
+      <el-table-column prop="app" label="应用名" align="center" show-overflow-tooltip/>
+      <el-table-column prop="stream" label="流ID" align="center" show-overflow-tooltip/>
+      <el-table-column label="推流状态" align="center">
         <template #default="scope">
           <el-tag v-if="scope.row.pushing">推流中</el-tag>
           <el-tag type="info" v-if="!scope.row.pushing">已停止</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="gbDeviceId" label="国标编码" min-width="150" align="center"/>
-      <el-table-column label="位置信息" min-width="150" align="center">
+      <el-table-column prop="gbDeviceId" label="国标编码" align="center" show-overflow-tooltip/>
+      <el-table-column label="位置信息" align="center" show-overflow-tooltip>
         <template #default="scope">
           <span
               v-if="scope.row.gbLongitude && scope.row.gbLatitude">{{
@@ -37,31 +45,54 @@
           <span v-if="!scope.row.gbLongitude || !scope.row.gbLatitude">无</span>
         </template>
       </el-table-column>
-      <el-table-column prop="mediaServerId" label="流媒体" min-width="150" align="center"/>
-      <el-table-column label="开始时间" min-width="200" align="center">
+      <el-table-column prop="mediaServerId" label="流媒体" align="center" show-overflow-tooltip/>
+      <el-table-column label="开始时间" align="center" show-overflow-tooltip>
         <template #default="scope">
           <el-button-group v-if="scope.row.pushTime && scope.row.pushTime">
             {{ scope.row.pushTime == null ? "-" : scope.row.pushTime }}
           </el-button-group>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <el-button @click="playPush(scope.row)" type="text" v-hasPermi="['wvp:push:play']">播放</el-button>
-          <el-button type="text" @click="handleChannelConfiguration(scope.row)" v-hasPermi="['wvp:channel:edit']">
-            通道配置
-          </el-button>
-          <el-button type="text" @click="handleEdit(scope.row)" v-hasPermi="['wvp:push:edit']">
-            编辑
-          </el-button>
-          <el-button type="text" @click="handleDelete(scope.row)" v-hasPermi="['wvp:push:remove']">
-            删除
-          </el-button>
-          <el-button type="text" @click="queryCloudRecords(scope.row)" v-hasPermi="['wvp:record:list']">云端录像
-          </el-button>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div
+              class="new_table_svg_group"
+              @click.stop="playPush(scope.row)"
+              v-hasPermi="['wvp:push:play']"
+            >
+              <el-icon><View /></el-icon>
+              <span>播放</span>
+            </div>
+            <el-dropdown
+              @command="(command)=>{moreClick(command, scope.row)}"
+              v-if="checkPermi(['wvp:channel:edit', 'wvp:push:edit', 'wvp:push:remove', 'wvp:record:list'])"
+            >
+              <div class="new_table_svg_group" @click.stop>
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="handleChannelConfiguration" v-if="checkPermi(['wvp:channel:edit'])">
+                    通道配置
+                  </el-dropdown-item>
+                  <el-dropdown-item command="handleEdit" v-if="checkPermi(['wvp:push:edit'])">
+                    编辑
+                  </el-dropdown-item>
+                  <el-dropdown-item command="handleDelete" style="color: #f56c6c" v-if="checkPermi(['wvp:push:remove'])">
+                    删除
+                  </el-dropdown-item>
+                  <el-dropdown-item command="queryCloudRecords" v-if="checkPermi(['wvp:record:list'])">
+                    云端录像
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total > 0"
@@ -483,6 +514,8 @@ import H265web from "@/components/H265web/index.vue";
 import StreamDropdown from "@/views/wvp/channel/components/streamDropdown.vue";
 import MediaInfo from "@/views/wvp/channel/components/mediaInfo.vue";
 import {DocumentCopy, Microphone} from '@element-plus/icons-vue'
+import {checkPermi} from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 
 import router from "@/router";
 const {proxy} = getCurrentInstance();
@@ -771,6 +804,18 @@ function chooseGroupFun() {
 function gbParentOnSubmit(deviceId, businessGroupId) {
   form.value.gbBusinessGroupId = businessGroupId;
   form.value.gbParentId = deviceId;
+}
+
+function moreClick(command, row) {
+  if (command === 'handleChannelConfiguration') {
+    handleChannelConfiguration(row)
+  } else if (command === 'handleEdit') {
+    handleEdit(row)
+  } else if (command === 'handleDelete') {
+    handleDelete(row)
+  } else if (command === 'queryCloudRecords') {
+    queryCloudRecords(row)
+  }
 }
 
 function queryCloudRecords(row) {

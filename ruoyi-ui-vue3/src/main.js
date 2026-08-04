@@ -46,6 +46,8 @@ import DictTag from '@/components/DictTag'
 import SearchHeightBox from '@/components/SearchHeightBox'
 import ExportExcelPdf from '@/components/ExportExcelPdf'
 import ButtonGroup from '@/components/ButtonGroup'
+import TableSelf from '@/components/TableSelf'
+import { clacPXToVW } from '@/utils/index'
 
 const app = createApp(App)
 
@@ -58,6 +60,7 @@ app.config.globalProperties.handleTree = handleTree
 app.config.globalProperties.addDateRange = addDateRange
 app.config.globalProperties.selectDictLabel = selectDictLabel
 app.config.globalProperties.selectDictLabels = selectDictLabels
+app.config.globalProperties.clacPXToVW = clacPXToVW
 
 // 全局组件挂载
 app.component('DictTag', DictTag)
@@ -70,6 +73,7 @@ app.component('Editor', Editor)
 app.component('SearchHeightBox', SearchHeightBox)
 app.component('ExportExcelPdf', ExportExcelPdf)
 app.component('ButtonGroup', ButtonGroup)
+app.component('TableSelf', TableSelf)
 
 app.use(router)
 app.use(store)

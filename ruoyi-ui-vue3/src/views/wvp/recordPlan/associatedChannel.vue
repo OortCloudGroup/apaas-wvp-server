@@ -34,12 +34,12 @@
         </div>
       </div>
 
-      <el-table v-loading="loading" :data="channelList" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="center"/>
-        <el-table-column prop="gbName" label="名称" min-width="180" align="center"/>
-        <el-table-column prop="gbDeviceId" label="编号" min-width="180" align="center"/>
-        <el-table-column prop="gbManufacturer" label="厂家" min-width="100" align="center"/>
-        <el-table-column label="类型" min-width="100" align="center">
+      <table-self v-loading="loading" :data="channelList" @selection-change="handleSelectionChange" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+        <el-table-column type="selection" :width="clacPXToVW(55)" align="center"/>
+        <el-table-column prop="gbName" label="名称" :min-width="clacPXToVW(180)" align="center"/>
+        <el-table-column prop="gbDeviceId" label="编号" :min-width="clacPXToVW(180)" align="center"/>
+        <el-table-column prop="gbManufacturer" label="厂家" :min-width="clacPXToVW(100)" align="center"/>
+        <el-table-column label="类型" :min-width="clacPXToVW(100)" align="center">
           <template #default="scope">
             <div slot="reference" class="name-wrapper">
               <el-tag effect="plain" v-if="scope.row.dataType === 1">国标设备</el-tag>
@@ -48,7 +48,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="状态" min-width="100" align="center">
+        <el-table-column label="状态" :min-width="clacPXToVW(100)" align="center">
           <template #default="scope">
             <div slot="reference" class="name-wrapper">
               <el-tag v-if="scope.row.gbStatus === 'ON'">在线</el-tag>
@@ -56,7 +56,7 @@
             </div>
           </template>
         </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination
           v-show="total > 0"
@@ -77,8 +77,8 @@
           </el-col>
         </el-row>
 
-        <el-table v-loading="loading" :data="deviceList" @selection-change="handleSelectionDeviceChange">
-          <el-table-column type="selection" width="55" align="center"/>
+        <table-self v-loading="loading" :data="deviceList" @selection-change="handleSelectionDeviceChange" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+          <el-table-column type="selection" :width="clacPXToVW(55)" align="center"/>
           <el-table-column prop="name" label="名称" align="center"/>
           <el-table-column prop="deviceId" label="设备编号" align="center"/>
           <el-table-column prop="channelCount" label="通道数" align="center"/>
@@ -99,7 +99,7 @@
               </div>
             </template>
           </el-table-column>
-        </el-table>
+        </table-self>
 
         <pagination
             v-show="totalDevice > 0"
@@ -114,6 +114,7 @@
 </template>
 
 <script setup name="RecordPlan">
+import { clacPXToVW } from "@/utils/index";
 import {link, listPlanRecord} from "../../../api/wvp/record.js";
 import {useRoute} from "vue-router";
 import {listDevice} from "../../../api/wvp/device.js";

@@ -16,7 +16,7 @@
         <export-excel-pdf />
       </div>
     </div>
-    <el-table :data="detailFiles" border height="600">
+    <table-self :data="detailFiles" height="600" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
       <el-table-column label="设备ID" align="center" prop="deviceId" />
       <el-table-column label="位置" align="center" prop="address">
         <template #default="scope">
@@ -33,13 +33,21 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="250">
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(180)">
         <template #default="scope">
-          <el-button link type="primary" icon="View" @click="playRecord(scope.row)" v-hasPermi="['gb:playback:start']">播放</el-button>
-          <el-button link type="primary" icon="Download" @click="downloadFun(scope.row)" v-hasPermi="['gb:record:download']">下载</el-button>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div class="new_table_svg_group" @click.stop="playRecord(scope.row)" v-hasPermi="['gb:playback:start']">
+              <el-icon><View /></el-icon>
+              <span>播放</span>
+            </div>
+            <div class="new_table_svg_group" @click.stop="downloadFun(scope.row)" v-hasPermi="['gb:record:download']">
+              <el-icon><Download /></el-icon>
+              <span>下载</span>
+            </div>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
     <div style="margin-top: 20px; display: flex; justify-content: flex-end;">总条数： {{detailFiles.length}}</div>
 
     <el-dialog title="播放视频" v-model="openPlay" width="1000px" append-to-body>
@@ -54,6 +62,7 @@
 </template>
 
 <script setup name="GbRecordDetail">
+import { clacPXToVW } from "@/utils/index";
 import {useRoute} from "vue-router";
 import {download, progress, recordinfo} from "../../../api/wvp/gb_record.js";
 import {playStop, start} from "../../../api/wvp/playback.js";

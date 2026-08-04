@@ -34,14 +34,22 @@
               </div>
             </div>
 
-            <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
-              <el-table-column type="selection" width="50" align="center" />
+            <table-self
+              class="new_table"
+              header-cell-class-name="header_tenant_cell"
+              stripe
+              v-loading="loading"
+              :data="userList"
+              current-row-key="userId"
+              @selection-change="handleSelectionChange"
+            >
+              <el-table-column type="selection" :width="clacPXToVW(55)" align="center" />
               <el-table-column label="用户编号" align="center" key="userId" prop="userId" v-if="columns[0].visible" />
               <el-table-column label="用户名称" align="center" key="userName" prop="userName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
               <el-table-column label="用户昵称" align="center" key="nickName" prop="nickName" v-if="columns[2].visible" :show-overflow-tooltip="true" />
               <el-table-column label="部门" align="center" key="deptName" prop="dept.deptName" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-              <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber" v-if="columns[4].visible" width="120" />
-              <el-table-column label="状态" align="center" key="status" v-if="columns[5].visible">
+              <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber" v-if="columns[4].visible" :width="clacPXToVW(120)" />
+              <el-table-column label="状态" align="center" key="status" v-if="columns[5].visible" :width="clacPXToVW(100)">
                 <template #default="scope">
                   <el-switch
                     v-model="scope.row.status"
@@ -51,28 +59,38 @@
                   ></el-switch>
                 </template>
               </el-table-column>
-              <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" width="160">
+              <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" :width="clacPXToVW(160)">
                 <template #default="scope">
                   <span>{{ parseTime(scope.row.createTime) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
+              <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
                 <template #default="scope">
-                  <el-tooltip content="修改" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:user:edit']"></el-button>
-                  </el-tooltip>
-                  <el-tooltip content="删除" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:user:remove']"></el-button>
-                  </el-tooltip>
-                  <el-tooltip content="重置密码" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="Key" @click="handleResetPwd(scope.row)" v-hasPermi="['system:user:resetPwd']"></el-button>
-                  </el-tooltip>
-                  <el-tooltip content="分配角色" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="CircleCheck" @click="handleAuthRole(scope.row)" v-hasPermi="['system:user:edit']"></el-button>
-                  </el-tooltip>
+                  <div class="operateAppBox flexRowAC" style="justify-content: flex-end;" v-if="scope.row.userId !== 1">
+                    <div class="new_table_svg_group" @click.stop="handleUpdate(scope.row)" v-hasPermi="['system:user:edit']">
+                      <el-icon><Edit /></el-icon>
+                      <span>修改</span>
+                    </div>
+                    <div class="new_table_svg_group" @click.stop="handleDelete(scope.row)" v-hasPermi="['system:user:remove']">
+                      <el-icon><Delete /></el-icon>
+                      <span>删除</span>
+                    </div>
+                    <el-dropdown @command="(command)=>{userMoreClick(command, scope.row)}">
+                      <div class="new_table_svg_group" @click.stop>
+                        <span>更多</span>
+                        <el-icon><ArrowDown /></el-icon>
+                      </div>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item command="handleResetPwd" v-if="checkPermi(['system:user:resetPwd'])">重置密码</el-dropdown-item>
+                          <el-dropdown-item command="handleAuthRole" v-if="checkPermi(['system:user:edit'])">分配角色</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </div>
                 </template>
               </el-table-column>
-            </el-table>
+            </table-self>
             <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" @pagination="getList" />
           </el-col>
         </pane>
@@ -197,6 +215,8 @@ import useAppStore from '@/store/modules/app'
 import { changeUserStatus, listUser, resetUserPwd, delUser, getUser, updateUser, addUser, deptTreeSelect } from "@/api/system/user";
 import { Splitpanes, Pane } from "splitpanes"
 import "splitpanes/dist/splitpanes.css"
+import { checkPermi } from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 
 const router = useRouter();
 const appStore = useAppStore()
@@ -420,6 +440,14 @@ function handleCommand(command, row) {
 function handleAuthRole(row) {
   const userId = row.userId;
   router.push("/system/user-auth/role/" + userId);
+}
+
+function userMoreClick(command, row) {
+  if (command === "handleResetPwd") {
+    handleResetPwd(row);
+  } else if (command === "handleAuthRole") {
+    handleAuthRole(row);
+  }
 };
 
 /** 重置密码按钮操作 */

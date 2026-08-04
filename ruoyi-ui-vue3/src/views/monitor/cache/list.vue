@@ -13,17 +13,17 @@
               @click="refreshCacheNames()"
             ></el-button>
           </template>
-          <el-table
+          <table-self
             v-loading="loading"
             :data="cacheNames"
             :height="tableHeight"
             highlight-current-row
             @row-click="getCacheKeys"
             style="width: 100%"
-          >
+           class="new_table" header-cell-class-name="header_tenant_cell" stripe>
             <el-table-column
               label="序号"
-              width="60"
+              :width="clacPXToVW(60)"
               type="index"
             ></el-table-column>
 
@@ -43,20 +43,19 @@
             />
             <el-table-column
               label="操作"
-              width="60"
-              align="center"
-              class-name="small-padding fixed-width"
+              :width="clacPXToVW(80)"
+              align="right"
+              fixed="right"
             >
               <template #default="scope">
-                <el-button
-                  link
-                  type="primary"
-                  icon="Delete"
-                  @click="handleClearCacheName(scope.row)"
-                ></el-button>
+                <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                  <div class="new_table_svg_group" @click.stop="handleClearCacheName(scope.row)">
+                    <el-icon><Delete /></el-icon>
+                  </div>
+                </div>
               </template>
             </el-table-column>
-          </el-table>
+          </table-self>
         </el-card>
       </el-col>
 
@@ -72,17 +71,17 @@
               @click="refreshCacheKeys()"
             ></el-button>
           </template>
-          <el-table
+          <table-self
             v-loading="subLoading"
             :data="cacheKeys"
             :height="tableHeight"
             highlight-current-row
             @row-click="handleCacheValue"
             style="width: 100%"
-          >
+           class="new_table" header-cell-class-name="header_tenant_cell" stripe>
             <el-table-column
               label="序号"
-              width="60"
+              :width="clacPXToVW(60)"
               type="index"
             ></el-table-column>
             <el-table-column
@@ -94,20 +93,19 @@
             </el-table-column>
             <el-table-column
               label="操作"
-              width="60"
-              align="center"
-              class-name="small-padding fixed-width"
+              :width="clacPXToVW(80)"
+              align="right"
+              fixed="right"
             >
               <template #default="scope">
-                <el-button
-                  link
-                  type="primary"
-                  icon="Delete"
-                  @click="handleClearCacheKey(scope.row)"
-                ></el-button>
+                <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                  <div class="new_table_svg_group" @click.stop="handleClearCacheKey(scope.row)">
+                    <el-icon><Delete /></el-icon>
+                  </div>
+                </div>
               </template>
             </el-table-column>
-          </el-table>
+          </table-self>
         </el-card>
       </el-col>
 
@@ -155,6 +153,7 @@
 </template>
 
 <script setup name="CacheList">
+import { clacPXToVW } from "@/utils/index";
 import { listCacheName, listCacheKey, getCacheValue, clearCacheName, clearCacheKey, clearCacheAll } from "@/api/monitor/cache";
 
 const { proxy } = getCurrentInstance();

@@ -37,8 +37,8 @@
           </div>
         </div>
 
-        <el-table v-loading="loading" :data="channelList" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="55" align="center"/>
+        <table-self v-loading="loading" :data="channelList" @selection-change="handleSelectionChange" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+          <el-table-column type="selection" :width="clacPXToVW(55)" align="center"/>
           <el-table-column prop="gbName" label="名称" align="center"/>
           <el-table-column prop="gbDeviceId" label="编号" align="center"/>
           <el-table-column prop="gbManufacturer" label="厂家" align="center"/>
@@ -59,7 +59,7 @@
               </div>
             </template>
           </el-table-column>
-        </el-table>
+        </table-self>
 
         <pagination
             v-show="total > 0"
@@ -80,8 +80,8 @@
             </el-col>
           </el-row>
 
-          <el-table v-loading="loadingSelect" :data="channelSelectList" @selection-change="handleSelectionSelectChange">
-            <el-table-column type="selection" width="55" align="center"/>
+          <table-self v-loading="loadingSelect" :data="channelSelectList" @selection-change="handleSelectionSelectChange" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+            <el-table-column type="selection" :width="clacPXToVW(55)" align="center"/>
             <el-table-column prop="gbName" label="名称" align="center"/>
             <el-table-column prop="gbDeviceId" label="编号" align="center"/>
             <el-table-column prop="gbManufacturer" label="厂家" align="center"/>
@@ -102,7 +102,7 @@
                 </div>
               </template>
             </el-table-column>
-          </el-table>
+          </table-self>
 
           <pagination
               v-show="totalSelect > 0"
@@ -118,6 +118,7 @@
 </template>
 
 <script setup name="Region">
+import { clacPXToVW } from "@/utils/index";
 import {queryForTree} from "../../../api/wvp/region.js";
 import {
   addChannelToRegion,

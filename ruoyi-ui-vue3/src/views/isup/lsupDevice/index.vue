@@ -15,24 +15,32 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="lsupDeviceList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="所属部门" align="center" prop="deptName"/>
-      <el-table-column label="设备ID" align="center" prop="deviceId"/>
-      <el-table-column label="设备名称" align="center" prop="name"/>
-      <el-table-column label="地址" align="center" prop="addressMap"/>
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="lsupDeviceList"
+      current-row-key="id"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" :width="clacPXToVW(55)" align="center"/>
+      <el-table-column label="所属部门" align="center" prop="deptName" show-overflow-tooltip/>
+      <el-table-column label="设备ID" align="center" prop="deviceId" show-overflow-tooltip/>
+      <el-table-column label="设备名称" align="center" prop="name" show-overflow-tooltip/>
+      <el-table-column label="地址" align="center" prop="addressMap" show-overflow-tooltip/>
       <el-table-column label="通道" align="center" prop="channel"/>
-      <el-table-column label="IP地址" align="center" prop="ipAddress"/>
-      <el-table-column label="设备类型" align="center" prop="devType"/>
-      <el-table-column label="设备的序列号" align="center" prop="deviceSerial"/>
-      <el-table-column label="设备协议版本" align="center" prop="devProtocolVersion"/>
+      <el-table-column label="IP地址" align="center" prop="ipAddress" show-overflow-tooltip/>
+      <el-table-column label="设备类型" align="center" prop="devType" show-overflow-tooltip/>
+      <el-table-column label="设备的序列号" align="center" prop="deviceSerial" show-overflow-tooltip/>
+      <el-table-column label="设备协议版本" align="center" prop="devProtocolVersion" show-overflow-tooltip/>
       <el-table-column label="用户名" align="center" prop="userName"/>
       <el-table-column label="密码" align="center" prop="password">
         <template #default="scope">
           <div class="password-container">
             <span v-if="!passwordVisibility[scope.row.id]">******</span>
             <span v-else>{{ scope.row.password }}</span>
-            <el-icon class="eye-icon" @click="togglePasswordVisibility(scope.row.id)">
+            <el-icon class="eye-icon" @click.stop="togglePasswordVisibility(scope.row.id)">
               <component :is="passwordVisibility[scope.row.id] ? 'Hide' : 'View'"/>
             </el-icon>
           </div>
@@ -44,23 +52,27 @@
           <el-tag v-if="scope.row.status === 'OFFLINE'" type="danger">离线</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark"/>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="备注" align="center" prop="remark" show-overflow-tooltip/>
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(180)">
         <template #default="scope">
-          <div style="display:flex; align-items: center;justify-content: center">
-            <el-button link type="primary" icon="View" @click="handleStartPlay(scope.row)"
-                       v-hasPermi="['isup:lsupDevice:start']" v-if="scope.row.status === 'ON'">播放
-            </el-button>
-            <el-dropdown @command="(command)=>{moreClick(command, scope.row)}"
-                         v-if="checkPermi(['isup:lsupDevice:edit', 'isup:lsupDevice:remove'])">
-             <span class="el-dropdown-link">
-              <el-button type="text">
-                更多
-                <el-icon>
-                  <arrow-down/>
-                </el-icon>
-              </el-button>
-            </span>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div
+              v-if="scope.row.status === 'ON'"
+              v-hasPermi="['isup:lsupDevice:start']"
+              class="new_table_svg_group"
+              @click.stop="handleStartPlay(scope.row)"
+            >
+              <el-icon><View /></el-icon>
+              <span>播放</span>
+            </div>
+            <el-dropdown
+              @command="(command)=>{moreClick(command, scope.row)}"
+              v-if="checkPermi(['isup:lsupDevice:edit', 'isup:lsupDevice:remove'])"
+            >
+              <div class="new_table_svg_group" @click.stop>
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="handleMap" v-if="checkPermi(['isup:lsupDevice:edit'])">修改位置</el-dropdown-item>
@@ -72,7 +84,7 @@
           </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total>0"
@@ -224,6 +236,7 @@ import {getDigitalChannel, ptzCtrl} from "../../../api/isup/lsupDevice.js";
 import Hikvision from "@/components/Hikvision/index.vue";
 import {deptTreeSelect} from "@/api/system/user";
 import MapGaoDe from "@/components/MapGaoDe/index.vue";
+import { clacPXToVW } from "@/utils/index";
 
 const {proxy} = getCurrentInstance();
 

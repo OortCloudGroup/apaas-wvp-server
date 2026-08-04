@@ -17,17 +17,17 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="channelList" ref="channelListTable" border>
-      <el-table-column prop="name" label="名称" min-width="180" align="center"/>
-      <el-table-column prop="deviceId" label="编号" min-width="180" align="center"/>
-      <el-table-column label="快照" min-width="100" align="center">
+    <table-self v-loading="loading" :data="channelList" ref="channelListTable" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+      <el-table-column prop="name" label="名称" :min-width="clacPXToVW(180)" align="center"/>
+      <el-table-column prop="deviceId" label="编号" :min-width="clacPXToVW(180)" align="center"/>
+      <el-table-column label="快照" :min-width="clacPXToVW(100)" align="center">
         <template #default="scope">
           <ImagePreview :src="getSnap(scope.row)"></ImagePreview>
         </template>
       </el-table-column>
-      <el-table-column prop="subCount" label="子节点数" min-width="100" align="center"/>
-      <el-table-column prop="manufacturer" label="厂家" min-width="100" align="center"/>
-      <el-table-column label="位置信息" min-width="120" align="center">
+      <el-table-column prop="subCount" label="子节点数" :min-width="clacPXToVW(100)" align="center"/>
+      <el-table-column prop="manufacturer" label="厂家" :min-width="clacPXToVW(100)" align="center"/>
+      <el-table-column label="位置信息" :min-width="clacPXToVW(120)" align="center">
         <template #default="scope">
           <span
               v-if="scope.row.longitude && scope.row.latitude">{{ scope.row.longitude }}<br/>{{
@@ -36,18 +36,18 @@
           <span v-if="!scope.row.longitude || !scope.row.latitude">无</span>
         </template>
       </el-table-column>
-      <el-table-column prop="ptzType" label="云台类型" min-width="100" align="center">
+      <el-table-column prop="ptzType" label="云台类型" :min-width="clacPXToVW(100)" align="center">
         <template #default="scope">
           <div>{{ scope.row.ptzTypeText }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="开启音频" min-width="100" align="center">
+      <el-table-column label="开启音频" :min-width="clacPXToVW(100)" align="center">
         <template #default="scope">
           <el-switch @change="updateChannel(scope.row)" v-model="scope.row.hasAudio" active-color="#409EFF">
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="码流类型" min-width="180" align="center">
+      <el-table-column label="码流类型" :min-width="clacPXToVW(180)" align="center">
         <template #default="scope">
           <div v-if="checkPermi(['wvp:device:channelStreamIdentification'])">
             <el-select @change="channelSubStreamChange(scope.row)"
@@ -79,7 +79,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="状态" min-width="100" align="center">
+      <el-table-column label="状态" :min-width="clacPXToVW(100)" align="center">
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag v-if="scope.row.status === 'ON'">在线</el-tag>
@@ -87,59 +87,68 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <el-button v-bind:disabled="device == null || device.online === 0"
-                     v-if="checkPermi(['wvp:play:start'])"
-                     type="text" @click="start(scope.row)">播放
-          </el-button>
-          <el-button v-bind:disabled="device == null || device.online === 0"
-                     v-hasPermi="['wvp:play:stop']"
-                     type="text" style="color: #f56c6c" v-if="!!scope.row.streamId"
-                     @click="stopDevicePush(scope.row)">停止
-          </el-button>
-          <el-button
-              type="text"
-              @click="handleEdit(scope.row)"
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div
+              v-if="checkPermi(['wvp:play:start'])"
+              class="new_table_svg_group"
+              :class="{ 'is-disabled': device == null || device.online === 0 }"
+              @click.stop="(device == null || device.online === 0) ? null : start(scope.row)"
+            >
+              <el-icon><View /></el-icon>
+              <span>播放</span>
+            </div>
+            <div
+              v-if="!!scope.row.streamId"
+              v-hasPermi="['wvp:play:stop']"
+              class="new_table_svg_group"
+              :class="{ 'is-disabled': device == null || device.online === 0 }"
+              @click.stop="(device == null || device.online === 0) ? null : stopDevicePush(scope.row)"
+            >
+              <span>停止</span>
+            </div>
+            <div
               v-hasPermi="['wvp:channel:edit']"
-          >
-            编辑
-          </el-button>
-
-          <el-dropdown @command="(command)=>{moreClick(command, scope.row)}"
-                       v-if="checkPermi(['wvp:control:recordApi'])">
-             <span class="el-dropdown-link">
-              <el-button type="text">
-                更多
-                <el-icon>
-                  <arrow-down/>
-                </el-icon>
-              </el-button>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="records" v-bind:disabled="device == null || device.online === 0">
-                  设备录像
-                </el-dropdown-item>
-                <el-dropdown-item command="cloudRecords" v-bind:disabled="device == null || device.online === 0"
-                                  v-if="checkPermi(['wvp:record:list'])">
-                  云端录像
-                </el-dropdown-item>
-                <el-dropdown-item command="record" v-bind:disabled="device == null || device.online === 0"
-                                  v-if="checkPermi(['wvp:control:recordApi'])">
-                  设备录像控制-开始
-                </el-dropdown-item>
-                <el-dropdown-item command="stopRecord" v-bind:disabled="device == null || device.online === 0"
-                                  v-if="checkPermi(['wvp:control:recordApi'])">
-                  设备录像控制-停止
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+              class="new_table_svg_group"
+              @click.stop="handleEdit(scope.row)"
+            >
+              <el-icon><Edit /></el-icon>
+              <span>编辑</span>
+            </div>
+            <el-dropdown
+              @command="(command)=>{moreClick(command, scope.row)}"
+              v-if="checkPermi(['wvp:control:recordApi'])"
+            >
+              <div class="new_table_svg_group" @click.stop>
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="records" v-bind:disabled="device == null || device.online === 0">
+                    设备录像
+                  </el-dropdown-item>
+                  <el-dropdown-item command="cloudRecords" v-bind:disabled="device == null || device.online === 0"
+                                    v-if="checkPermi(['wvp:record:list'])">
+                    云端录像
+                  </el-dropdown-item>
+                  <el-dropdown-item command="record" v-bind:disabled="device == null || device.online === 0"
+                                    v-if="checkPermi(['wvp:control:recordApi'])">
+                    设备录像控制-开始
+                  </el-dropdown-item>
+                  <el-dropdown-item command="stopRecord" v-bind:disabled="device == null || device.online === 0"
+                                    v-if="checkPermi(['wvp:control:recordApi'])">
+                    设备录像控制-停止
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
 
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total > 0"
@@ -628,6 +637,7 @@
 </template>
 
 <script setup name="Channel">
+import { clacPXToVW } from "@/utils/index";
 import {checkPermi} from "@/utils/permission";
 import { CaretTop } from '@element-plus/icons-vue'
 import ChannelCode from "../../components/common/channelCode.vue"

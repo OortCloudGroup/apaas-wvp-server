@@ -13,9 +13,19 @@
       </div>
     </div>
 
-    <el-table ref="genRef" v-loading="loading" :data="tableList" @selection-change="handleSelectionChange" :default-sort="defaultSort" @sort-change="handleSortChange">
-      <el-table-column type="selection" align="center" width="55"></el-table-column>
-      <el-table-column label="序号" type="index" width="50" align="center">
+    <table-self
+      ref="genRef"
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="tableList"
+      @selection-change="handleSelectionChange"
+      :default-sort="defaultSort"
+      @sort-change="handleSortChange"
+    >
+      <el-table-column type="selection" align="center" :width="clacPXToVW(55)"></el-table-column>
+      <el-table-column label="序号" type="index" :width="clacPXToVW(55)" align="center">
         <template #default="scope">
           <span>{{(queryParams.pageNum - 1) * queryParams.pageSize + scope.$index + 1}}</span>
         </template>
@@ -23,28 +33,36 @@
       <el-table-column label="表名称" align="center" prop="tableName" :show-overflow-tooltip="true" />
       <el-table-column label="表描述" align="center" prop="tableComment" :show-overflow-tooltip="true" />
       <el-table-column label="实体" align="center" prop="className" :show-overflow-tooltip="true" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="160" sortable="custom" :sort-orders="['descending', 'ascending']" />
-      <el-table-column label="更新时间" align="center" prop="updateTime" width="160" sortable="custom" :sort-orders="['descending', 'ascending']" />
-      <el-table-column label="操作" align="center" width="330" class-name="small-padding fixed-width">
+      <el-table-column label="创建时间" align="center" prop="createTime" :width="clacPXToVW(160)" sortable="custom" :sort-orders="['descending', 'ascending']" />
+      <el-table-column label="更新时间" align="center" prop="updateTime" :width="clacPXToVW(160)" sortable="custom" :sort-orders="['descending', 'ascending']" />
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <el-tooltip content="预览" placement="top">
-            <el-button link type="primary" icon="View" @click="handlePreview(scope.row)" v-hasPermi="['tool:gen:preview']"></el-button>
-          </el-tooltip>
-          <el-tooltip content="编辑" placement="top">
-            <el-button link type="primary" icon="Edit" @click="handleEditTable(scope.row)" v-hasPermi="['tool:gen:edit']"></el-button>
-          </el-tooltip>
-          <el-tooltip content="删除" placement="top">
-            <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['tool:gen:remove']"></el-button>
-          </el-tooltip>
-          <el-tooltip content="同步" placement="top">
-            <el-button link type="primary" icon="Refresh" @click="handleSynchDb(scope.row)" v-hasPermi="['tool:gen:edit']"></el-button>
-          </el-tooltip>
-          <el-tooltip content="生成代码" placement="top">
-            <el-button link type="primary" icon="Download" @click="handleGenTable(scope.row)" v-hasPermi="['tool:gen:code']"></el-button>
-          </el-tooltip>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div class="new_table_svg_group" @click.stop="handlePreview(scope.row)" v-hasPermi="['tool:gen:preview']">
+              <el-icon><View /></el-icon>
+              <span>预览</span>
+            </div>
+            <div class="new_table_svg_group" @click.stop="handleEditTable(scope.row)" v-hasPermi="['tool:gen:edit']">
+              <el-icon><Edit /></el-icon>
+              <span>编辑</span>
+            </div>
+            <el-dropdown @command="(command)=>{genMoreClick(command, scope.row)}">
+              <div class="new_table_svg_group" @click.stop>
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="handleDelete" v-if="checkPermi(['tool:gen:remove'])">删除</el-dropdown-item>
+                  <el-dropdown-item command="handleSynchDb" v-if="checkPermi(['tool:gen:edit'])">同步</el-dropdown-item>
+                  <el-dropdown-item command="handleGenTable" v-if="checkPermi(['tool:gen:code'])">生成代码</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
     <pagination
       v-show="total>0"
       :total="total"
@@ -76,7 +94,8 @@ import { listTable, previewTable, delTable, genCode, synchDb } from "@/api/tool/
 import router from "@/router";
 import importTable from "./importTable";
 import createTable from "./createTable";
-import { checkRole } from "@/utils/permission";
+import { checkRole, checkPermi } from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 
 const route = useRoute();
 const { proxy } = getCurrentInstance();
@@ -245,6 +264,16 @@ function handleDelete(row) {
     getList();
     proxy.$modal.msgSuccess("删除成功");
   }).catch(() => {});
+}
+
+function genMoreClick(command, row) {
+  if (command === "handleDelete") {
+    handleDelete(row);
+  } else if (command === "handleSynchDb") {
+    handleSynchDb(row);
+  } else if (command === "handleGenTable") {
+    handleGenTable(row);
+  }
 }
 
 getList();

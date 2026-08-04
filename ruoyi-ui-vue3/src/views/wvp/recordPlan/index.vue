@@ -17,19 +17,36 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="recordList" border>
-      <el-table-column prop="name" label="名称" align="center"/>
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="recordList"
+      current-row-key="id"
+    >
+      <el-table-column prop="name" label="名称" align="center" show-overflow-tooltip/>
       <el-table-column prop="channelCount" label="关联通道" align="center"/>
       <el-table-column prop="updateTime" label="更新时间" align="center"/>
       <el-table-column prop="createTime" label="创建时间" align="center"/>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <el-button type="text" @click="handleLink(scope.row)" v-hasPermi="['wvp:record:channelList']">关联通道</el-button>
-          <el-button type="text" @click="handleEdit(scope.row)"  v-hasPermi="['wvp:record:edit']">编辑</el-button>
-          <el-button type="text" @click="handleDelete(scope.row)"  v-hasPermi="['wvp:record:delete']">删除</el-button>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div class="new_table_svg_group" @click.stop="handleLink(scope.row)" v-hasPermi="['wvp:record:channelList']">
+              <span>关联通道</span>
+            </div>
+            <div class="new_table_svg_group" @click.stop="handleEdit(scope.row)" v-hasPermi="['wvp:record:edit']">
+              <el-icon><Edit /></el-icon>
+              <span>编辑</span>
+            </div>
+            <div class="new_table_svg_group" @click.stop="handleDelete(scope.row)" v-hasPermi="['wvp:record:delete']">
+              <el-icon><Delete /></el-icon>
+              <span>删除</span>
+            </div>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total > 0"
@@ -63,6 +80,7 @@ import {addRecord, deleteRecord, getRecord, listRecord, updateRecord} from "../.
 import ByteWeekTimePicker from "./byteWeekTimePicker.vue";
 import {ElMessage} from "element-plus";
 import router from "@/router";
+import { clacPXToVW } from "@/utils/index";
 const {proxy} = getCurrentInstance();
 
 const loading = ref(false);

@@ -12,12 +12,15 @@
             <export-excel-pdf />
          </div>
       </div>
-      <el-table
+      <table-self
+         class="new_table"
+         header-cell-class-name="header_tenant_cell"
+         stripe
          v-loading="loading"
          :data="onlineList.slice((pageNum - 1) * pageSize, pageNum * pageSize)"
          style="width: 100%;"
       >
-         <el-table-column label="序号" width="50" type="index" align="center">
+         <el-table-column label="序号" :width="clacPXToVW(55)" type="index" align="center">
             <template #default="scope">
                <span>{{ (pageNum - 1) * pageSize + scope.$index + 1 }}</span>
             </template>
@@ -29,17 +32,26 @@
          <el-table-column label="登录地点" align="center" prop="loginLocation" :show-overflow-tooltip="true" />
          <el-table-column label="操作系统" align="center" prop="os" :show-overflow-tooltip="true" />
          <el-table-column label="浏览器" align="center" prop="browser" :show-overflow-tooltip="true" />
-         <el-table-column label="登录时间" align="center" prop="loginTime" width="180">
+         <el-table-column label="登录时间" align="center" prop="loginTime">
             <template #default="scope">
                <span>{{ parseTime(scope.row.loginTime) }}</span>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(120)">
             <template #default="scope">
-               <el-button link type="primary" icon="Delete" @click="handleForceLogout(scope.row)" v-hasPermi="['monitor:online:forceLogout']">强退</el-button>
+               <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                  <div
+                     class="new_table_svg_group"
+                     @click.stop="handleForceLogout(scope.row)"
+                     v-hasPermi="['monitor:online:forceLogout']"
+                  >
+                     <el-icon><Delete /></el-icon>
+                     <span>强退</span>
+                  </div>
+               </div>
             </template>
          </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination v-show="total > 0" :total="total" v-model:page="pageNum" v-model:limit="pageSize" />
    </div>
@@ -47,6 +59,7 @@
 
 <script setup name="Online">
 import { forceLogout, list as initData } from "@/api/monitor/online";
+import { clacPXToVW } from "@/utils/index";
 
 const { proxy } = getCurrentInstance();
 
