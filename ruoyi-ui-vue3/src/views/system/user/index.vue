@@ -16,54 +16,40 @@
         <!--用户数据-->
         <pane size="84">
           <el-col>
-            <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-              <el-form-item label="用户名称" prop="userName">
-                <el-input v-model="queryParams.userName" placeholder="请输入用户名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
-              </el-form-item>
-              <el-form-item label="手机号码" prop="phonenumber">
-                <el-input v-model="queryParams.phonenumber" placeholder="请输入手机号码" clearable style="width: 240px" @keyup.enter="handleQuery" />
-              </el-form-item>
-              <el-form-item label="状态" prop="status">
-                <el-select v-model="queryParams.status" placeholder="用户状态" clearable style="width: 240px">
-                  <el-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label" :value="dict.value" />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="创建时间" style="width: 308px">
-                <el-date-picker v-model="dateRange" value-format="YYYY-MM-DD" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-                <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-              </el-form-item>
-            </el-form>
+            <div class="toolbar-with-search">
+              <div class="toolbar-left">
+                <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['system:user:add']">
+                  <el-icon class="BtnImg"><Plus /></el-icon>新增
+                </button>
+                <button-group :button-list="toolbarButtons" />
+              </div>
+              <div class="searchHeight_out flexRowAC">
+                <search-height-box
+                  keyword="userName"
+                  placeholder="请输入用户名称等关键词"
+                  :data="searchData"
+                  @handle="searchResetFn"
+                />
+                <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
+              </div>
+            </div>
 
-            <el-row :gutter="10" class="mb8">
-              <el-col :span="1.5">
-                <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['system:user:add']">新增</el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate" v-hasPermi="['system:user:edit']">修改</el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:user:remove']">删除</el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button type="info" plain icon="Upload" @click="handleImport" v-hasPermi="['system:user:import']">导入</el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['system:user:export']">导出</el-button>
-              </el-col>
-              <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
-            </el-row>
-
-            <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
-              <el-table-column type="selection" width="50" align="center" />
+            <table-self
+              class="new_table"
+              header-cell-class-name="header_tenant_cell"
+              stripe
+              v-loading="loading"
+              :data="userList"
+              current-row-key="userId"
+              @selection-change="handleSelectionChange"
+            >
+              <el-table-column type="selection" :width="clacPXToVW(55)" align="center" />
               <el-table-column label="用户编号" align="center" key="userId" prop="userId" v-if="columns[0].visible" />
               <el-table-column label="用户名称" align="center" key="userName" prop="userName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
               <el-table-column label="用户昵称" align="center" key="nickName" prop="nickName" v-if="columns[2].visible" :show-overflow-tooltip="true" />
               <el-table-column label="部门" align="center" key="deptName" prop="dept.deptName" v-if="columns[3].visible" :show-overflow-tooltip="true" />
-              <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber" v-if="columns[4].visible" width="120" />
-              <el-table-column label="状态" align="center" key="status" v-if="columns[5].visible">
+              <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber" v-if="columns[4].visible" :width="clacPXToVW(120)" />
+              <el-table-column label="状态" align="center" key="status" v-if="columns[5].visible" :width="clacPXToVW(100)">
                 <template #default="scope">
                   <el-switch
                     v-model="scope.row.status"
@@ -73,28 +59,38 @@
                   ></el-switch>
                 </template>
               </el-table-column>
-              <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" width="160">
+              <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" :width="clacPXToVW(160)">
                 <template #default="scope">
                   <span>{{ parseTime(scope.row.createTime) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
+              <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
                 <template #default="scope">
-                  <el-tooltip content="修改" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:user:edit']"></el-button>
-                  </el-tooltip>
-                  <el-tooltip content="删除" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:user:remove']"></el-button>
-                  </el-tooltip>
-                  <el-tooltip content="重置密码" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="Key" @click="handleResetPwd(scope.row)" v-hasPermi="['system:user:resetPwd']"></el-button>
-                  </el-tooltip>
-                  <el-tooltip content="分配角色" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="CircleCheck" @click="handleAuthRole(scope.row)" v-hasPermi="['system:user:edit']"></el-button>
-                  </el-tooltip>
+                  <div class="operateAppBox flexRowAC" style="justify-content: flex-end;" v-if="scope.row.userId !== 1">
+                    <div class="new_table_svg_group" @click.stop="handleUpdate(scope.row)" v-hasPermi="['system:user:edit']">
+                      <el-icon><Edit /></el-icon>
+                      <span>修改</span>
+                    </div>
+                    <div class="new_table_svg_group" @click.stop="handleDelete(scope.row)" v-hasPermi="['system:user:remove']">
+                      <el-icon><Delete /></el-icon>
+                      <span>删除</span>
+                    </div>
+                    <el-dropdown @command="(command)=>{userMoreClick(command, scope.row)}">
+                      <div class="new_table_svg_group" @click.stop>
+                        <span>更多</span>
+                        <el-icon><ArrowDown /></el-icon>
+                      </div>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item command="handleResetPwd" v-if="checkPermi(['system:user:resetPwd'])">重置密码</el-dropdown-item>
+                          <el-dropdown-item command="handleAuthRole" v-if="checkPermi(['system:user:edit'])">分配角色</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </div>
                 </template>
               </el-table-column>
-            </el-table>
+            </table-self>
             <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" @pagination="getList" />
           </el-col>
         </pane>
@@ -219,6 +215,8 @@ import useAppStore from '@/store/modules/app'
 import { changeUserStatus, listUser, resetUserPwd, delUser, getUser, updateUser, addUser, deptTreeSelect } from "@/api/system/user";
 import { Splitpanes, Pane } from "splitpanes"
 import "splitpanes/dist/splitpanes.css"
+import { checkPermi } from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 
 const router = useRouter();
 const appStore = useAppStore()
@@ -229,9 +227,34 @@ const userList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
+const searchData = computed(() => [
+  { label: '手机号码', value: 'phonenumber', type: 'text', default: '' },
+  {
+    label: '状态',
+    value: 'status',
+    type: 'select',
+    option: (sys_normal_disable.value || []).map(d => ({ label: d.label, value: d.value })),
+    default: undefined
+  },
+  {
+    label: '创建时间',
+    value: 'dateRange',
+    type: 'daterange',
+    startP: '开始日期',
+    endP: '结束日期',
+    format: 'YYYY-MM-DD',
+    default: []
+  }
+]);
 const ids = ref([]);
 const single = ref(true);
 const multiple = ref(true);
+
+const toolbarButtons = computed(() => [
+  { name: '修改', svg: 'edit', disabled: single.value, permi: ['system:user:edit'], clickFn: () => handleUpdate() },
+  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['system:user:remove'], clickFn: () => handleDelete() },
+  { name: '导入', svg: 'upload', permi: ['system:user:import'], clickFn: () => handleImport() }
+]);
 const total = ref(0);
 const title = ref("");
 const dateRange = ref([]);
@@ -342,10 +365,22 @@ function handleQuery() {
   getList();
 };
 
+/** 高级搜索 / 重置 */
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.userName = val.userName || undefined;
+  queryParams.value.phonenumber = val.phonenumber || undefined;
+  queryParams.value.status = val.status || undefined;
+  dateRange.value = val.dateRange && val.dateRange.length ? val.dateRange : [];
+  getList();
+}
+
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm("queryRef");
+  queryParams.value.userName = undefined;
+  queryParams.value.phonenumber = undefined;
+  queryParams.value.status = undefined;
   queryParams.value.deptId = undefined;
   proxy.$refs.deptTreeRef.setCurrentKey(null);
   handleQuery();
@@ -353,7 +388,7 @@ function resetQuery() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const userIds = row.userId || ids.value;
+  const userIds = row?.userId || ids.value;
   proxy.$modal.confirm('是否确认删除用户编号为"' + userIds + '"的数据项？').then(function () {
     return delUser(userIds);
   }).then(() => {
@@ -368,6 +403,12 @@ function handleExport() {
     ...queryParams.value,
   },`user_${new Date().getTime()}.xlsx`);
 };
+
+function handleExportType(type) {
+  if (type === 'Excel') {
+    handleExport();
+  }
+}
 
 /** 用户状态修改  */
 function handleStatusChange(row) {
@@ -399,6 +440,14 @@ function handleCommand(command, row) {
 function handleAuthRole(row) {
   const userId = row.userId;
   router.push("/system/user-auth/role/" + userId);
+}
+
+function userMoreClick(command, row) {
+  if (command === "handleResetPwd") {
+    handleResetPwd(row);
+  } else if (command === "handleAuthRole") {
+    handleAuthRole(row);
+  }
 };
 
 /** 重置密码按钮操作 */
@@ -499,7 +548,7 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const userId = row.userId || ids.value;
+  const userId = row?.userId || ids.value;
   getUser(userId).then(response => {
     form.value = response.data;
     postOptions.value = response.posts;

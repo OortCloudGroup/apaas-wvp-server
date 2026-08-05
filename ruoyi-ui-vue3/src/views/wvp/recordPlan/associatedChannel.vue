@@ -4,94 +4,42 @@
       <el-tab-pane label="未关联" name="false"/>
       <el-tab-pane label="已关联" name="true"/>
 
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-        <el-form-item label="关键字" prop="query">
-          <el-input v-model="queryParams.query" placeholder="请输入关键字" clearable style="width: 240px"
-                    @keyup.enter="handleQuery"/>
-        </el-form-item>
-        <el-form-item label="在线状态" prop="online">
-          <el-select v-model="queryParams.online" placeholder="请选择在线状态" style="width: 250px;"
-                     default-first-option>
-            <el-option label="在线" value="true"></el-option>
-            <el-option label="离线" value="false"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="类型" prop="channelType">
-          <el-select v-model="queryParams.channelType" placeholder="请选择类型" style="width: 250px;"
-                     default-first-option>
-            <el-option label="国标设备" :value="1"></el-option>
-            <el-option label="推流设备" :value="2"></el-option>
-            <el-option label="拉流代理" :value="3"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-          <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-        </el-form-item>
-      </el-form>
+      <div class="toolbar-with-search">
+        <div class="toolbar-left">
+          <button
+            v-if="queryParams.hasLink !== 'true'"
+            type="button"
+            class="exportBtn newBtn flexRowAC"
+            :disabled="multiple"
+            @click="handleAdd"
+            v-hasPermi="['wvp:record:channelAdd']"
+          >
+            <el-icon class="BtnImg"><Plus /></el-icon>新增
+          </button>
+          <button
+            v-else
+            type="button"
+            class="exportBtn newBtn flexRowAC"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['wvp:record:channelDelete']"
+          >
+            <el-icon class="BtnImg"><Delete /></el-icon>删除
+          </button>
+          <button-group :button-list="toolbarButtons" />
+        </div>
+        <div class="searchHeight_out flexRowAC">
+          <search-height-box keyword="query" placeholder="请输入关键字" :data="searchData" @handle="searchResetFn" />
+          <export-excel-pdf />
+        </div>
+      </div>
 
-      <el-row :gutter="10" class="mb8">
-        <el-col :span="1.5" v-if="queryParams.hasLink !=='true'" v-hasPermi="['wvp:record:channelAdd']">
-          <el-button type="primary"
-                     plain
-                     icon="Plus"
-                     :disabled="multiple"
-                     @click="handleAdd">新增
-          </el-button>
-        </el-col>
-        <el-col :span="1.5" v-if="queryParams.hasLink ==='true'" v-hasPermi="['wvp:record:channelDelete']">
-          <el-button
-              type="danger"
-              plain
-              icon="Delete"
-              :disabled="multiple"
-              @click="handleDelete">
-            删除
-          </el-button>
-        </el-col>
-        <el-col :span="1.5" v-if="queryParams.hasLink !=='true'" v-hasPermi="['wvp:record:channelAdd']">
-          <el-button type="primary"
-                     plain
-                     icon="Plus"
-                     @click="handleAddByDevice">
-            按设备添加
-          </el-button>
-        </el-col>
-        <el-col :span="1.5" v-if="queryParams.hasLink ==='true'" v-hasPermi="['wvp:record:channelDelete']">
-          <el-button
-              type="danger"
-              plain
-              icon="Delete"
-              @click="handleRemoveByDevice">
-            按设备移除
-          </el-button>
-        </el-col>
-        <el-col :span="1.5" v-if="queryParams.hasLink !=='true'" v-hasPermi="['wvp:record:channelAdd']">
-          <el-button type="primary"
-                     plain
-                     icon="Plus"
-                     @click="handleAddAll">
-            添加所有通道
-          </el-button>
-        </el-col>
-        <el-col :span="1.5" v-if="queryParams.hasLink ==='true'" v-hasPermi="['wvp:record:channelDelete']">
-          <el-button
-              type="danger"
-              plain
-              icon="Delete"
-              @click="handleRemoveAll">
-            移除所有通道
-          </el-button>
-        </el-col>
-        <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-      </el-row>
-
-      <el-table v-loading="loading" :data="channelList" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="center"/>
-        <el-table-column prop="gbName" label="名称" min-width="180" align="center"/>
-        <el-table-column prop="gbDeviceId" label="编号" min-width="180" align="center"/>
-        <el-table-column prop="gbManufacturer" label="厂家" min-width="100" align="center"/>
-        <el-table-column label="类型" min-width="100" align="center">
+      <table-self v-loading="loading" :data="channelList" @selection-change="handleSelectionChange" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+        <el-table-column type="selection" :width="clacPXToVW(55)" align="center"/>
+        <el-table-column prop="gbName" label="名称" :min-width="clacPXToVW(180)" align="center"/>
+        <el-table-column prop="gbDeviceId" label="编号" :min-width="clacPXToVW(180)" align="center"/>
+        <el-table-column prop="gbManufacturer" label="厂家" :min-width="clacPXToVW(100)" align="center"/>
+        <el-table-column label="类型" :min-width="clacPXToVW(100)" align="center">
           <template #default="scope">
             <div slot="reference" class="name-wrapper">
               <el-tag effect="plain" v-if="scope.row.dataType === 1">国标设备</el-tag>
@@ -100,7 +48,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="状态" min-width="100" align="center">
+        <el-table-column label="状态" :min-width="clacPXToVW(100)" align="center">
           <template #default="scope">
             <div slot="reference" class="name-wrapper">
               <el-tag v-if="scope.row.gbStatus === 'ON'">在线</el-tag>
@@ -108,7 +56,7 @@
             </div>
           </template>
         </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination
           v-show="total > 0"
@@ -119,61 +67,18 @@
       />
 
       <el-dialog :title="title" v-model="open" width="800px" append-to-body>
-        <el-form :model="queryParamsDevice" ref="queryDeviceRef" :inline="true" v-show="showSearchDevice" label-width="68px">
-          <el-form-item label="设备名称" prop="name">
-            <el-input
-                v-model="queryParamsDevice.name"
-                placeholder="请输入设备名称"
-                clearable
-                style="width: 240px"
-                @keyup.enter="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item label="地址" prop="ip">
-            <el-input
-                v-model="queryParamsDevice.ip"
-                placeholder="请输入地址"
-                clearable
-                style="width: 240px"
-                @keyup.enter="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item label="厂家" prop="manufacturer">
-            <el-input
-                v-model="queryParamsDevice.manufacturer"
-                placeholder="请输入厂家"
-                clearable
-                style="width: 240px"
-                @keyup.enter="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item label="在线状态" prop="status">
-            <el-select v-model="queryParamsDevice.status" placeholder="请选择在线状态" style="width: 250px;"
-                       default-first-option>
-              <el-option label="在线" value="true"></el-option>
-              <el-option label="离线" value="false"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleDeviceQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetDeviceQuery">重置</el-button>
-          </el-form-item>
-        </el-form>
-
+        <div class="searchHeight_out flexRowAC" style="margin-bottom: 12px; justify-content: flex-end;">
+          <search-height-box keyword="name" placeholder="请输入设备名称等关键词" :data="deviceSearchData" @handle="deviceSearchResetFn" />
+          <export-excel-pdf />
+        </div>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="primary"
-                       plain
-                       :disabled="multipleDevice"
-                       @click="handleSure">
-              确定
-            </el-button>
+            <el-button type="primary" plain :disabled="multipleDevice" @click="handleSure">确定</el-button>
           </el-col>
-          <right-toolbar v-model:showSearch="showSearchDevice" @queryTable="getDeviceList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="deviceList" @selection-change="handleSelectionDeviceChange">
-          <el-table-column type="selection" width="55" align="center"/>
+        <table-self v-loading="loading" :data="deviceList" @selection-change="handleSelectionDeviceChange" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+          <el-table-column type="selection" :width="clacPXToVW(55)" align="center"/>
           <el-table-column prop="name" label="名称" align="center"/>
           <el-table-column prop="deviceId" label="设备编号" align="center"/>
           <el-table-column prop="channelCount" label="通道数" align="center"/>
@@ -194,7 +99,7 @@
               </div>
             </template>
           </el-table-column>
-        </el-table>
+        </table-self>
 
         <pagination
             v-show="totalDevice > 0"
@@ -209,6 +114,7 @@
 </template>
 
 <script setup name="RecordPlan">
+import { clacPXToVW } from "@/utils/index";
 import {link, listPlanRecord} from "../../../api/wvp/record.js";
 import {useRoute} from "vue-router";
 import {listDevice} from "../../../api/wvp/device.js";
@@ -219,7 +125,6 @@ const route = useRoute();
 const loading = ref(false)
 const channelList = ref([])
 const total = ref(0);
-const showSearch = ref(true);
 const multiple = ref(true);
 const selectionList = ref([]);
 const open = ref(false);
@@ -228,7 +133,6 @@ const title = ref("");
 const loadingDevice = ref(false)
 const deviceList = ref([])
 const totalDevice = ref(0);
-const showSearchDevice = ref(true);
 const multipleDevice = ref(true);
 const selectionDeviceList = ref([]);
 const typeDevice = ref("");
@@ -256,6 +160,58 @@ const data = reactive({
 
 const {queryParams, form, rules, queryParamsDevice} = toRefs(data);
 
+const toolbarButtons = computed(() => {
+  if (queryParams.value.hasLink === 'true') {
+    return [
+      { name: '按设备移除', svg: 'delete', permi: ['wvp:record:channelDelete'], clickFn: () => handleRemoveByDevice() },
+      { name: '移除所有通道', svg: 'delete', permi: ['wvp:record:channelDelete'], clickFn: () => handleRemoveAll() }
+    ]
+  }
+  return [
+    { name: '按设备添加', svg: 'edit', permi: ['wvp:record:channelAdd'], clickFn: () => handleAddByDevice() },
+    { name: '添加所有通道', svg: 'edit', permi: ['wvp:record:channelAdd'], clickFn: () => handleAddAll() }
+  ]
+});
+
+const searchData = [
+  {
+    label: '在线状态',
+    value: 'online',
+    type: 'select',
+    option: [
+      { label: '在线', value: 'true' },
+      { label: '离线', value: 'false' }
+    ],
+    default: undefined
+  },
+  {
+    label: '类型',
+    value: 'channelType',
+    type: 'select',
+    option: [
+      { label: '国标设备', value: 1 },
+      { label: '推流设备', value: 2 },
+      { label: '拉流代理', value: 3 }
+    ],
+    default: undefined
+  }
+];
+
+const deviceSearchData = [
+  { label: '地址', value: 'ip', type: 'text', default: '' },
+  { label: '厂家', value: 'manufacturer', type: 'text', default: '' },
+  {
+    label: '在线状态',
+    value: 'status',
+    type: 'select',
+    option: [
+      { label: '在线', value: 'true' },
+      { label: '离线', value: 'false' }
+    ],
+    default: undefined
+  }
+];
+
 function getList() {
   loading.value = true
   listPlanRecord(queryParams.value).then((res) => {
@@ -271,10 +227,21 @@ function handleQuery() {
   getList();
 }
 
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
+function searchResetFn(val) {
+  queryParams.value.pageNum = 1;
+  queryParams.value.query = val.query || undefined;
+  queryParams.value.online = val.online || undefined;
+  queryParams.value.channelType = val.channelType || undefined;
+  getList();
+}
+
+function deviceSearchResetFn(val) {
+  queryParamsDevice.value.pageNum = 1;
+  queryParamsDevice.value.name = val.name || undefined;
+  queryParamsDevice.value.ip = val.ip || undefined;
+  queryParamsDevice.value.manufacturer = val.manufacturer || undefined;
+  queryParamsDevice.value.status = val.status || undefined;
+  getDeviceList();
 }
 
 /** 选择条数  */
@@ -367,18 +334,6 @@ function getDeviceList() {
     totalDevice.value = res.total
     loadingDevice.value = false
   })
-}
-
-/** 搜索按钮操作 */
-function handleDeviceQuery() {
-  queryParams.value.pageNum = 1;
-  getDeviceList();
-}
-
-/** 重置按钮操作 */
-function resetDeviceQuery() {
-  proxy.resetForm("queryDeviceRef");
-  handleDeviceQuery();
 }
 
 function handleSelectionDeviceChange(selection){

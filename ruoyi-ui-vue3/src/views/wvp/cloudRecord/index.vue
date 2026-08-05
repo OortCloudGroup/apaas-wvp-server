@@ -1,54 +1,34 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="开始时间" prop="startTime">
-        <el-date-picker
-            v-model="queryParams.startTime"
-            type="datetime"
-            value-format="YYYY-MM-DD HH:mm:ss"
-            placeholder="选择日期时间">
-        </el-date-picker>
-      </el-form-item>
+    <div class="toolbar-with-search">
+      <div class="toolbar-left" />
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="query"
+          placeholder="请输入关键字"
+          :data="searchData"
+          @handle="searchResetFn"
+        />
+        <export-excel-pdf />
+      </div>
+    </div>
 
-      <el-form-item label="结束时间" prop="endTime">
-        <el-date-picker
-            v-model="queryParams.endTime"
-            type="datetime"
-            value-format="YYYY-MM-DD HH:mm:ss"
-            placeholder="选择日期时间">
-        </el-date-picker>
-      </el-form-item>
-
-      <el-form-item label="节点选择" prop="mediaServerId">
-        <el-select style="width: 250px;"
-                   v-model="queryParams.mediaServerId" placeholder="请选择节点选择">
-          <el-option
-              v-for="item in mediaServerList"
-              :key="item.id"
-              :label="item.id"
-              :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getRecordList"></right-toolbar>
-    </el-row>
-
-    <el-table v-loading="loading" :data="recordList" border>
-      <el-table-column prop="app" label="应用名" align="center"/>
-      <el-table-column prop="stream" label="流ID" width="380" align="center"/>
-      <el-table-column label="开始时间" align="center">
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="recordList"
+      current-row-key="id"
+    >
+      <el-table-column prop="app" label="应用名" align="center" show-overflow-tooltip/>
+      <el-table-column prop="stream" label="流ID" align="center" show-overflow-tooltip/>
+      <el-table-column label="开始时间" align="center" show-overflow-tooltip>
         <template #default="scope">
           {{ formatTimeStamp(scope.row.startTime) }}
         </template>
       </el-table-column>
-      <el-table-column label="结束时间" align="center">
+      <el-table-column label="结束时间" align="center" show-overflow-tooltip>
         <template #default="scope">
           {{ formatTimeStamp(scope.row.endTime) }}
         </template>
@@ -58,17 +38,31 @@
           <el-tag v-if="scope.row.timeLen">{{ formatTime(scope.row.timeLen) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="fileName" label="文件名称" align="center"/>
-      <el-table-column prop="mediaServerId" label="流媒体" align="center"/>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column prop="fileName" label="文件名称" align="center" show-overflow-tooltip/>
+      <el-table-column prop="mediaServerId" label="流媒体" align="center" show-overflow-tooltip/>
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(180)">
         <template #default="scope">
-          <el-button type="text" @click="play(scope.row)" v-hasPermi="['wvp:record:play']">播放
-          </el-button>
-          <el-button type="text" @click="downloadFile(scope.row)" v-hasPermi="['wvp:record:download']">下载
-          </el-button>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div
+              class="new_table_svg_group"
+              @click.stop="play(scope.row)"
+              v-hasPermi="['wvp:record:play']"
+            >
+              <el-icon><View /></el-icon>
+              <span>播放</span>
+            </div>
+            <div
+              class="new_table_svg_group"
+              @click.stop="downloadFile(scope.row)"
+              v-hasPermi="['wvp:record:download']"
+            >
+              <el-icon><Download /></el-icon>
+              <span>下载</span>
+            </div>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total > 0"
@@ -90,13 +84,14 @@
 import {getOnlineMediaServerList} from "../../../api/wvp/wvpMediaServer.js";
 import {getPlayUrlPath, openRtpServer} from "../../../api/wvp/record.js";
 import moment from 'moment'
+import { clacPXToVW } from "@/utils/index";
 const {proxy} = getCurrentInstance();
 const mediaServerList = ref([])
 const recordList = ref([])
 const loading = ref(false)
 const openPlay = ref(false)
 const total = ref(0);
-const showSearch = ref(true);
+const searchData = ref([]);
 
 const data = reactive({
   queryParams: {
@@ -113,16 +108,40 @@ const data = reactive({
 
 const {queryParams} = toRefs(data);
 
-/** 搜索按钮操作 */
-function handleQuery() {
+/** 高级搜索 / 重置 */
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.query = val.query || '';
+  if (val.dateRange && val.dateRange.length === 2) {
+    queryParams.value.startTime = val.dateRange[0];
+    queryParams.value.endTime = val.dateRange[1];
+  } else {
+    queryParams.value.startTime = undefined;
+    queryParams.value.endTime = undefined;
+  }
+  queryParams.value.mediaServerId = val.mediaServerId || undefined;
   getRecordList();
 }
 
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
+function initSearchData() {
+  searchData.value = [
+    {
+      label: '时间范围',
+      value: 'dateRange',
+      type: 'daterange',
+      startP: '开始时间',
+      endP: '结束时间',
+      format: 'YYYY-MM-DD HH:mm:ss',
+      default: []
+    },
+    {
+      label: '节点选择',
+      value: 'mediaServerId',
+      type: 'select',
+      option: (mediaServerList.value || []).map(item => ({ label: item.id, value: item.id })),
+      default: undefined
+    }
+  ];
 }
 
 function getRecordList() {
@@ -137,6 +156,7 @@ function getRecordList() {
 function getMediaServerList() {
   getOnlineMediaServerList().then((res) => {
     mediaServerList.value = res.data
+    initSearchData();
   })
 }
 

@@ -1,35 +1,26 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true">
-         <el-form-item label="登录地址" prop="ipaddr">
-            <el-input
-               v-model="queryParams.ipaddr"
-               placeholder="请输入登录地址"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
+      <div class="toolbar-with-search">
+         <div class="toolbar-left" />
+         <div class="searchHeight_out flexRowAC">
+            <search-height-box
+               keyword="userName"
+               placeholder="请输入用户名称、登录地址等关键词"
+               :data="searchData"
+               @handle="searchResetFn"
             />
-         </el-form-item>
-         <el-form-item label="用户名称" prop="userName">
-            <el-input
-               v-model="queryParams.userName"
-               placeholder="请输入用户名称"
-               clearable
-               style="width: 200px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
-      <el-table
+            <export-excel-pdf />
+         </div>
+      </div>
+      <table-self
+         class="new_table"
+         header-cell-class-name="header_tenant_cell"
+         stripe
          v-loading="loading"
          :data="onlineList.slice((pageNum - 1) * pageSize, pageNum * pageSize)"
          style="width: 100%;"
       >
-         <el-table-column label="序号" width="50" type="index" align="center">
+         <el-table-column label="序号" :width="clacPXToVW(55)" type="index" align="center">
             <template #default="scope">
                <span>{{ (pageNum - 1) * pageSize + scope.$index + 1 }}</span>
             </template>
@@ -41,17 +32,26 @@
          <el-table-column label="登录地点" align="center" prop="loginLocation" :show-overflow-tooltip="true" />
          <el-table-column label="操作系统" align="center" prop="os" :show-overflow-tooltip="true" />
          <el-table-column label="浏览器" align="center" prop="browser" :show-overflow-tooltip="true" />
-         <el-table-column label="登录时间" align="center" prop="loginTime" width="180">
+         <el-table-column label="登录时间" align="center" prop="loginTime">
             <template #default="scope">
                <span>{{ parseTime(scope.row.loginTime) }}</span>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(120)">
             <template #default="scope">
-               <el-button link type="primary" icon="Delete" @click="handleForceLogout(scope.row)" v-hasPermi="['monitor:online:forceLogout']">强退</el-button>
+               <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                  <div
+                     class="new_table_svg_group"
+                     @click.stop="handleForceLogout(scope.row)"
+                     v-hasPermi="['monitor:online:forceLogout']"
+                  >
+                     <el-icon><Delete /></el-icon>
+                     <span>强退</span>
+                  </div>
+               </div>
             </template>
          </el-table-column>
-      </el-table>
+      </table-self>
 
       <pagination v-show="total > 0" :total="total" v-model:page="pageNum" v-model:limit="pageSize" />
    </div>
@@ -59,6 +59,7 @@
 
 <script setup name="Online">
 import { forceLogout, list as initData } from "@/api/monitor/online";
+import { clacPXToVW } from "@/utils/index";
 
 const { proxy } = getCurrentInstance();
 
@@ -73,6 +74,10 @@ const queryParams = ref({
   userName: undefined
 });
 
+const searchData = ref([
+  { label: '登录地址', value: 'ipaddr', type: 'text', default: '' }
+]);
+
 /** 查询登录日志列表 */
 function getList() {
   loading.value = true;
@@ -83,16 +88,12 @@ function getList() {
   });
 }
 
-/** 搜索按钮操作 */
-function handleQuery() {
+/** 高级搜索 / 重置 */
+function searchResetFn(val) {
   pageNum.value = 1;
+  queryParams.value.userName = val.userName || undefined;
+  queryParams.value.ipaddr = val.ipaddr || undefined;
   getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 /** 强退按钮操作 */

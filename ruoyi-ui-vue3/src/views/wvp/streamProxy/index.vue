@@ -1,66 +1,39 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="关键字" prop="query">
-        <el-input
-            v-model="queryParams.query"
-            placeholder="请输入关键字"
-            clearable
-            style="width: 240px"
-
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
+        <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['wvp:proxy:add']">
+          <el-icon class="BtnImg"><Plus /></el-icon>新增
+        </button>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="query"
+          placeholder="请输入关键字"
+          :data="searchData"
+          @handle="searchResetFn"
         />
-      </el-form-item>
+        <export-excel-pdf />
+      </div>
+    </div>
 
-      <el-form-item label="流媒体" prop="mediaServerId">
-        <el-select style="width: 250px;" v-model="queryParams.mediaServerId"
-                   placeholder="请选择流媒体" default-first-option>
-          <el-option
-              v-for="item in mediaServerList"
-              :key="item.id"
-              :label="item.id"
-              :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="拉流状态" prop="pulling">
-        <el-select style="width: 250px;" v-model="queryParams.pulling" placeholder="请选择拉流状态"
-                   default-first-option>
-          <el-option label="正在拉流" value="true"></el-option>
-          <el-option label="尚未拉流" value="false"></el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-            type="primary"
-            plain
-            icon="Plus"
-            @click="handleAdd"
-            v-hasPermi="['wvp:proxy:add']"
-        >新增
-        </el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getStreamProxyList"></right-toolbar>
-    </el-row>
-
-    <el-table v-loading="loading" :data="streamProxyList" border>
-      <el-table-column prop="app" label="流应用名" min-width="120" show-overflow-tooltip align="center" fixed/>
-      <el-table-column prop="stream" label="流ID" min-width="120" show-overflow-tooltip align="center" fixed/>
-      <el-table-column label="流地址" min-width="200" align="center" show-overflow-tooltip>
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="streamProxyList"
+      current-row-key="id"
+    >
+      <el-table-column prop="app" label="流应用名" show-overflow-tooltip align="center" fixed/>
+      <el-table-column prop="stream" label="流ID" show-overflow-tooltip align="center" fixed/>
+      <el-table-column label="流地址" align="center" show-overflow-tooltip>
         <template #default="scope">
           {{ scope.row.srcUrl }}
         </template>
       </el-table-column>
-      <el-table-column prop="mediaServerId" label="流媒体" min-width="150" align="center"/>
-      <el-table-column label="代理方式" width="100" align="center">
+      <el-table-column prop="mediaServerId" label="流媒体" align="center" show-overflow-tooltip/>
+      <el-table-column label="代理方式" align="center">
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             {{ scope.row.type === "default" ? "默认" : "FFMPEG代理" }}
@@ -68,8 +41,8 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="gbDeviceId" label="国标编码" min-width="120" show-overflow-tooltip align="center"/>
-      <el-table-column label="拉流状态" min-width="120" align="center">
+      <el-table-column prop="gbDeviceId" label="国标编码" show-overflow-tooltip align="center"/>
+      <el-table-column label="拉流状态" align="center">
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag v-if="scope.row.pulling">正在拉流</el-tag>
@@ -77,7 +50,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="启用" min-width="120" align="center">
+      <el-table-column label="启用" align="center">
         <template #default="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag v-if="scope.row.enable">已启用</el-tag>
@@ -85,31 +58,56 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" min-width="150" show-overflow-tooltip align="center"/>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip align="center"/>
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <el-button @click="playPush(scope.row)" type="text" :loading="scope.row.playLoading"
-                     v-hasPermi="['wvp:proxy:play']">
-            播放
-          </el-button>
-          <el-button v-hasPermi="['wvp:proxy:stop']" style="color: #f56c6c" type="text" v-if="scope.row.pulling"
-                     @click="onStopPlay(scope.row)">
-            停止
-          </el-button>
-          <el-button type="text" @click="handleChannelConfiguration(scope.row)" v-hasPermi="['wvp:channel:edit']">
-            通道配置
-          </el-button>
-          <el-button type="text" @click="handleEdit(scope.row)" v-hasPermi="['wvp:proxy:edit']">
-            编辑
-          </el-button>
-          <el-button type="text" @click="handleDelete(scope.row)" v-hasPermi="['wvp:proxy:delete']">
-            删除
-          </el-button>
-          <el-button type="text" @click="queryCloudRecords(scope.row)" v-hasPermi="['wvp:record:list']">云端录像
-          </el-button>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div
+              class="new_table_svg_group"
+              :class="{ 'is-disabled': scope.row.playLoading }"
+              @click.stop="!scope.row.playLoading && playPush(scope.row)"
+              v-hasPermi="['wvp:proxy:play']"
+            >
+              <el-icon><View /></el-icon>
+              <span>播放</span>
+            </div>
+            <div
+              v-if="scope.row.pulling"
+              class="new_table_svg_group"
+              @click.stop="onStopPlay(scope.row)"
+              v-hasPermi="['wvp:proxy:stop']"
+            >
+              <span>停止</span>
+            </div>
+            <el-dropdown
+              @command="(command)=>{moreClick(command, scope.row)}"
+              v-if="checkPermi(['wvp:channel:edit', 'wvp:proxy:edit', 'wvp:proxy:delete', 'wvp:record:list'])"
+            >
+              <div class="new_table_svg_group" @click.stop>
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="handleChannelConfiguration" v-if="checkPermi(['wvp:channel:edit'])">
+                    通道配置
+                  </el-dropdown-item>
+                  <el-dropdown-item command="handleEdit" v-if="checkPermi(['wvp:proxy:edit'])">
+                    编辑
+                  </el-dropdown-item>
+                  <el-dropdown-item command="handleDelete" style="color: #f56c6c" v-if="checkPermi(['wvp:proxy:delete'])">
+                    删除
+                  </el-dropdown-item>
+                  <el-dropdown-item command="queryCloudRecords" v-if="checkPermi(['wvp:record:list'])">
+                    云端录像
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total > 0"
@@ -608,6 +606,8 @@ import H265web from "@/components/H265web/index.vue";
 import StreamDropdown from "@/views/wvp/channel/components/streamDropdown.vue";
 import MediaInfo from "@/views/wvp/channel/components/mediaInfo.vue";
 import {DocumentCopy} from '@element-plus/icons-vue'
+import {checkPermi} from "@/utils/permission";
+import { clacPXToVW } from "@/utils/index";
 
 import router from "@/router";
 const {proxy} = getCurrentInstance();
@@ -615,7 +615,25 @@ const {proxy} = getCurrentInstance();
 const streamProxyList = ref([]);
 const mediaServerList = ref([]);
 const loading = ref(false);
-const showSearch = ref(true);
+const searchData = ref([
+  {
+    label: '流媒体',
+    value: 'mediaServerId',
+    type: 'select',
+    option: [],
+    default: undefined
+  },
+  {
+    label: '拉流状态',
+    value: 'pulling',
+    type: 'select',
+    option: [
+      { label: '正在拉流', value: 'true' },
+      { label: '尚未拉流', value: 'false' }
+    ],
+    default: undefined
+  }
+]);
 const total = ref(0);
 const title = ref("");
 const rtcUrl = ref("");
@@ -712,19 +730,35 @@ function initData() {
   getStreamProxyList();
   getOnlineMediaServerList().then((res) => {
     mediaServerList.value = res.data;
+    searchData.value = [
+      {
+        label: '流媒体',
+        value: 'mediaServerId',
+        type: 'select',
+        option: (mediaServerList.value || []).map(item => ({ label: item.id, value: item.id })),
+        default: undefined
+      },
+      {
+        label: '拉流状态',
+        value: 'pulling',
+        type: 'select',
+        option: [
+          { label: '正在拉流', value: 'true' },
+          { label: '尚未拉流', value: 'false' }
+        ],
+        default: undefined
+      }
+    ];
   })
 }
 
 /** 搜索按钮操作 */
-function handleQuery() {
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.query = val.query || undefined;
+  queryParams.value.mediaServerId = val.mediaServerId || undefined;
+  queryParams.value.pulling = val.pulling || undefined;
   getStreamProxyList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 /** 表单重置 */
@@ -881,6 +915,18 @@ function chooseGroupFun() {
 function gbParentOnSubmit(deviceId, businessGroupId) {
   form.value.gbBusinessGroupId = businessGroupId;
   form.value.gbParentId = deviceId;
+}
+
+function moreClick(command, row) {
+  if (command === 'handleChannelConfiguration') {
+    handleChannelConfiguration(row)
+  } else if (command === 'handleEdit') {
+    handleEdit(row)
+  } else if (command === 'handleDelete') {
+    handleDelete(row)
+  } else if (command === 'queryCloudRecords') {
+    queryCloudRecords(row)
+  }
 }
 
 function queryCloudRecords(row) {

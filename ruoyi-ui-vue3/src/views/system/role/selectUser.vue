@@ -1,33 +1,13 @@
 <template>
    <!-- 授权用户 -->
    <el-dialog title="选择用户" v-model="visible" width="800px" top="5vh" append-to-body>
-      <el-form :model="queryParams" ref="queryRef" :inline="true">
-         <el-form-item label="用户名称" prop="userName">
-            <el-input
-               v-model="queryParams.userName"
-               placeholder="请输入用户名称"
-               clearable
-               style="width: 180px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item label="手机号码" prop="phonenumber">
-            <el-input
-               v-model="queryParams.phonenumber"
-               placeholder="请输入手机号码"
-               clearable
-               style="width: 180px"
-               @keyup.enter="handleQuery"
-            />
-         </el-form-item>
-         <el-form-item>
-            <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-            <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-         </el-form-item>
-      </el-form>
+      <div class="searchHeight_out flexRowAC" style="margin-bottom: 12px; justify-content: flex-end;">
+         <search-height-box keyword="userName" placeholder="请输入用户名称等关键词" :data="searchData" @handle="searchResetFn" />
+         <export-excel-pdf />
+      </div>
       <el-row>
-         <el-table @row-click="clickRow" ref="refTable" :data="userList" @selection-change="handleSelectionChange" height="260px">
-            <el-table-column type="selection" width="55"></el-table-column>
+         <table-self @row-click="clickRow" ref="refTable" :data="userList" @selection-change="handleSelectionChange" height="260px" class="new_table" header-cell-class-name="header_tenant_cell" stripe>
+            <el-table-column type="selection" :width="clacPXToVW(55)"></el-table-column>
             <el-table-column label="用户名称" prop="userName" :show-overflow-tooltip="true" />
             <el-table-column label="用户昵称" prop="nickName" :show-overflow-tooltip="true" />
             <el-table-column label="邮箱" prop="email" :show-overflow-tooltip="true" />
@@ -37,12 +17,12 @@
                   <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
                </template>
             </el-table-column>
-            <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+            <el-table-column label="创建时间" align="center" prop="createTime" :width="clacPXToVW(180)">
                <template #default="scope">
                   <span>{{ parseTime(scope.row.createTime) }}</span>
                </template>
             </el-table-column>
-         </el-table>
+         </table-self>
          <pagination
             v-show="total > 0"
             :total="total"
@@ -61,6 +41,7 @@
 </template>
 
 <script setup name="SelectUser">
+import { clacPXToVW } from "@/utils/index";
 import { authUserSelectAll, unallocatedUserList } from "@/api/system/role";
 
 const props = defineProps({
@@ -84,6 +65,10 @@ const queryParams = reactive({
   userName: undefined,
   phonenumber: undefined
 });
+
+const searchData = [
+  { label: '手机号码', value: 'phonenumber', type: 'text', default: '' }
+];
 
 // 显示弹框
 function show() {
@@ -116,10 +101,11 @@ function handleQuery() {
   getList();
 }
 
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
+function searchResetFn(val) {
+  queryParams.pageNum = 1;
+  queryParams.userName = val.userName || undefined;
+  queryParams.phonenumber = val.phonenumber || undefined;
+  getList();
 }
 
 const emit = defineEmits(["ok"]);

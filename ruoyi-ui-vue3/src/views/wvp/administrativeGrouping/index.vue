@@ -1,42 +1,47 @@
 <template>
   <div class="app-container">
-    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+    <el-tabs v-model="activeName" class="work-tabs" @tab-click="handleClick">
       <el-tab-pane label="行政区划" name="region">
 
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button
-                type="info"
-                plain
-                icon="Sort"
-                @click="toggleExpandAll"
-            >展开/折叠
-            </el-button>
-          </el-col>
+        <div class="toolbar-with-search">
+          <div class="toolbar-left">
+            <button-group :button-list="toolbarButtons" />
+          </div>
           <right-toolbar :search="false" @queryTable="getList"></right-toolbar>
-        </el-row>
+        </div>
 
-        <el-table
+        <table-self
             v-if="refreshTable"
             v-loading="loading"
             :data="treeRegionData"
             row-key="id"
             :default-expand-all="isExpandAll"
             :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-        >
+         class="new_table" header-cell-class-name="header_tenant_cell" stripe>
           <el-table-column prop="name" label="名称" :show-overflow-tooltip="true"></el-table-column>
           <el-table-column prop="deviceId" label="设备编号" :show-overflow-tooltip="true"
           ></el-table-column>
           <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true"
           ></el-table-column>
-          <el-table-column label="操作" align="center" width="210" class-name="small-padding fixed-width">
+          <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
             <template #default="scope">
-              <el-button link type="primary" @click="handleRegionUpdate(scope.row)" v-if="scope.row.id" v-hasPermi="['wvp:region:edit']">修改</el-button>
-              <el-button link type="primary" @click="handleRegionAdd(scope.row)" v-hasPermi="['wvp:region:add']">新增</el-button>
-              <el-button link type="primary" @click="handleRegionDelete(scope.row)" v-if="scope.row.id" v-hasPermi="['wvp:region:delete']">删除</el-button>
+              <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                <div class="new_table_svg_group" @click.stop="handleRegionUpdate(scope.row)" v-if="scope.row.id" v-hasPermi="['wvp:region:edit']">
+                  <el-icon><Edit /></el-icon>
+                  <span>修改</span>
+                </div>
+                <div class="new_table_svg_group" @click.stop="handleRegionAdd(scope.row)" v-hasPermi="['wvp:region:add']">
+                  <el-icon><Plus /></el-icon>
+                  <span>新增</span>
+                </div>
+                <div class="new_table_svg_group" @click.stop="handleRegionDelete(scope.row)" v-if="scope.row.id" v-hasPermi="['wvp:region:delete']">
+                  <el-icon><Delete /></el-icon>
+                  <span>删除</span>
+                </div>
+              </div>
             </template>
           </el-table-column>
-        </el-table>
+        </table-self>
 
         <el-dialog :title="title" v-model="openRegion" width="1000px" append-to-body>
           <el-tabs v-model="activeKeyRegion" style="padding: 0 1rem; margin: auto 0" @tab-click="getRegionList">
@@ -122,40 +127,45 @@
         </el-dialog>
       </el-tab-pane>
       <el-tab-pane label="业务分组" name="group">
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button
-                type="info"
-                plain
-                icon="Sort"
-                @click="toggleExpandAll"
-            >展开/折叠
-            </el-button>
-          </el-col>
+        <div class="toolbar-with-search">
+          <div class="toolbar-left">
+            <button-group :button-list="toolbarButtons" />
+          </div>
           <right-toolbar :search="false" @queryTable="getList"></right-toolbar>
-        </el-row>
+        </div>
 
-        <el-table
+        <table-self
             v-if="refreshTable"
             v-loading="loading"
             :data="treeGroupData"
             row-key="id"
             :default-expand-all="isExpandAll"
             :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-        >
+         class="new_table" header-cell-class-name="header_tenant_cell" stripe>
           <el-table-column prop="name" label="名称" :show-overflow-tooltip="true"></el-table-column>
           <el-table-column prop="deviceId" label="设备编号" :show-overflow-tooltip="true"
           ></el-table-column>
           <el-table-column prop="createTime" label="创建时间" :show-overflow-tooltip="true"
           ></el-table-column>
-          <el-table-column label="操作" align="center" width="210" class-name="small-padding fixed-width">
+          <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
             <template #default="scope">
-              <el-button link type="primary" @click="handleGroupUpdate(scope.row)" v-if="scope.row.id" v-hasPermi="['wvp:group:edit']">修改</el-button>
-              <el-button link type="primary" @click="handleGroupAdd(scope.row)" v-hasPermi="['wvp:group:add']">新增</el-button>
-              <el-button link type="primary" @click="handleGroupDelete(scope.row)" v-if="scope.row.id" v-hasPermi="['wvp:group:delete']">删除</el-button>
+              <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+                <div class="new_table_svg_group" @click.stop="handleGroupUpdate(scope.row)" v-if="scope.row.id" v-hasPermi="['wvp:group:edit']">
+                  <el-icon><Edit /></el-icon>
+                  <span>修改</span>
+                </div>
+                <div class="new_table_svg_group" @click.stop="handleGroupAdd(scope.row)" v-hasPermi="['wvp:group:add']">
+                  <el-icon><Plus /></el-icon>
+                  <span>新增</span>
+                </div>
+                <div class="new_table_svg_group" @click.stop="handleGroupDelete(scope.row)" v-if="scope.row.id" v-hasPermi="['wvp:group:delete']">
+                  <el-icon><Delete /></el-icon>
+                  <span>删除</span>
+                </div>
+              </div>
             </template>
           </el-table-column>
-        </el-table>
+        </table-self>
 
         <el-dialog :title="title" v-model="openGroup" width="1000px" append-to-body>
           <el-form ref="formGroupRef" :model="formGroup" :rules="rulesGroup" label-width="80px">
@@ -194,6 +204,7 @@
 </template>
 
 <script setup name="AdministrativeGrouping">
+import { clacPXToVW } from "@/utils/index";
 import ChannelCode from "../../components/common/channelCode.vue"
 import ChooseCivilCode from "../../components/common/chooseCivilCode.vue"
 import {addRegion, deleteRegion, getAllChild, queryForTree, updateRegion} from "../../../api/wvp/region.js";
@@ -229,6 +240,10 @@ const treeGroupData = ref([])
 const openGroup = ref(false);
 const channelCodeRef = ref(null);
 const chooseCivilCodeRef = ref(null);
+
+const toolbarButtons = computed(() => [
+  { name: '展开/折叠', svg: 'list', clickFn: () => toggleExpandAll() }
+]);
 
 const {formRegion, rulesRegion, formGroup, rulesGroup} = toRefs(data);
 
@@ -567,10 +582,48 @@ onMounted(() => {
 })
 </script>
 
-<style>
+<style scoped lang="scss">
 .show-code-item {
   text-align: center;
   font-size: 3rem;
+}
+
+:deep(.work-tabs) {
+  --el-tabs-header-height: 32px;
+
+  .el-tabs__header {
+    margin: 0 0 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .el-tabs__nav-wrap::after {
+    display: none;
+  }
+
+  .el-tabs__item {
+    width: 96px;
+    height: 32px;
+    padding: 0;
+    line-height: 32px;
+    text-align: center;
+    color: #333;
+    font-size: 14px;
+    font-weight: 400;
+    box-sizing: border-box;
+  }
+
+  .el-tabs__item.is-active {
+    color: var(--el-color-primary);
+  }
+
+  .el-tabs__item:hover {
+    color: var(--el-color-primary);
+  }
+
+  .el-tabs__active-bar {
+    height: 2px;
+    background-color: var(--el-color-primary);
+  }
 }
 </style>
 

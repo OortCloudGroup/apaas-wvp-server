@@ -1,48 +1,52 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="关键字" prop="query">
-        <el-input
-            v-model="queryParams.query"
-            placeholder="请输入关键字"
-            clearable
-            style="width: 240px"
-            @keyup.enter="handleQuery"
+    <div class="toolbar-with-search">
+      <div class="toolbar-left">
+        <button type="button" class="exportBtn newBtn flexRowAC" @click="handleAdd" v-hasPermi="['wvp:record:add']">
+          <el-icon class="BtnImg"><Plus /></el-icon>新增
+        </button>
+      </div>
+      <div class="searchHeight_out flexRowAC">
+        <search-height-box
+          keyword="query"
+          placeholder="请输入关键字"
+          :data="searchData"
+          @handle="searchResetFn"
         />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
+        <export-excel-pdf />
+      </div>
+    </div>
 
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-            type="primary"
-            plain
-            icon="Plus"
-            @click="handleAdd"
-            v-hasPermi="['wvp:record:add']"
-        >新增
-        </el-button>
-      </el-col>
-      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
-
-    <el-table v-loading="loading" :data="recordList" border>
-      <el-table-column prop="name" label="名称" align="center"/>
+    <table-self
+      class="new_table"
+      header-cell-class-name="header_tenant_cell"
+      stripe
+      v-loading="loading"
+      :data="recordList"
+      current-row-key="id"
+    >
+      <el-table-column prop="name" label="名称" align="center" show-overflow-tooltip/>
       <el-table-column prop="channelCount" label="关联通道" align="center"/>
       <el-table-column prop="updateTime" label="更新时间" align="center"/>
       <el-table-column prop="createTime" label="创建时间" align="center"/>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(220)">
         <template #default="scope">
-          <el-button type="text" @click="handleLink(scope.row)" v-hasPermi="['wvp:record:channelList']">关联通道</el-button>
-          <el-button type="text" @click="handleEdit(scope.row)"  v-hasPermi="['wvp:record:edit']">编辑</el-button>
-          <el-button type="text" @click="handleDelete(scope.row)"  v-hasPermi="['wvp:record:delete']">删除</el-button>
+          <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
+            <div class="new_table_svg_group" @click.stop="handleLink(scope.row)" v-hasPermi="['wvp:record:channelList']">
+              <span>关联通道</span>
+            </div>
+            <div class="new_table_svg_group" @click.stop="handleEdit(scope.row)" v-hasPermi="['wvp:record:edit']">
+              <el-icon><Edit /></el-icon>
+              <span>编辑</span>
+            </div>
+            <div class="new_table_svg_group" @click.stop="handleDelete(scope.row)" v-hasPermi="['wvp:record:delete']">
+              <el-icon><Delete /></el-icon>
+              <span>删除</span>
+            </div>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+    </table-self>
 
     <pagination
         v-show="total > 0"
@@ -76,12 +80,13 @@ import {addRecord, deleteRecord, getRecord, listRecord, updateRecord} from "../.
 import ByteWeekTimePicker from "./byteWeekTimePicker.vue";
 import {ElMessage} from "element-plus";
 import router from "@/router";
+import { clacPXToVW } from "@/utils/index";
 const {proxy} = getCurrentInstance();
 
 const loading = ref(false);
 const total = ref(0);
 const recordList = ref([]);
-const showSearch = ref(true);
+const searchData = ref([]);
 const title = ref("");
 const open = ref(false);
 const byteTime = ref("");
@@ -111,15 +116,10 @@ function getList() {
 }
 
 /** 搜索按钮操作 */
-function handleQuery() {
+function searchResetFn(val) {
   queryParams.value.pageNum = 1;
+  queryParams.value.query = val.query || undefined;
   getList();
-}
-
-/** 重置按钮操作 */
-function resetQuery() {
-  proxy.resetForm("queryRef");
-  handleQuery();
 }
 
 /** 表单重置 */
