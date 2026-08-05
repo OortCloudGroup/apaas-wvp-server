@@ -5,6 +5,36 @@ import createVitePlugins from './vite/plugins'
 const host = "localhost"
 const post = "2001"
 
+/**
+ * 构建时向 index.html 注入打包时间
+ */
+function createBuildTimePlugin() {
+  const buildTime = new Date().toLocaleString('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    hour12: false
+  })
+
+  return {
+    name: 'vite-plugin-build-time',
+    apply: 'build',
+    transformIndexHtml() {
+      return {
+        tags: [
+          {
+            tag: 'div',
+            attrs: {
+              id: 'build-time',
+              style: 'display: none;'
+            },
+            children: `buildTime: ${buildTime}`,
+            injectTo: 'body'
+          }
+        ]
+      }
+    }
+  }
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd())
@@ -12,7 +42,10 @@ export default defineConfig(({ mode, command }) => {
 
   return {
     base: './',
-    plugins: createVitePlugins(env, command === 'build'),
+    plugins: [
+      ...createVitePlugins(env, command === 'build'),
+      createBuildTimePlugin()
+    ],
 
     resolve: {
       alias: {
