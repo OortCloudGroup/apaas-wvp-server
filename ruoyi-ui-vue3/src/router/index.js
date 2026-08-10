@@ -48,6 +48,19 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/gbmanger/cloudRecord',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/wvp/cloudRecord/index'),
+        name: 'CloudRecord',
+        meta: { title: '云端录像' }
+      }
+    ]
+  },
+  {
     path: "/:pathMatch(.*)*",
     component: () => import('@/views/error/404'),
     hidden: true

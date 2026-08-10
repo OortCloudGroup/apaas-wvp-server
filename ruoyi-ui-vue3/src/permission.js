@@ -12,6 +12,7 @@ import usePermissionStore from '@/store/modules/permission'
 NProgress.configure({ showSpinner: false })
 
 const whiteList = ['/login', '/register']
+const platformDirectRoutes = ['/gbmanger/cloudRecord']
 
 const isWhiteList = (path) => {
   return whiteList.some(pattern => isPathMatch(pattern, path))
@@ -26,6 +27,9 @@ router.beforeEach((to, from, next) => {
       next({ path: '/' })
       NProgress.done()
     } else if (isWhiteList(to.path)) {
+      next()
+    } else if (platformDirectRoutes.includes(to.path)) {
+      // 平台入口只使用 URL 中携带的 accessToken，后端 /api 接口无需传统用户菜单初始化。
       next()
     } else {
       if (useUserStore().roles.length === 0) {

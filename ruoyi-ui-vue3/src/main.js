@@ -18,6 +18,7 @@ import directive from './directive' // directive
 // 注册指令
 import plugins from './plugins' // plugins
 import { download } from '@/utils/request'
+import { setToken } from '@/utils/auth'
 
 // svg图标
 import 'virtual:svg-icons-register'
@@ -48,6 +49,12 @@ import ExportExcelPdf from '@/components/ExportExcelPdf'
 import ButtonGroup from '@/components/ButtonGroup'
 import TableSelf from '@/components/TableSelf'
 import { clacPXToVW } from '@/utils/index'
+
+// 平台从 URL 传入 accessToken 时，需要在路由守卫执行前保存，避免落入传统登录流程。
+const platformAccessToken = new URL(window.location.href).searchParams.get('accessToken')
+if (platformAccessToken) {
+  setToken(platformAccessToken)
+}
 
 const app = createApp(App)
 
