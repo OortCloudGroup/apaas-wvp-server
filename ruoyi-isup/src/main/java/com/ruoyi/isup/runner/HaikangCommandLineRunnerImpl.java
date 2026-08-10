@@ -4,6 +4,7 @@ import com.ruoyi.isup.common.osSelect;
 import com.ruoyi.isup.linux64.service.AlarmService;
 import com.ruoyi.isup.linux64.service.CmsService;
 import com.ruoyi.isup.linux64.service.SsService;
+import com.ruoyi.isup.config.IsupLinuxConfig;
 import com.ruoyi.isup.service.AlarmService.Alarm;
 import com.ruoyi.isup.service.cmsService.CMS;
 import com.ruoyi.isup.service.smsService.SMS;
@@ -54,9 +55,12 @@ public class HaikangCommandLineRunnerImpl implements CommandLineRunner {
     @Autowired
     private SsService ssService;
 
+    @Autowired
+    private IsupLinuxConfig isupLinuxConfig;
+
     @Override
     public void run(String... args) throws Exception {
-        if(osSelect.isLinux()){
+        if(osSelect.isLinux() && isupLinuxConfig.isEnabled()){
             //初始化报警服务
             alarmService.init();
             alarmService.startAlarmListen();
@@ -66,7 +70,7 @@ public class HaikangCommandLineRunnerImpl implements CommandLineRunner {
             //初始化注册服务
             cmsService.init();
             cmsService.startCmsListen();
-        } else {
+        } else if (osSelect.isWindows()) {
             //初始化报警服务
 //            alarm.eAlarm_Init();
 //            alarm.startAlarmListen();
@@ -82,6 +86,8 @@ public class HaikangCommandLineRunnerImpl implements CommandLineRunner {
             //初始化注册服务
             cms.cMS_Init();
             cms.startCmsListen();
+        } else if (osSelect.isLinux()) {
+            log.warn("Linux ISUP 原生服务未启用，跳过 ISUP SDK 初始化；如需启用请设置 isup-linux64.enabled=true");
         }
 
 

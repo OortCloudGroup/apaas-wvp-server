@@ -14,6 +14,13 @@ import org.springframework.stereotype.Component;
 @Data
 public class IsupLinuxConfig {
     /**
+     * 是否在 Linux 启动时初始化 ISUP 原生服务。
+     * 当前仓库附带的 ISUP SDK 在部分运行时中会在 OpenSSL 初始化阶段触发 native crash，
+     * 因此默认关闭；确认 SDK 与运行时兼容后再开启。
+     */
+    private boolean enabled = false;
+
+    /**
      * 注册服务器监听地址（服务器本地地址）
      */
     private String cmsServerIP;
