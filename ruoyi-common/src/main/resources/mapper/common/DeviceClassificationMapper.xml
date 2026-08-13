@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.common.deviceclassification.mapper.DeviceClassificationMapper">
+    <resultMap id="CategoryResult" type="com.ruoyi.common.deviceclassification.domain.DeviceCategory">
+        <id property="id" column="id"/>
+        <result property="categoryType" column="category_type"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="ancestors" column="ancestors"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="sortNum" column="sort_num"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <resultMap id="RelationResult" type="com.ruoyi.common.deviceclassification.domain.DeviceCategoryRelation">
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryType" column="category_type"/>
+        <result property="protocolType" column="protocol_type"/>
+        <result property="deviceKey" column="device_key"/>
+        <result property="createBy" column="create_by"/>
+    </resultMap>
+
+    <select id="selectCategoryById" resultMap="CategoryResult">
+        select * from wvp_device_category where id = #{id}
+    </select>
+    <select id="selectCategoriesByType" resultMap="CategoryResult">
+        select * from wvp_device_category where category_type = #{categoryType}
+        order by sort_num, id
+    </select>
+    <select id="countSiblingName" resultType="int">
+        select count(1) from wvp_device_category
+        where category_type = #{categoryType} and parent_id = #{parentId} and category_name = #{categoryName}
+        <if test="excludeId != null">and id != #{excludeId}</if>
+    </select>
+    <insert id="insertCategory" useGeneratedKeys="true" keyProperty="id">
+        insert into wvp_device_category(category_type, parent_id, ancestors, category_name, sort_num,
+            create_by, create_time, update_by, update_time)
+        values(#{categoryType}, #{parentId}, #{ancestors}, #{categoryName}, #{sortNum},
+            #{createBy}, now(), #{updateBy}, now())
+    </insert>
+    <update id="updateCategory">
+        update wvp_device_category set parent_id=#{parentId}, ancestors=#{ancestors}, category_name=#{categoryName},
+            sort_num=#{sortNum}, update_by=#{updateBy}, update_time=now() where id=#{id}
+    </update>
+    <update id="updateDescendantAncestors">
+        update wvp_device_category
+        set ancestors = concat(#{newPrefix}, substring(ancestors, length(#{oldPrefix}) + 1)), update_time=now()
+        where find_in_set(#{categoryId}, ancestors)
+    </update>
+    <select id="countChildren" resultType="int">select count(1) from wvp_device_category where parent_id=#{id}</select>
+    <select id="countRelations" resultType="int">select count(1) from wvp_device_category_relation where category_id=#{categoryId}</select>
+    <delete id="deleteCategory">delete from wvp_device_category where id=#{id}</delete>
+    <select id="selectRelations" resultMap="RelationResult">
+        select category_id, category_type, protocol_type, device_key, create_by
+        from wvp_device_category_relation where protocol_type=#{protocolType} and category_type=#{categoryType}
+    </select>
+    <select id="selectDeviceRelations" resultMap="RelationResult">
+        select category_id, category_type, protocol_type, device_key, create_by
+        from wvp_device_category_relation where protocol_type=#{protocolType} and device_key=#{deviceKey}
+    </select>
+    <delete id="deleteDeviceTypeRelations">
+        delete from wvp_device_category_relation
+        where protocol_type=#{protocolType} and device_key=#{deviceKey} and category_type=#{categoryType}
+    </delete>
+    <insert id="insertRelation">
+        insert into wvp_device_category_relation(category_id, category_type, protocol_type, device_key, create_by, create_time)
+        values(#{categoryId}, #{categoryType}, #{protocolType}, #{deviceKey}, #{createBy}, now())
+    </insert>
+    <delete id="deleteDeviceRelations">
+        delete from wvp_device_category_relation where protocol_type=#{protocolType}
+        and device_key in
+        <foreach collection="deviceKeys" item="key" open="(" separator="," close=")">#{key}</foreach>
+    </delete>
+    <select id="countProtocolDevices" resultType="int">
+        <choose>
+            <when test="protocolType == 'ISUP'">select count(1) from isup_device</when>
+            <when test="protocolType == 'RTSP'">select count(1) from rtsp_device</when>
+            <when test="protocolType == 'ONVIF'">select count(1) from onvif_device</when>
+            <when test="protocolType == 'GB28181'">select count(1) from wvp_device</when>
+            <when test="protocolType == 'DAHUA'">select count(1) from dahua_device</when>
+            <when test="protocolType == 'VLSTREAM'">select count(1) from wvp_vlstream_device</when>
+            <otherwise>select 0</otherwise>
+        </choose>
+    </select>
+</mapper>

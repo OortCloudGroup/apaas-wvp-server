@@ -1,4 +1,5 @@
 <template>
+  <DeviceClassificationLayout protocol-type="DAHUA" :selected-device-keys="classificationDeviceKeys" @filter-change="handleClassificationFilter" @assigned="getList">
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="所属部门" prop="deptId">
@@ -600,6 +601,7 @@
 
 
   </div>
+  </DeviceClassificationLayout>
 </template>
 
 <script setup name="DahuaDevice">
@@ -641,6 +643,7 @@ import {ElMessage} from "element-plus";
 import {startPlay} from "../../../api/wvp/push.js";
 import {proxyPlay, stopProxy} from "@/api/dahua/zlmApi.js";
 import useClipboard from "vue-clipboard3";
+import DeviceClassificationLayout from '@/components/DeviceClassificationLayout/index.vue'
 const { toClipboard } = useClipboard()
 
 const {proxy} = getCurrentInstance();
@@ -664,6 +667,8 @@ const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
+const classificationDeviceKeys = ref([]);
+function handleClassificationFilter(filter) { Object.assign(queryParams.value, filter, { pageNum: 1 }); getList(); }
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -917,6 +922,7 @@ function resetQuery() {
 // 多选框选中数据
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.id);
+  classificationDeviceKeys.value = selection.map(item => String(item.id));
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }

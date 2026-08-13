@@ -7,6 +7,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.deviceclassification.service.DeviceClassificationService;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.dahua.domain.DahuaDevice;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,6 +37,9 @@ import java.util.stream.Collectors;
 public class DahuaDeviceController extends BaseController {
     @Autowired
     private IDahuaDeviceService dahuaDeviceService;
+
+    @Autowired
+    private DeviceClassificationService classificationService;
 
     @Autowired
     private DahuaCommandLineRunnerImpl commandLineRunnerimpl;
@@ -117,7 +122,9 @@ public class DahuaDeviceController extends BaseController {
     @Log(title = "大华设备", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
-        return toAjax(dahuaDeviceService.deleteDahuaDeviceByIds(ids));
+        int rows = dahuaDeviceService.deleteDahuaDeviceByIds(ids);
+        if (rows > 0) classificationService.removeDeviceRelations("DAHUA", Arrays.stream(ids).map(String::valueOf).collect(Collectors.toList()));
+        return toAjax(rows);
     }
 
     /**

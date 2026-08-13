@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.vlstream.mapper.VlStreamDeviceStreamMapper">
+    <resultMap id="StreamResult" type="com.ruoyi.vlstream.domain.VlStreamDeviceStream">
+        <id property="id" column="id"/><result property="deviceRowId" column="device_row_id"/>
+        <result property="channelId" column="channel_id"/><result property="streamName" column="stream_name"/>
+        <result property="streamType" column="stream_type"/><result property="protocol" column="protocol"/>
+        <result property="sourceUrl" column="source_url"/><result property="defaultStream" column="is_default"/>
+        <result property="available" column="available"/><result property="zlmApp" column="zlm_app"/>
+        <result property="zlmStream" column="zlm_stream"/><result property="zlmProxyKey" column="zlm_proxy_key"/>
+        <result property="lastReportTime" column="last_report_time"/><result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <sql id="columns">id,device_row_id,channel_id,stream_name,stream_type,protocol,source_url,is_default,available,
+        zlm_app,zlm_stream,zlm_proxy_key,last_report_time,create_time,update_time</sql>
+    <select id="selectById" resultMap="StreamResult">select <include refid="columns"/> from wvp_vlstream_device_stream where id=#{id}</select>
+    <select id="selectByKey" resultMap="StreamResult">select <include refid="columns"/> from wvp_vlstream_device_stream where device_row_id=#{deviceRowId} and channel_id=#{channelId} and stream_type=#{streamType}</select>
+    <select id="selectAvailableByDeviceId" resultMap="StreamResult">select <include refid="columns"/> from wvp_vlstream_device_stream where device_row_id=#{deviceRowId} and available=1 order by is_default desc,channel_id,stream_type</select>
+    <update id="markUnavailable">update wvp_vlstream_device_stream set available=0,update_time=#{updateTime} where device_row_id=#{deviceRowId}</update>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into wvp_vlstream_device_stream(device_row_id,channel_id,stream_name,stream_type,protocol,source_url,is_default,available,last_report_time,create_time,update_time)
+        values(#{deviceRowId},#{channelId},#{streamName},#{streamType},#{protocol},#{sourceUrl},#{defaultStream},#{available},#{lastReportTime},#{createTime},#{updateTime})
+    </insert>
+    <update id="update">
+        update wvp_vlstream_device_stream set stream_name=#{streamName},protocol=#{protocol},source_url=#{sourceUrl},
+          is_default=#{defaultStream},available=#{available},zlm_app=#{zlmApp},zlm_stream=#{zlmStream},zlm_proxy_key=#{zlmProxyKey},
+          last_report_time=#{lastReportTime},update_time=#{updateTime} where id=#{id}
+    </update>
+</mapper>

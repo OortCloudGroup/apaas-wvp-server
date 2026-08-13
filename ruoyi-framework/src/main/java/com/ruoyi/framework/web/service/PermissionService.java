@@ -2,12 +2,14 @@ package com.ruoyi.framework.web.service;
 
 import java.util.Set;
 import org.springframework.stereotype.Service;
+import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.CollectionUtils;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.security.context.FederatedPermissionUtils;
 import com.ruoyi.framework.security.context.PermissionContextHolder;
 
 /**
@@ -31,6 +33,13 @@ public class PermissionService
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
+        if (StringUtils.isNotNull(loginUser)
+                && loginUser.isFederated()
+                && FederatedPermissionUtils.isProtocolPermission(permission))
+        {
+            PermissionContextHolder.setContext(permission);
+            return true;
+        }
         if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
         {
             return false;
@@ -63,6 +72,17 @@ public class PermissionService
             return false;
         }
         LoginUser loginUser = SecurityUtils.getLoginUser();
+        if (StringUtils.isNotNull(loginUser) && loginUser.isFederated())
+        {
+            for (String permission : permissions.split(Constants.PERMISSION_DELIMETER))
+            {
+                if (permission != null && FederatedPermissionUtils.isProtocolPermission(permission))
+                {
+                    PermissionContextHolder.setContext(permissions);
+                    return true;
+                }
+            }
+        }
         if (StringUtils.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getPermissions()))
         {
             return false;
@@ -154,6 +174,9 @@ public class PermissionService
      */
     private boolean hasPermissions(Set<String> permissions, String permission)
     {
-        return permissions.contains(Constants.ALL_PERMISSION) || permissions.contains(StringUtils.trim(permission));
+        String normalizedPermission = StringUtils.trim(permission);
+        return permissions.stream().anyMatch(grantedPermission ->
+                Constants.ALL_PERMISSION.equals(grantedPermission)
+                        || PatternMatchUtils.simpleMatch(grantedPermission, normalizedPermission));
     }
 }

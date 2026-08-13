@@ -1,4 +1,5 @@
 <template>
+  <DeviceClassificationLayout protocol-type="ONVIF" :selected-device-keys="classificationDeviceKeys" @filter-change="handleClassificationFilter" @assigned="getList">
   <div class="app-container">
     <el-alert title="ONVIF协议 16的设备可以使用Digest/WS,2.20版本使用WS" type="success" style="margin-bottom: 10px;" />
     <el-card>
@@ -677,6 +678,7 @@
       </div>
     </el-dialog>
   </div>
+  </DeviceClassificationLayout>
 </template>
 
 <script setup name="CameraManage">
@@ -708,6 +710,7 @@ import {DocumentCopy} from '@element-plus/icons-vue'
 import {startPlay} from "../../../api/wvp/push.js";
 import {onvifPZTEnd, onvifPZTStart} from "../../../api/onvif/device.js";
 import {ptzControlUpEnd} from "../../../api/dahua/device.js";
+import DeviceClassificationLayout from '@/components/DeviceClassificationLayout/index.vue'
 
 const {proxy} = getCurrentInstance();
 
@@ -717,6 +720,8 @@ const openAdd = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
+const classificationDeviceKeys = ref([]);
+function handleClassificationFilter(filter) { Object.assign(queryParams.value, filter, { pageNum: 1 }); getList(); }
 const single = ref(true);
 const multiple = ref(true);
 const showPresets = ref(false);
@@ -1177,6 +1182,7 @@ function resetQuery() {
 // 多选框选中数据
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.id);
+  classificationDeviceKeys.value = selection.map(item => String(item.id));
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }

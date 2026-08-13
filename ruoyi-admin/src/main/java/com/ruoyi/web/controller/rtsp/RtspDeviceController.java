@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import ai.onnxruntime.OrtException;
@@ -33,6 +35,7 @@ import com.ruoyi.rtsp.domain.RtspDevice;
 import com.ruoyi.rtsp.service.IRtspDeviceService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.deviceclassification.service.DeviceClassificationService;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -47,6 +50,9 @@ public class RtspDeviceController extends BaseController {
 
     @Autowired
     private IRtspDeviceService rtspDeviceService;
+
+    @Autowired
+    private DeviceClassificationService classificationService;
 
     /**
      * 历史播放
@@ -135,7 +141,9 @@ public class RtspDeviceController extends BaseController {
     @Log(title = "rtsp设备", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
-        return toAjax(rtspDeviceService.deleteRtspDeviceByIds(ids));
+        int rows = rtspDeviceService.deleteRtspDeviceByIds(ids);
+        if (rows > 0) classificationService.removeDeviceRelations("RTSP", Arrays.stream(ids).map(String::valueOf).collect(Collectors.toList()));
+        return toAjax(rows);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.deviceclassification.service.DeviceClassificationService;
 import com.ruoyi.isup.domain.IsupDevice;
 import com.ruoyi.isup.service.IIsupDeviceService;
 import com.ruoyi.isup.service.cmsService.CMS;
@@ -14,10 +15,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * isup设备Controller
@@ -30,6 +33,9 @@ import java.util.concurrent.ExecutionException;
 public class IsupDeviceController extends BaseController {
     @Autowired
     private IIsupDeviceService isupDeviceService;
+
+    @Autowired
+    private DeviceClassificationService classificationService;
 
     @Autowired
     private CMS cms;
@@ -241,6 +247,8 @@ public class IsupDeviceController extends BaseController {
     @Log(title = "isup设备", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
-        return toAjax(isupDeviceService.deleteIsupDeviceByIds(ids));
+        int rows = isupDeviceService.deleteIsupDeviceByIds(ids);
+        if (rows > 0) classificationService.removeDeviceRelations("ISUP", Arrays.stream(ids).map(String::valueOf).collect(Collectors.toList()));
+        return toAjax(rows);
     }
 }

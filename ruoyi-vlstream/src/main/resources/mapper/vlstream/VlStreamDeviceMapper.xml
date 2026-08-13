@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.vlstream.mapper.VlStreamDeviceMapper">
+    <resultMap id="DeviceResult" type="com.ruoyi.vlstream.domain.VlStreamDevice">
+        <id property="id" column="id"/>
+        <result property="deviceId" column="device_id"/><result property="deviceName" column="device_name"/>
+        <result property="deviceSerial" column="device_serial"/><result property="firmwareVersion" column="firmware_version"/>
+        <result property="faceVersion" column="face_version"/><result property="ipAddr" column="ip_addr"/>
+        <result property="mac" column="mac"/><result property="online" column="online"/>
+        <result property="onlineReason" column="online_reason"/><result property="heartbeatIndex" column="heartbeat_index"/>
+        <result property="lastMessageId" column="last_message_id"/><result property="lastReportedAt" column="last_reported_at"/>
+        <result property="lastHeartbeatTime" column="last_heartbeat_time"/><result property="telemetryJson" column="telemetry_json"/>
+        <result property="serviceStatusJson" column="service_status_json"/><result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <sql id="columns">id,device_id,device_name,device_serial,firmware_version,face_version,ip_addr,mac,online,
+        online_reason,heartbeat_index,last_message_id,last_reported_at,last_heartbeat_time,telemetry_json,
+        service_status_json,create_time,update_time</sql>
+    <select id="selectById" resultMap="DeviceResult">select <include refid="columns"/> from wvp_vlstream_device where id=#{id}</select>
+    <select id="selectByDeviceId" resultMap="DeviceResult">select <include refid="columns"/> from wvp_vlstream_device where device_id=#{deviceId}</select>
+    <select id="selectList" resultMap="DeviceResult">
+        select <include refid="columns"/> from wvp_vlstream_device
+        <where>
+            <if test="online != null">online=#{online}</if>
+            <if test="keyword != null and keyword != ''">
+                and (device_name like concat('%',#{keyword},'%') or device_id like concat('%',#{keyword},'%') or device_serial like concat('%',#{keyword},'%'))
+            </if>
+            <if test="categoryType != null and categoryType != ''">
+                <choose>
+                    <when test="unclassified != null and unclassified">
+                        and not exists (select 1 from wvp_device_category_relation cr where cr.protocol_type='VLSTREAM'
+                            and cr.device_key=cast(wvp_vlstream_device.id as char) and cr.category_type=#{categoryType})
+                    </when>
+                    <when test="categoryId != null">
+                        and exists (select 1 from wvp_device_category_relation cr
+                            inner join wvp_device_category cc on cc.id=cr.category_id where cr.protocol_type='VLSTREAM'
+                            and cr.device_key=cast(wvp_vlstream_device.id as char) and cr.category_type=#{categoryType}
+                            and (cc.id=#{categoryId} or find_in_set(#{categoryId}, cc.ancestors)))
+                    </when>
+                </choose>
+            </if>
+        </where>
+        order by last_heartbeat_time desc
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into wvp_vlstream_device(device_id,device_name,device_serial,firmware_version,face_version,ip_addr,mac,online,
+          online_reason,heartbeat_index,last_message_id,last_reported_at,last_heartbeat_time,telemetry_json,service_status_json,create_time,update_time)
+        values(#{deviceId},#{deviceName},#{deviceSerial},#{firmwareVersion},#{faceVersion},#{ipAddr},#{mac},#{online},
+          #{onlineReason},#{heartbeatIndex},#{lastMessageId},#{lastReportedAt},#{lastHeartbeatTime},#{telemetryJson},#{serviceStatusJson},#{createTime},#{updateTime})
+    </insert>
+    <update id="update">
+        update wvp_vlstream_device set device_name=#{deviceName},device_serial=#{deviceSerial},firmware_version=#{firmwareVersion},
+          face_version=#{faceVersion},ip_addr=#{ipAddr},mac=#{mac},online=#{online},online_reason=#{onlineReason},
+          heartbeat_index=#{heartbeatIndex},last_message_id=#{lastMessageId},last_reported_at=#{lastReportedAt},
+          last_heartbeat_time=#{lastHeartbeatTime},telemetry_json=#{telemetryJson},service_status_json=#{serviceStatusJson},update_time=#{updateTime}
+        where id=#{id}
+    </update>
+    <update id="markOfflineBefore">
+        update wvp_vlstream_device set online=0,online_reason='heartbeat_timeout',update_time=#{updateTime}
+        where online=1 and last_heartbeat_time &lt; #{deadline}
+    </update>
+</mapper>

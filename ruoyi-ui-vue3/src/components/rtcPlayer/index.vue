@@ -94,6 +94,11 @@ export default {
   },
   destroyed() {
     clearTimeout(this.timer);
+    this.pause();
+  },
+  beforeUnmount() {
+    clearTimeout(this.timer);
+    this.pause();
   },
 }
 </script>

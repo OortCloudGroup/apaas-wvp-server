@@ -17,6 +17,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.security.context.FederatedPermissionUtils;
 import com.ruoyi.framework.security.context.PermissionContextHolder;
 
 /**
@@ -76,6 +77,10 @@ public class DataScopeAspect
             if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin())
             {
                 String permission = StringUtils.defaultIfEmpty(controllerDataScope.permission(), PermissionContextHolder.getContext());
+                if (loginUser.isFederated() && FederatedPermissionUtils.isProtocolPermission(permission))
+                {
+                    return;
+                }
                 dataScopeFilter(joinPoint, currentUser, controllerDataScope.deptAlias(), controllerDataScope.userAlias(), permission);
             }
         }

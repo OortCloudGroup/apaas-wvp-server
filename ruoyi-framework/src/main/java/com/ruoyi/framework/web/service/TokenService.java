@@ -54,6 +54,14 @@ public class TokenService
 {
     private static final Logger log = LoggerFactory.getLogger(TokenService.class);
 
+    private static final String HEADER_AUTH_SOURCE = "X-WVP-Auth-Source";
+
+    private static final String AUTH_SOURCE_VLSTREAM = "vlstream";
+
+    private static final Set<String> VLSTREAM_PROTOCOL_PERMISSIONS = new HashSet<>(Arrays.asList(
+            "isup:*", "rtsp:*", "onvif:*", "dahua:*", "wvp:*", "gb:*"
+    ));
+
     // 令牌自定义标识
     @Value("${token.header}")
     private String header;
@@ -64,6 +72,15 @@ public class TokenService
 
     @Value("${token.verifyTokenAddress}")
     private String verifyTokenAddress;
+
+    @Value("${token.vlstreamVerifyTokenAddress:}")
+    private String vlstreamVerifyTokenAddress;
+
+    /**
+     * 可选的协议设备默认部门。为空时新增记录不写入 dept_id。
+     */
+    @Value("${token.vlstreamDefaultDeptId:${VLSTREAM_DEFAULT_DEPT_ID:}}")
+    private String vlstreamDefaultDeptId;
 
     // 令牌有效期（默认30分钟）
     @Value("${token.expireTime}")
@@ -109,8 +126,11 @@ public class TokenService
 
         String userKey = getTokenKey(accessToken);
 
-        log.info("检查redis缓存：{}", userKey);
-        log.info("检查平台token和登录：{}", accessToken);
+        log.info("检查登录缓存：{}", userKey);
+        if (isVlstreamRequest(request)) {
+            return createVlstreamLoginUser(getVlstreamLoginUser(request, accessToken), accessToken, userKey);
+        }
+
         PlatformLoginUser platformLoginUser = getPlatformLoginUser(request, accessToken);
 
         SysUser sysUser = sysUserMapper.selectUserByPlatformUserId(platformLoginUser.getUserId());
@@ -145,6 +165,56 @@ public class TokenService
     }
 
     /**
+     * 创建不落WVP用户、角色表的VLStream联邦身份。
+     */
+    private LoginUser createVlstreamLoginUser(PlatformLoginUser platformUser, String accessToken, String userKey) {
+        SysUser sysUser = new SysUser();
+        Long userId = toSyntheticUserId(platformUser.getUserId());
+        Long deptId = toLong(vlstreamDefaultDeptId);
+        sysUser.setUserId(userId);
+        sysUser.setDeptId(deptId);
+        sysUser.setUserName(platformUser.getUserName());
+        sysUser.setNickName(platformUser.getUserName());
+        sysUser.setPassword("");
+        sysUser.setStatus("0");
+        sysUser.setDelFlag("0");
+        sysUser.setPlatformUserId(platformUser.getUserId());
+
+        SysRole federatedRole = new SysRole();
+        federatedRole.setRoleId(-1L);
+        federatedRole.setRoleName("VLStream 联邦用户");
+        federatedRole.setRoleKey("vlstream_federated");
+        federatedRole.setDataScope("1");
+        federatedRole.setStatus("0");
+        federatedRole.setPermissions(new HashSet<>(VLSTREAM_PROTOCOL_PERMISSIONS));
+        sysUser.setRoles(Collections.singletonList(federatedRole));
+
+        LoginUser loginUser = new LoginUser(userId, deptId, sysUser, new HashSet<>(VLSTREAM_PROTOCOL_PERMISSIONS));
+        loginUser.setFederated(true);
+        loginUser.setToken(accessToken);
+        long loginTime = System.currentTimeMillis();
+        loginUser.setLoginTime(loginTime);
+        loginUser.setExpireTime(loginTime + expireTime * MILLIS_MINUTE);
+        redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
+        return loginUser;
+    }
+
+    /**
+     * 为审计字段生成稳定的负数ID，避免与WVP数据库中的正数用户ID冲突。
+     */
+    private Long toSyntheticUserId(String externalUserId) {
+        long hash = 1125899906842597L;
+        for (int i = 0; i < externalUserId.length(); i++) {
+            hash = 31 * hash + externalUserId.charAt(i);
+        }
+        if (hash == Long.MIN_VALUE) {
+            return -2L;
+        }
+        long absolute = Math.abs(hash);
+        return absolute == 0L ? -2L : -absolute;
+    }
+
+    /**
      * 校验平台token有效性获取平台用户信息
      *
      * @param request
@@ -176,6 +246,113 @@ public class TokenService
             throw new ServiceException("网关verifyToken失败！");
         }
         return platformLoginUser;
+    }
+
+    /**
+     * 校验 VLStream/SpringBlade token 并转换为 WVP 使用的平台用户模型。
+     */
+    private PlatformLoginUser getVlstreamLoginUser(HttpServletRequest request, String accessToken) {
+        if (StringUtils.isBlank(vlstreamVerifyTokenAddress)) {
+            throw new ServiceException("WVP未配置VLStream令牌校验地址");
+        }
+
+        String token = normalizeFederatedToken(accessToken);
+        String bearerToken = "Bearer " + token;
+        HttpResponse response;
+        try {
+            response = HttpRequest.get(vlstreamVerifyTokenAddress)
+                    .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                    .header("blade-auth", token)
+                    .header("AccessToken", token)
+                    .header(HEADER_ACCESS_TOKEN, token)
+                    .header(HEADER_REQUEST_TYPE, request.getHeader(HEADER_REQUEST_TYPE))
+                    .timeout(1500)
+                    .execute();
+        } catch (Exception e) {
+            log.warn("VLStream令牌校验服务调用失败: {}", e.getClass().getSimpleName());
+            throw new ServiceException("VLStream令牌校验服务不可用");
+        }
+
+        if (response == null || response.getStatus() < 200 || response.getStatus() >= 300) {
+            throw new ServiceException("VLStream令牌校验服务返回异常");
+        }
+
+        String responseBody = response.body();
+        if (StringUtils.isBlank(responseBody)) {
+            throw new ServiceException("VLStream令牌校验未返回结果");
+        }
+
+        JSONObject bodyJson;
+        try {
+            bodyJson = JSONUtil.parseObj(responseBody);
+        } catch (Exception e) {
+            log.warn("VLStream令牌校验返回格式错误: {}", e.getClass().getSimpleName());
+            throw new ServiceException("VLStream令牌校验返回格式错误");
+        }
+
+        Integer code = bodyJson.getInt("code");
+        Boolean success = bodyJson.getBool("success");
+        JSONObject data = bodyJson.getJSONObject("data");
+        if (!Integer.valueOf(200).equals(code) || Boolean.FALSE.equals(success) || data == null) {
+            log.warn("VLStream令牌校验失败，code={}，msg={}", code, bodyJson.getStr("msg"));
+            throw new ServiceException("VLStream令牌校验失败");
+        }
+
+        JSONObject user = data.getJSONObject("user");
+        if (user == null) {
+            user = data;
+        }
+
+        String userId = firstNotBlank(user.getStr("userId"), user.getStr("id"),
+                data.getStr("userId"), data.getStr("account"), user.getStr("userName"));
+        String userName = firstNotBlank(data.getStr("userName"), data.getStr("realName"),
+                data.getStr("account"), user.getStr("userName"), user.getStr("nickName"),
+                user.getStr("loginId"), userId);
+        if (StringUtils.isBlank(userId)) {
+            throw new ServiceException("VLStream用户信息缺少用户标识");
+        }
+
+        PlatformLoginUser platformLoginUser = new PlatformLoginUser();
+        platformLoginUser.setUserId(userId);
+        platformLoginUser.setUserName(userName);
+        platformLoginUser.setTenantId(firstNotBlank(data.getStr("tenantId"), user.getStr("tenantId")));
+        platformLoginUser.setAccessToken(accessToken);
+        return platformLoginUser;
+    }
+
+    private boolean isVlstreamRequest(HttpServletRequest request) {
+        return AUTH_SOURCE_VLSTREAM.equalsIgnoreCase(request.getHeader(HEADER_AUTH_SOURCE));
+    }
+
+    private String normalizeFederatedToken(String accessToken) {
+        String token = accessToken == null ? "" : accessToken.trim();
+        if (token.regionMatches(true, 0, "Bearer ", 0, 7)) {
+            token = token.substring(7).trim();
+        }
+        return token;
+    }
+
+    private String firstNotBlank(String... values) {
+        if (values == null) {
+            return null;
+        }
+        for (String value : values) {
+            if (StringUtils.isNotBlank(value)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    private Long toLong(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        try {
+            return Long.valueOf(value.trim());
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
     }
 
     /**

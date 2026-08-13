@@ -218,6 +218,20 @@
             <if test="device.manufacturer != null">
                 AND de.manufacturer LIKE CONCAT('%', #{device.manufacturer}, '%')
             </if>
+            <if test="device.categoryType != null and device.categoryType != ''">
+                <choose>
+                    <when test="device.unclassified != null and device.unclassified">
+                        and not exists (select 1 from wvp_device_category_relation cr where cr.protocol_type='GB28181'
+                            and cr.device_key=cast(de.id as char) and cr.category_type=#{device.categoryType})
+                    </when>
+                    <when test="device.categoryId != null">
+                        and exists (select 1 from wvp_device_category_relation cr
+                            inner join wvp_device_category cc on cc.id=cr.category_id where cr.protocol_type='GB28181'
+                            and cr.device_key=cast(de.id as char) and cr.category_type=#{device.categoryType}
+                            and (cc.id=#{device.categoryId} or find_in_set(#{device.categoryId}, cc.ancestors)))
+                    </when>
+                </choose>
+            </if>
 
             <!-- 数据范围过滤 -->
             ${device.params.dataScope}

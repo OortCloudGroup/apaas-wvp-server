@@ -6,6 +6,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.deviceclassification.service.DeviceClassificationService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.onvif.domain.OnvifDevice;
 import com.ruoyi.onvif.service.IOnvifDeviceService;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * onvif 设备Controller
@@ -28,6 +31,9 @@ import java.util.List;
 public class OnvifDeviceController extends BaseController {
     @Autowired
     private IOnvifDeviceService onvifDeviceService;
+
+    @Autowired
+    private DeviceClassificationService classificationService;
 
     /**
      * Web Services Dynamic Discovery
@@ -128,6 +134,8 @@ public class OnvifDeviceController extends BaseController {
     @Log(title = "onvif 设备", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
-        return toAjax(onvifDeviceService.deleteOnvifDeviceByIds(ids));
+        int rows = onvifDeviceService.deleteOnvifDeviceByIds(ids);
+        if (rows > 0) classificationService.removeDeviceRelations("ONVIF", Arrays.stream(ids).map(String::valueOf).collect(Collectors.toList()));
+        return toAjax(rows);
     }
 }

@@ -5,6 +5,7 @@ import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.deviceclassification.service.DeviceClassificationService;
 import com.ruoyi.wvp.conf.DynamicTask;
 import com.ruoyi.common.exception.ControllerException;
 import com.ruoyi.wvp.gb28181.bean.ChangeAudio;
@@ -68,6 +69,9 @@ public class DeviceQueryController extends BaseController {
 
     @Autowired
     private IDeviceService deviceService;
+
+    @Autowired
+    private DeviceClassificationService classificationService;
 
     @Autowired
     private DynamicTask dynamicTask;
@@ -170,8 +174,10 @@ public class DeviceQueryController extends BaseController {
             log.debug("设备信息删除API调用，deviceId：" + deviceId);
         }
         // 清除redis记录
+        Device device = deviceService.getDeviceByDeviceId(deviceId);
         boolean isSuccess = deviceService.delete(deviceId);
         if (isSuccess) {
+            if (device != null) classificationService.removeDeviceRelations("GB28181", Collections.singletonList(String.valueOf(device.getId())));
             inviteStreamService.clearInviteInfo(deviceId);
             // 停止此设备的订阅更新
             Set<String> allKeys = dynamicTask.getAllKeys();

@@ -71,6 +71,13 @@ public class LoginUser implements UserDetails
      */
     private SysUser user;
 
+    /**
+     * 是否为 VLStream 联邦用户。
+     *
+     * 联邦用户只在当前请求和短期缓存上下文中存在，不写入 WVP 用户表。
+     */
+    private boolean federated;
+
     public LoginUser()
     {
     }
@@ -256,6 +263,16 @@ public class LoginUser implements UserDetails
     public void setUser(SysUser user)
     {
         this.user = user;
+    }
+
+    public boolean isFederated()
+    {
+        return federated;
+    }
+
+    public void setFederated(boolean federated)
+    {
+        this.federated = federated;
     }
 
     @Override

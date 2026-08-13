@@ -27,6 +27,11 @@ public class Device extends WvpBaseEntity {
      */
     private Long deptId;
 
+    /** 全局设备分类筛选参数，不写入设备表。 */
+    private String categoryType;
+    private Long categoryId;
+    private Boolean unclassified;
+
     /**
      * 部门名称
      */

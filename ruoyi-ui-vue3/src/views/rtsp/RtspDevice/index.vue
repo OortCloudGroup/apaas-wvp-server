@@ -1,4 +1,5 @@
 <template>
+  <DeviceClassificationLayout protocol-type="RTSP" :selected-device-keys="classificationDeviceKeys" @filter-change="handleClassificationFilter" @assigned="getList">
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
       <el-form-item label="所属部门" prop="deptId">
@@ -361,6 +362,7 @@
     </el-dialog>
 
   </div>
+  </DeviceClassificationLayout>
 </template>
 
 <script setup name="RtspDevice">
@@ -389,6 +391,7 @@ import H265web from "@/components/H265web/index.vue";
 import StreamDropdown from "@/views/wvp/channel/components/streamDropdown.vue";
 import MediaInfo from "@/views/wvp/channel/components/mediaInfo.vue";
 import useClipboard from "vue-clipboard3";
+import DeviceClassificationLayout from '@/components/DeviceClassificationLayout/index.vue'
 const { toClipboard } = useClipboard()
 
 const {proxy} = getCurrentInstance();
@@ -400,6 +403,8 @@ const loading = ref(true);
 const showSearch = ref(true);
 const cusPlayerShow = ref(false);
 const ids = ref([]);
+const classificationDeviceKeys = ref([]);
+function handleClassificationFilter(filter) { Object.assign(queryParams.value, filter, { pageNum: 1 }); getList(); }
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -717,6 +722,7 @@ function resetQuery() {
 // 多选框选中数据
 function handleSelectionChange(selection) {
   ids.value = selection.map(item => item.id);
+  classificationDeviceKeys.value = selection.map(item => String(item.id));
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }

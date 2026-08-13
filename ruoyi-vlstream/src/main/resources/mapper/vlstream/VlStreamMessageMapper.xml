@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.vlstream.mapper.VlStreamMessageMapper">
+    <insert id="insertIgnore">insert ignore into wvp_vlstream_message(device_id,message_id,reported_at,received_at) values(#{deviceId},#{messageId},#{reportedAt},#{receivedAt})</insert>
+    <delete id="deleteBefore">delete from wvp_vlstream_message where received_at &lt; #{deadline}</delete>
+</mapper>

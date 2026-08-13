@@ -29,6 +29,11 @@ public class DahuaDevice extends BaseEntity {
      */
     private Long deptId;
 
+    /** 全局设备分类筛选参数，不写入设备表。 */
+    private String categoryType;
+    private Long categoryId;
+    private Boolean unclassified;
+
     /**
      * 所属部门
      */

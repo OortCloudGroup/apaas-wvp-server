@@ -116,6 +116,7 @@
             <if test="name != null ">and i.name like concat('%', #{name}, '%')</if>
 
 
+            <include refid="classificationFilter"/>
             <!-- 数据范围过滤 -->
             ${params.dataScope}
         </where>
@@ -167,6 +168,7 @@
             <if test="name != null ">and i.name like concat('%', #{name}, '%')</if>
             and lat IS NOT NULL AND lng IS NOT NULL
 
+            <include refid="classificationFilter"/>
             <!-- 数据范围过滤 -->
             ${params.dataScope}
         </where>
@@ -326,4 +328,20 @@
             #{id}
         </foreach>
     </delete>
+    <sql id="classificationFilter">
+        <if test="categoryType != null and categoryType != ''">
+            <choose>
+                <when test="unclassified != null and unclassified">
+                    and not exists (select 1 from wvp_device_category_relation cr where cr.protocol_type='ISUP'
+                        and cr.device_key=cast(i.id as char) and cr.category_type=#{categoryType})
+                </when>
+                <when test="categoryId != null">
+                    and exists (select 1 from wvp_device_category_relation cr
+                        inner join wvp_device_category cc on cc.id=cr.category_id where cr.protocol_type='ISUP'
+                        and cr.device_key=cast(i.id as char) and cr.category_type=#{categoryType}
+                        and (cc.id=#{categoryId} or find_in_set(#{categoryId}, cc.ancestors)))
+                </when>
+            </choose>
+        </if>
+    </sql>
 </mapper>
