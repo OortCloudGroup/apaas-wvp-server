@@ -1,0 +1,8 @@
+.git
+.idea
+**/target
+**/target/**
+**/node_modules
+codex
+*.log
+sql/ry_wvp_init.sql

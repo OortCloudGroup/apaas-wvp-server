@@ -44,7 +44,7 @@
             <version>8.0.33</version>
         </dependency>
 
-        <!-- Existing databases are baselined; versioned upgrades run automatically at startup. -->
+        <!-- Database migrations for upgrades of existing deployments. -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>

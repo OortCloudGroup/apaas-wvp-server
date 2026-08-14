@@ -7,7 +7,7 @@ ruoyi:
   # 版权年份
   copyrightYear: 2025
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
-  profile: D:/ruoyi/uploadPath
+  profile: ${APP_PROFILE:/app/data/uploadPath}
   # 获取ip地址开关
   addressEnabled: true
   # 验证码类型 math 数字计算 char 字符验证
@@ -24,7 +24,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: ${SERVER_PORT:9080}
+  port: ${SERVER_PORT:8080}
   # [可选] HTTPS配置， 默认不开启
   ssl:
     # [可选] 是否开启HTTPS访问
@@ -32,7 +32,7 @@ server:
     # [可选] 证书文件路径，放置在resource/目录下即可，修改xxx为文件名
     key-store: classpath:test.monitor.89iot.cn.jks
     # [可选] 证书密码
-    key-store-password: gpf64qmw
+    key-store-password: ${SERVER_SSL_KEY_STORE_PASSWORD:}
     # [可选] 证书类型， 默认为jks，根据实际修改
     key-store-type: JKS
   servlet:
@@ -69,6 +69,9 @@ spring:
     allow-circular-references: true
   application:
     name: viid-server-api
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:/app/ui/
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -78,6 +81,14 @@ spring:
     basename: i18n/messages
   profiles:
     active: druid
+  flyway:
+    enabled: true
+    url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:ry-wvp}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    user: ${DB_MIGRATION_USERNAME:${DB_USERNAME:root}}
+    password: ${DB_MIGRATION_PASSWORD:${DB_PASSWORD:}}
+    baseline-on-migrate: true
+    baseline-version: 1.0.0
+    baseline-description: public-release-initial-schema
   # 文件上传
   servlet:
     multipart:
@@ -93,10 +104,13 @@ spring:
   # redis 配置
   redis:
     # 地址
-    host: ${REDIS_HOST:192.168.60.76}
-    port: ${REDIS_PORT:32576}
-    database: 10
-    password: ${REDIS_PASSWORD:redis@pass}
+    host: ${REDIS_HOST:redis}
+    # 端口，默认为6379
+    port: ${REDIS_PORT:6379}
+    # 数据库索引
+    database: 1
+    # 必须要密码
+    password: ${REDIS_PASSWORD:}
     # 连接超时时间
     timeout: 10s
     lettuce:
@@ -109,41 +123,27 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
-
+      
 # token配置
-wvp:
-  auth:
-    # 登录鉴权模式：sso（外部统一认证）或 local（系统自身账号密码认证）
-    mode: ${WVP_AUTH_MODE:local}
-
 token:
   # 令牌自定义标识
-  header: accessToken
+  header: Authorization
   # 令牌密钥
-  secret: abcdefghijklmnopqrstuvwxyz
+  secret: ${TOKEN_SECRET:change-me-before-production}
   # 令牌有效期（默认30分钟）
-  expireTime: 30
-  #校验token地址 http://apaas-sso.p-lvgemgroup/sso/v1/verifyToken
-  verifyTokenAddress: ${SSO_VERIFY_TOKEN:http://oort.oortcloudsmart.com:21410/bus/apaas-sso/sso/v1/verifyToken}
-  # VLStream/SpringBlade token校验地址，仅X-WVP-Auth-Source=vlstream时使用
-  vlstreamVerifyTokenAddress: ${VLSTREAM_VERIFY_TOKEN:http://127.0.0.1:8080/blade-system/user/info}
-  # 可选的协议设备默认部门；留空时新增设备不写入 dept_id
-  vlstreamDefaultDeptId: ${VLSTREAM_DEFAULT_DEPT_ID:}
+  expireTime: 720
+  verifyTokenAddress: ${VLSTREAM_VERIFY_TOKEN:}
 
-# MyBatis配置
-mybatis:
-  # 搜索指定包别名
-  typeAliasesPackage: com.ruoyi.**.domain
-  # 配置mapper的扫描，找到所有的mapper.xml映射文件
-  mapperLocations: classpath*:mapper/**/*Mapper.xml
-  # 加载全局的配置文件
-  configLocation: classpath:mybatis/mybatis-config.xml
+wvp:
+  auth:
+    mode: ${WVP_AUTH_MODE:LOCAL}
 
 # MyBatisPlus配置
 mybatis-plus:
   type-aliases-package: com.ruoyi.**.domain
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   config-location: classpath:mybatis/mybatis-config.xml
+
 
 # PageHelper分页插件
 pagehelper:
@@ -169,48 +169,42 @@ xss:
 
 # 作为28181服务器的配置
 sip:
-  #  ip: 0.0.0.0
+  #  ip: ${DAHUA_BIND_IP:127.0.0.1}
   # [可选] 28181服务监听的端口
-  port: 8116
+  port: ${SIP_PORT:8116}
   # 根据国标6.1.2中规定，domain宜采用ID统一编码的前十位编码。国标附录D中定义前8位为中心编码（由省级、市级、区级、基层编号组成，参照GB/T 2260-2007）
   # 后两位为行业编码，定义参照附录D.3
   # 3701020049标识山东济南历下区 信息行业接入
   # [可选]
-  domain: 4101050000
+  domain: ${SIP_DOMAIN:4101050000}
   # [可选]
-  id: 41010500002000000001
+  id: ${SIP_ID:41010500002000000001}
   # [可选] 默认设备认证密码，后续扩展使用设备单独密码, 移除密码将不进行校验
-  password: 12345678
+  password: ${SIP_PASSWORD:change-me}
   # 是否存储alarm信息
   alarm: false
 
-## ZLMediaKit默认服务器配置
-# ${环境变量名:默认值}：优先读取操作系统或容器环境变量，未设置时使用冒号后的默认值。
+#zlm 默认服务器配置
 media:
-  # WVP内部使用的ZLM节点唯一标识，必须与ZLM的general.mediaServerId一致；它不是网络地址。
-  id: zlmediakit-local
-  # ZLMEDIAKIT_HOST：WVP访问ZLM HTTP API时使用的主机名或IP。
-  # 只填写主机，例如127.0.0.1、192.168.1.10或zlmediakit；不要填写http://、路径或端口。
-  # 本地联调默认访问本机Docker映射出来的ZLM端口，因此主机默认为127.0.0.1。
-  ip: ${ZLMEDIAKIT_HOST:127.0.0.1}
-  # ZLMEDIAKIT_HOOK_HOST：ZLM向WVP发送启动、心跳和流状态Hook时使用的WVP主机名或IP。
-  # 该地址必须从ZLM运行环境可达；本地ZLM运行在Docker中，所以默认使用host.docker.internal访问宿主机WVP。
-  # 只填写主机，不填写协议、端口或/index/hook路径，协议、WVP端口和Hook路径由后端自动拼接。
-  hook-ip: ${ZLMEDIAKIT_HOOK_HOST:host.docker.internal}
-  # ZLMEDIAKIT_HTTP_PORT：WVP访问ZLM HTTP API的端口。
-  # 本地Docker将容器80端口映射为宿主机8090，因此默认值为8090；不要把该端口重复写入ZLMEDIAKIT_HOST。
-  http-port: ${ZLMEDIAKIT_HTTP_PORT:8090}
-  # ZLMEDIAKIT_SECRET：调用ZLM /index/api/* 管理接口时使用的鉴权密钥。
-  # 必须与ZLM配置中的api.secret完全一致；WVP与VLS连接同一ZLM时应使用相同值。
-  secret: ${ZLMEDIAKIT_SECRET:su6TiedN2rVAmBbIDX0aa0QTiBJLBdcf}
+  id: ${ZLM_ID:zlmediakit-local}
+  # [必须修改] zlm服务器的内网IP
+  ip: ${ZLM_HOST:zlmediakit}
+  sdp-ip: ${ZLM_PUBLIC_HOST:127.0.0.1}
+  stream-ip: ${ZLM_PUBLIC_HOST:127.0.0.1}
+  # [必须修改] zlm服务器的http.port
+  http-port: ${ZLM_HTTP_PORT:8080}
+  # [可选] zlm服务器的hook所使用的IP, 默认使用sip.ip
+  hook-ip: ${ZLM_HOOK_IP:wvp-backend}
+  # [必选选] zlm服务器的hook.admin_params=secret
+  secret: ${ZLM_SECRET:change-me}
   # 启用多端口模式, 多端口模式使用端口区分每路流，兼容性更好。 单端口使用流的ssrc区分， 点播超时建议使用多端口测试
   rtp:
     # [可选] 是否启用多端口模式, 开启后会在portRange范围内选择端口用于媒体流传输
     enable: true
     # [可选] 在此范围内选择端口用于媒体流传输, 必须提前在zlm上配置该属性，不然自动配置此属性可能不成功
-    port-range: 40000,40300 # 端口范围
+    port-range: ${ZLM_RTP_PORT_RANGE:40000,40300} # 端口范围
     # [可选] 国标级联在此范围内选择端口发送媒体流,
-    send-port-range: 40000,40300 # 端口范围
+    send-port-range: ${ZLM_RTP_PORT_RANGE:40000,40300} # 端口范围
 
 # [根据业务需求配置]
 user-settings:
@@ -219,28 +213,24 @@ user-settings:
   # [可选] 自动点播， 使用固定流地址进行播放时，如果未点播则自动进行点播, 需要rtp.enable=true
   auto-apply-play: true
   # 推流直播是否录制
-  record-push-live: false
+  record-push-live: true
   # 国标是否录制
-  record-sip: false
+  record-sip: true
   # 国标点播 按需拉流, true：有人观看拉流，无人观看释放， false：拉起后不自动释放
   stream-on-demand: true
   # 开启sip日志
   sip-log: true
 
-# ISUP配置
+# ISUP win64配置
 isup:
   #注册服务器监听地址(服务器本地地址)
-  IP: 127.0.0.1
+  IP: ${ISUP_BIND_IP:127.0.0.1}
   route: Isup
-  cmsServer:
+  cmsServer: # 中心管理服务
     Port: 7660
-  # 取流服务器地址端口（公网对接填入公网地址和端口）
-  smsServer:
+  smsServer: # 流媒体服务
     Port: 7665
-    #取流服务器监听地址端口(服务器本地地址)
-    ListenIP: 127.0.0.1
     ListenPort: 7665
-  # 当前项目保留的ISUP服务配置
   ssService: # 报警管理服务
     Port: 7661
   alarmService: # 存储服务
@@ -252,21 +242,19 @@ isup:
   smsBackServerListe:
     Port: 8000
   # ISUP5.0登录秘钥
-  isupKey: 12345678
+  isupKey: ${ISUP_KEY:}
 
 # ISUP linux64配置
 isup-linux64:
-  # Linux 原生 ISUP SDK 默认关闭；确认 SDK 运行时兼容后再开启
-  enabled: false
   # 海康服务的注册服务器 IP 地址
-  cmsServerIP: 127.0.0.1
+  cmsServerIP: ${ISUP_BIND_IP:127.0.0.1}
   # 海康服务的注册服务器监听的端口号
   cmsServerPort: 2660
   # DAS地址（公网对接填入公网地址和端口）
-  dasServerIP: 127.0.0.1
+  dasServerIP: ${ISUP_BIND_IP:127.0.0.1}
   dasServerPort: 2660
   # 报警服务器地址（公网对接填入公网地址和端口）
-  alarmServerIP: 127.0.0.1
+  alarmServerIP: ${ISUP_BIND_IP:127.0.0.1}
   # 海康报警服务器的 TCP 通信端口号
   alarmServerTCPPort: 2663
   # 海康报警服务器的 UDP 通信端口号
@@ -275,13 +263,13 @@ isup-linux64:
   alarmServerType: 2
   # 报警服务器监听地址端口
   # 报警服务器用于监听外部请求的 IP 地址
-  alarmServerListenIP: 127.0.0.1
+  alarmServerListenIP: ${ISUP_BIND_IP:127.0.0.1}
   # 报警服务器监听 TCP 协议连接的端口号
   alarmServerListenTCPPort: 2663
   # 报警服务器监听 UDP 协议连接的端口号
   alarmServerListenUDPPort: 2662
   # 海康服务用来存储图片的服务器 IP 地址
-  picServerIP: 127.0.0.1
+  picServerIP: ${ISUP_BIND_IP:127.0.0.1}
   # 海康服务的图片存储服务器监听端口号
   picServerPort: 2612
   # 图片存储服务器类型：
@@ -292,11 +280,11 @@ isup-linux64:
   # 4 - ISUP5.0
   picServerType: 2
   # 图片存储服务器用于监听外部请求的 IP 地址
-  picServerListenIP: 127.0.0.1
+  picServerListenIP: ${ISUP_BIND_IP:127.0.0.1}
   # 图片存储服务器监听外部请求的端口号
   picServerListenPort: 2611
   # 用于海康设备认证的秘钥，ISUP5.0协议中的必需项
-  iSUPKey: "12345678"
+  iSUPKey: "${ISUP_KEY:}"
   # 报警服务器打印事件模式：
   # file=事件保存到文件中
   # console=事件打印在控制台上
@@ -313,10 +301,11 @@ isup-linux64:
 
 # dahua配置
 dahua:
+  enabled: ${DAHUA_ENABLED:false}
   # [必须修改] dahua服务器的可以是内网IP也可以是公网IP
-  ip: 127.0.0.1
+  ip: ${DAHUA_BIND_IP:127.0.0.1}
   # [必须修改] dahua服务器的端口
-  port: 9500
+  port: ${DAHUA_PORT:9500}
   # 抓图间隔，单位：秒
   snapPictureInterval: 3600
   # 是否公网
@@ -331,26 +320,3 @@ zlm-api:
   hk-rtsp-port: 7555
   hk-rtmp-port: 7936
 
-# 第三方登录配置
-just-auth:
-  gitee:
-    client-id:
-    secret:
-    redirect-uri: http://127.0.0.1:8080/gitee-callback
-    front-url: http://localhost/login
-
-# VLStream原生MQTT设备接入，与VLS使用相同Broker配置和消息处理行为。
-vlstream:
-  mqtt:
-    host: ${VLSTREAM_MQTT_HOST:127.0.0.1}
-    port: ${VLSTREAM_MQTT_PORT:1883}
-    username: ${VLSTREAM_MQTT_USERNAME:}
-    password: ${VLSTREAM_MQTT_PASSWORD:}
-    # 必须与VLS客户端ID不同，否则同一Broker会断开其中一个连接。
-    client-id: ${VLSTREAM_WVP_MQTT_CLIENT_ID:wvp-vlstream-backend}
-    qos: ${VLSTREAM_MQTT_QOS:1}
-    keep-alive-seconds: ${VLSTREAM_MQTT_KEEP_ALIVE_SECONDS:60}
-    connection-timeout-seconds: ${VLSTREAM_MQTT_CONNECTION_TIMEOUT_SECONDS:10}
-  device:
-    offline-timeout-seconds: ${VLSTREAM_DEVICE_OFFLINE_TIMEOUT_SECONDS:180}
-    message-retention-hours: ${VLSTREAM_MQTT_MESSAGE_RETENTION_HOURS:24}

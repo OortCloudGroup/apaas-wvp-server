@@ -1,0 +1,115 @@
+name: apaas-wvp-server
+
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql:8.0.36}
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      MYSQL_DATABASE: ${DB_NAME:-ry-wvp}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME:-wvp}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
+    ports: ["${MYSQL_PORT:-3306}:3306"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./deploy/release/sql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: ${REDIS_IMAGE:-redis:7.4.9-alpine}
+    restart: unless-stopped
+    command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\""]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports: ["${REDIS_PORT:-6379}:6379"]
+    volumes: ["redis-data:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  zlmediakit:
+    image: ${ZLM_RELEASE_IMAGE:-apaas-wvp-zlmediakit:1.0.0}
+    build:
+      context: ./deploy/release/zlm
+      args:
+        BASE_IMAGE: ${ZLM_IMAGE:-zlmediakit/zlmediakit:master}
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      ZLM_SECRET: ${ZLM_SECRET}
+      ZLM_HOOK_IP: ${ZLM_HOOK_IP:-wvp-backend}
+      RTP_PORT_START: ${RTP_PORT_START:-40000}
+      RTP_PORT_END: ${RTP_PORT_END:-40300}
+    ports:
+      - "${ZLM_HTTP_PORT:-8081}:8080"
+      - "${ZLM_HTTPS_PORT:-8443}:8443"
+      - "${RTP_PORT_START:-40000}-${RTP_PORT_END:-40300}:${RTP_PORT_START:-40000}-${RTP_PORT_END:-40300}/udp"
+    volumes:
+      - zlm-data:/opt/media/www
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8080/index/api/getServerConfig >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  wvp-backend:
+    image: ${WVP_IMAGE:-ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.0}
+    restart: unless-stopped
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      zlmediakit: { condition: service_healthy }
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      SERVER_PORT: 8080
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-ry-wvp}
+      DB_USERNAME: ${DB_USERNAME:-wvp}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_MIGRATION_USERNAME: ${DB_MIGRATION_USERNAME:-root}
+      DB_MIGRATION_PASSWORD: ${DB_MIGRATION_PASSWORD:-${MYSQL_ROOT_PASSWORD}}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      TOKEN_SECRET: ${TOKEN_SECRET}
+      SIP_PORT: ${SIP_PORT:-8116}
+      SIP_PASSWORD: ${SIP_PASSWORD}
+      ZLM_HOST: ${ZLM_HOST:-zlmediakit}
+      ZLM_HTTP_PORT: 8080
+      ZLM_HOOK_IP: ${ZLM_HOOK_IP:-wvp-backend}
+      ZLM_PUBLIC_HOST: ${ZLM_PUBLIC_HOST:-127.0.0.1}
+      ZLM_SECRET: ${ZLM_SECRET}
+      ZLM_RTP_PORT_RANGE: ${RTP_PORT_START:-40000},${RTP_PORT_END:-40300}
+      ZLM_RTP_SEND_PORT_RANGE: ${RTP_PORT_START:-40000},${RTP_PORT_END:-40300}
+      VLSTREAM_VERIFY_TOKEN: ${VLSTREAM_VERIFY_TOKEN:-}
+      WVP_AUTH_MODE: ${WVP_AUTH_MODE:-LOCAL}
+      DAHUA_ENABLED: ${DAHUA_ENABLED:-false}
+      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx1024m -Dfile.encoding=UTF-8}
+    ports:
+      - "${WVP_HTTP_PORT:-8080}:8080"
+      - "${SIP_PORT:-8116}:${SIP_PORT:-8116}/udp"
+    volumes:
+      - wvp-data:/app/data
+      - wvp-logs:/app/logs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/ >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql-data:
+  redis-data:
+  zlm-data:
+  wvp-data:
+  wvp-logs:
