@@ -9,6 +9,7 @@ import com.sun.jna.Pointer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -26,7 +27,12 @@ import java.util.Map;
  * @date 2025-06-07
  **/
 @Component
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(prefix = "dahua", name = "enabled", havingValue = "true")
+@Slf4j
 public class DahuaCommandLineRunnerImpl implements CommandLineRunner {
+
+    @Value("${dahua.enabled:false}")
+    private boolean enabled;
 
     @Value("${dahua.ip}")
     private String ip;
@@ -48,6 +54,10 @@ public class DahuaCommandLineRunnerImpl implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        if (!enabled) {
+            log.warn("Dahua native service is disabled; set dahua.enabled=true only when the Linux SDK runtime is available");
+            return;
+        }
         // 打开工程，初始化，设置断线回调
         LoginModule.init(null, null);
 

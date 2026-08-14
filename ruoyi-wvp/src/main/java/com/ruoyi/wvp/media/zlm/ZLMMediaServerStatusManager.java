@@ -261,10 +261,14 @@ public class ZLMMediaServerStatusManager {
 
         Map<String, Object> param = new HashMap<>();
         param.put("api.secret",mediaServerItem.getSecret()); // -profile:v Baseline
+        param.put("general.mediaServerId", mediaServerItem.getId());
+        if (!ObjectUtils.isEmpty(mediaServerItem.getSdpIp())) {
+            param.put("rtc.externIP", mediaServerItem.getSdpIp());
+        }
         if (mediaServerItem.getRtspPort() != 0) {
             param.put("ffmpeg.snap", "%s -rtsp_transport tcp -i %s -y -f mjpeg -frames:v 1 %s");
         }
-        param.put("hook.enable","0");
+        param.put("hook.enable","1");
         param.put("hook.on_flow_report","");
         param.put("hook.on_play",String.format("%s/on_play", hookPrefix));
         param.put("hook.on_http_access","");

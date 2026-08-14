@@ -24,7 +24,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8080
+  port: ${SERVER_PORT:8080}
   # [可选] HTTPS配置， 默认不开启
   ssl:
     # [可选] 是否开启HTTPS访问
@@ -67,6 +67,12 @@ user:
 spring:
   main:
     allow-circular-references: true
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 1.2.0
+    validate-on-migrate: true
   application:
     name: viid-server-api
   mvc:
@@ -93,13 +99,13 @@ spring:
   # redis 配置
   redis:
     # 地址
-    host: 127.0.0.1
+    host: ${REDIS_HOST:127.0.0.1}
     # 端口，默认为6379
-    port: 6379
+    port: ${REDIS_PORT:6379}
     # 数据库索引
-    database: 1
+    database: ${REDIS_DATABASE:10}
     # 必须要密码
-    password: 123456
+    password: ${REDIS_PASSWORD:}
     # 连接超时时间
     timeout: 10s
     lettuce:
@@ -116,11 +122,14 @@ spring:
 # token配置
 token:
   # 令牌自定义标识
-  header: Authorization
+  header: accessToken
   # 令牌密钥
-  secret: abcdefghijklmnopqrstuvwxyz
+  secret: ${TOKEN_SECRET:change-this-wvp-token-secret}
   # 令牌有效期（默认30分钟）
-  expireTime: 720
+  expireTime: ${TOKEN_EXPIRE_MINUTES:30}
+  verifyTokenAddress: ${SSO_VERIFY_TOKEN:}
+  vlstreamVerifyTokenAddress: ${VLSTREAM_VERIFY_TOKEN:}
+  vlstreamDefaultDeptId: ${VLSTREAM_DEFAULT_DEPT_ID:}
 
 # MyBatisPlus配置
 mybatis-plus:
@@ -153,7 +162,8 @@ xss:
 
 # 作为28181服务器的配置
 sip:
-  #  ip: 127.0.0.1
+  ip: ${SIP_LISTEN_IP:0.0.0.0}
+  show-ip: ${SIP_PUBLIC_IP:127.0.0.1}
   # [可选] 28181服务监听的端口
   port: 8116
   # 根据国标6.1.2中规定，domain宜采用ID统一编码的前十位编码。国标附录D中定义前8位为中心编码（由省级、市级、区级、基层编号组成，参照GB/T 2260-2007）
@@ -170,23 +180,30 @@ sip:
 
 #zlm 默认服务器配置
 media:
-  id: hxkj_zlm
+  id: ${ZLMEDIAKIT_ID:zlmediakit-local}
   # [必须修改] zlm服务器的内网IP
-  ip: 192.168.2.200
+  ip: ${ZLMEDIAKIT_HOST:127.0.0.1}
+  wan_ip: ${ZLMEDIAKIT_PUBLIC_HOST:127.0.0.1}
+  sdp-ip: ${ZLMEDIAKIT_PUBLIC_HOST:127.0.0.1}
+  stream-ip: ${ZLMEDIAKIT_PUBLIC_HOST:127.0.0.1}
   # [必须修改] zlm服务器的http.port
-  http-port: 8092
+  http-port: ${ZLMEDIAKIT_HTTP_PORT:80}
+  flv-port: ${ZLMEDIAKIT_PUBLIC_HTTP_PORT:8090}
+  ws-flv-port: ${ZLMEDIAKIT_PUBLIC_HTTP_PORT:8090}
+  rtsp-port: ${ZLMEDIAKIT_RTSP_PORT:554}
+  rtmp-port: ${ZLMEDIAKIT_RTMP_PORT:1935}
   # [可选] zlm服务器的hook所使用的IP, 默认使用sip.ip
-  hook-ip: 192.168.2.200
+  hook-ip: ${ZLMEDIAKIT_HOOK_HOST:127.0.0.1}
   # [必选选] zlm服务器的hook.admin_params=secret
-  secret: hxkj_zlm
+  secret: ${ZLMEDIAKIT_SECRET:035c73f7-bb6b-4889-a715-d9eb2d1925cc}
   # 启用多端口模式, 多端口模式使用端口区分每路流，兼容性更好。 单端口使用流的ssrc区分， 点播超时建议使用多端口测试
   rtp:
     # [可选] 是否启用多端口模式, 开启后会在portRange范围内选择端口用于媒体流传输
     enable: true
     # [可选] 在此范围内选择端口用于媒体流传输, 必须提前在zlm上配置该属性，不然自动配置此属性可能不成功
-    port-range: 30000,30500 # 端口范围
+    port-range: ${ZLMEDIAKIT_RTP_PORT_RANGE:40000,40300} # 端口范围
     # [可选] 国标级联在此范围内选择端口发送媒体流,
-    send-port-range: 30000,30500 # 端口范围
+    send-port-range: ${ZLMEDIAKIT_RTP_PORT_RANGE:40000,40300} # 端口范围
 
 # [根据业务需求配置]
 user-settings:
@@ -195,9 +212,9 @@ user-settings:
   # [可选] 自动点播， 使用固定流地址进行播放时，如果未点播则自动进行点播, 需要rtp.enable=true
   auto-apply-play: true
   # 推流直播是否录制
-  record-push-live: true
+  record-push-live: false
   # 国标是否录制
-  record-sip: true
+  record-sip: false
   # 国标点播 按需拉流, true：有人观看拉流，无人观看释放， false：拉起后不自动释放
   stream-on-demand: true
   # 开启sip日志
@@ -228,6 +245,7 @@ isup:
 
 # ISUP linux64配置
 isup-linux64:
+  enabled: ${ISUP_LINUX_ENABLED:false}
   # 海康服务的注册服务器 IP 地址
   cmsServerIP: 127.0.0.1
   # 海康服务的注册服务器监听的端口号
@@ -283,6 +301,7 @@ isup-linux64:
 
 # dahua配置
 dahua:
+  enabled: ${DAHUA_ENABLED:false}
   # [必须修改] dahua服务器的可以是内网IP也可以是公网IP
   ip: 127.0.0.1
   # [必须修改] dahua服务器的端口

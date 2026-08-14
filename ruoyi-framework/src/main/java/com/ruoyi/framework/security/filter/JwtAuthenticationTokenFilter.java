@@ -24,8 +24,16 @@ import com.ruoyi.framework.web.service.TokenService;
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter
 {
+    private static final String ZLM_HOOK_PATH_PREFIX = "/index/hook/";
+
     @Autowired
     private TokenService tokenService;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request)
+    {
+        return request.getServletPath().startsWith(ZLM_HOOK_PATH_PREFIX);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

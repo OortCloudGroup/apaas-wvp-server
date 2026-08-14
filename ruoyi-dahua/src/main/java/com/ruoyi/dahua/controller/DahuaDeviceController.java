@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
  * @date 2025-06-06
  */
 @RestController
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(prefix = "dahua", name = "enabled", havingValue = "true")
 @RequestMapping("/dahua/device")
 public class DahuaDeviceController extends BaseController {
     @Autowired

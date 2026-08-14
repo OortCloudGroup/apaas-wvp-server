@@ -1,0 +1,7 @@
+.git
+.idea
+codex
+**/target
+ruoyi-ui-*/
+sql/
+README*.md

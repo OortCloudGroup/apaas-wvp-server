@@ -1,0 +1,21 @@
+FROM maven:3.9.11-eclipse-temurin-8 AS builder
+WORKDIR /workspace
+COPY . .
+RUN mvn -ntp -Dmaven.test.skip=true package
+
+FROM eclipse-temurin:8-jre-jammy
+ARG VERSION=1.2.0
+LABEL org.opencontainers.image.title="VLStream WVP Backend" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.source="https://github.com/OortCloudGroup/VLStream-Cloud"
+WORKDIR /app
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /app/logs /app/upload
+COPY --from=builder /workspace/ruoyi-admin/target/ruoyi-admin.jar /app/ruoyi-admin.jar
+ENV JAVA_OPTS="-Xms256m -Xmx1024m -Dfile.encoding=UTF-8"
+EXPOSE 9080 8116/tcp 8116/udp
+HEALTHCHECK --interval=20s --timeout=10s --start-period=60s --retries=30 \
+  CMD curl -fsS http://127.0.0.1:9080/health || exit 1
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/ruoyi-admin.jar"]

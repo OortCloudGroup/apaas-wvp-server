@@ -52,6 +52,7 @@ import static com.ruoyi.common.service.ZlmService.ZLM_API;
  * @date 2025-06-06
  */
 @Service
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(prefix = "dahua", name = "enabled", havingValue = "true")
 public class DahuaDeviceServiceImpl implements IDahuaDeviceService {
     @Autowired
     private DahuaDeviceMapper dahuaDeviceMapper;

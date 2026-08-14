@@ -16,6 +16,7 @@ import java.util.List;
  * @date 2025-06-12
  */
 @Service
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(prefix = "dahua", name = "enabled", havingValue = "true")
 public class DahuaDeviceScreenshotServiceImpl implements IDahuaDeviceScreenshotService {
     @Autowired
     private DahuaDeviceScreenshotMapper dahuaDeviceScreenshotMapper;

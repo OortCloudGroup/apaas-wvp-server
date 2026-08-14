@@ -71,7 +71,7 @@ public class ZLMRESTfulUtils {
         if (mediaServerItem == null) {
             return null;
         }
-        String url = String.format("http://%s/index/api/%s",  mediaServerItem.getIp(), api);
+        String url = String.format("http://%s:%s/index/api/%s", mediaServerItem.getIp(), mediaServerItem.getHttpPort(), api);
         JSONObject responseJSON = new JSONObject();
         //-2自定义流媒体 调用错误码
         responseJSON.put("code",-2);
@@ -162,7 +162,7 @@ public class ZLMRESTfulUtils {
     }
 
     public void sendGetForImg(MediaServer mediaServerItem, String api, Map<String, Object> params, String targetPath, String fileName) {
-        String url = String.format("http://%s/index/api/%s", mediaServerItem.getIp(), api);
+        String url = String.format("http://%s:%s/index/api/%s", mediaServerItem.getIp(), mediaServerItem.getHttpPort(), api);
         HttpUrl parseUrl = HttpUrl.parse(url);
         if (parseUrl == null) {
             return;

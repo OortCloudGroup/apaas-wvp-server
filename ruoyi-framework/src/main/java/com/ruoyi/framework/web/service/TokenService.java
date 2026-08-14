@@ -119,9 +119,9 @@ public class TokenService
     {
         // 获取请求携带的令牌
         String accessToken = getToken(request);
-        if (StringUtils.isBlank(accessToken)) {
-            log.error("accessToken为空：{}", request.getRequestURI());
-            throw new ServiceException("accessToken为空");
+        if (StringUtils.isBlank(accessToken))
+        {
+            return null;
         }
 
         String userKey = getTokenKey(accessToken);
