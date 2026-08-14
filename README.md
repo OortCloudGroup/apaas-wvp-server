@@ -17,6 +17,22 @@
 
 ---
 
+## v1.0.0 container quick start
+
+Download the GitHub Release package, then run:
+
+```powershell
+Copy-Item .env.example .env
+docker compose up -d
+```
+
+Open `http://localhost:8080`. The public-release administrator is `admin` and
+the verified initial password is `123456`. Change this password immediately
+after the first login. Full deployment, backup, upgrade, media-port, and
+troubleshooting guidance is in [DEPLOYMENT.md](DEPLOYMENT.md).
+
+---
+
 ## 平台介绍
 
 RuoYi-Wvp 是基于 [RuoYi-Vue](https://ruoyi.vip/) 与 WVP 框架开发的全开源 GB/T 28181 流媒体平台，依托 [ZLMediaKit](https://github.com/ZLMediaKit/ZLMediaKit) 流媒体服务，实现高效、稳定的视频接入与分发。
