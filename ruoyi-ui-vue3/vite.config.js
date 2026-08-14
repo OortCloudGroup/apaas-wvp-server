@@ -62,7 +62,7 @@ export default defineConfig(({ mode, command }) => {
       proxy: {
         // 保留原有的开发API代理
         '/dev-api': {
-          target: `http://${host}:8080`,
+          target: `http://${host}:9080`,
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, '')
         },

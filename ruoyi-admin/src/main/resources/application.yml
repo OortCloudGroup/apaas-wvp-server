@@ -24,7 +24,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8080
+  port: ${SERVER_PORT:9080}
   # [可选] HTTPS配置， 默认不开启
   ssl:
     # [可选] 是否开启HTTPS访问
@@ -93,13 +93,10 @@ spring:
   # redis 配置
   redis:
     # 地址
-    host: 127.0.0.1
-    # 端口，默认为6379
-    port: 6379
-    # 数据库索引
-    database: 1
-    # 必须要密码
-    password: 123456
+    host: ${REDIS_HOST:192.168.60.76}
+    port: ${REDIS_PORT:32576}
+    database: 10
+    password: ${REDIS_PASSWORD:redis@pass}
     # 连接超时时间
     timeout: 10s
     lettuce:
@@ -112,22 +109,41 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
-      
+
 # token配置
+wvp:
+  auth:
+    # 登录鉴权模式：sso（外部统一认证）或 local（系统自身账号密码认证）
+    mode: ${WVP_AUTH_MODE:local}
+
 token:
   # 令牌自定义标识
-  header: Authorization
+  header: accessToken
   # 令牌密钥
   secret: abcdefghijklmnopqrstuvwxyz
   # 令牌有效期（默认30分钟）
-  expireTime: 720
+  expireTime: 30
+  #校验token地址 http://apaas-sso.p-lvgemgroup/sso/v1/verifyToken
+  verifyTokenAddress: ${SSO_VERIFY_TOKEN:http://oort.oortcloudsmart.com:21410/bus/apaas-sso/sso/v1/verifyToken}
+  # VLStream/SpringBlade token校验地址，仅X-WVP-Auth-Source=vlstream时使用
+  vlstreamVerifyTokenAddress: ${VLSTREAM_VERIFY_TOKEN:http://127.0.0.1:8080/blade-system/user/info}
+  # 可选的协议设备默认部门；留空时新增设备不写入 dept_id
+  vlstreamDefaultDeptId: ${VLSTREAM_DEFAULT_DEPT_ID:}
+
+# MyBatis配置
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: com.ruoyi.**.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  # 加载全局的配置文件
+  configLocation: classpath:mybatis/mybatis-config.xml
 
 # MyBatisPlus配置
 mybatis-plus:
   type-aliases-package: com.ruoyi.**.domain
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   config-location: classpath:mybatis/mybatis-config.xml
-
 
 # PageHelper分页插件
 pagehelper:
@@ -153,7 +169,7 @@ xss:
 
 # 作为28181服务器的配置
 sip:
-  #  ip: 127.0.0.1
+  #  ip: 0.0.0.0
   # [可选] 28181服务监听的端口
   port: 8116
   # 根据国标6.1.2中规定，domain宜采用ID统一编码的前十位编码。国标附录D中定义前8位为中心编码（由省级、市级、区级、基层编号组成，参照GB/T 2260-2007）
@@ -168,25 +184,33 @@ sip:
   # 是否存储alarm信息
   alarm: false
 
-#zlm 默认服务器配置
+## ZLMediaKit默认服务器配置
+# ${环境变量名:默认值}：优先读取操作系统或容器环境变量，未设置时使用冒号后的默认值。
 media:
-  id: hxkj_zlm
-  # [必须修改] zlm服务器的内网IP
-  ip: 192.168.2.200
-  # [必须修改] zlm服务器的http.port
-  http-port: 8092
-  # [可选] zlm服务器的hook所使用的IP, 默认使用sip.ip
-  hook-ip: 192.168.2.200
-  # [必选选] zlm服务器的hook.admin_params=secret
-  secret: hxkj_zlm
+  # WVP内部使用的ZLM节点唯一标识，必须与ZLM的general.mediaServerId一致；它不是网络地址。
+  id: zlmediakit-local
+  # ZLMEDIAKIT_HOST：WVP访问ZLM HTTP API时使用的主机名或IP。
+  # 只填写主机，例如127.0.0.1、192.168.1.10或zlmediakit；不要填写http://、路径或端口。
+  # 本地联调默认访问本机Docker映射出来的ZLM端口，因此主机默认为127.0.0.1。
+  ip: ${ZLMEDIAKIT_HOST:127.0.0.1}
+  # ZLMEDIAKIT_HOOK_HOST：ZLM向WVP发送启动、心跳和流状态Hook时使用的WVP主机名或IP。
+  # 该地址必须从ZLM运行环境可达；本地ZLM运行在Docker中，所以默认使用host.docker.internal访问宿主机WVP。
+  # 只填写主机，不填写协议、端口或/index/hook路径，协议、WVP端口和Hook路径由后端自动拼接。
+  hook-ip: ${ZLMEDIAKIT_HOOK_HOST:host.docker.internal}
+  # ZLMEDIAKIT_HTTP_PORT：WVP访问ZLM HTTP API的端口。
+  # 本地Docker将容器80端口映射为宿主机8090，因此默认值为8090；不要把该端口重复写入ZLMEDIAKIT_HOST。
+  http-port: ${ZLMEDIAKIT_HTTP_PORT:8090}
+  # ZLMEDIAKIT_SECRET：调用ZLM /index/api/* 管理接口时使用的鉴权密钥。
+  # 必须与ZLM配置中的api.secret完全一致；WVP与VLS连接同一ZLM时应使用相同值。
+  secret: ${ZLMEDIAKIT_SECRET:su6TiedN2rVAmBbIDX0aa0QTiBJLBdcf}
   # 启用多端口模式, 多端口模式使用端口区分每路流，兼容性更好。 单端口使用流的ssrc区分， 点播超时建议使用多端口测试
   rtp:
     # [可选] 是否启用多端口模式, 开启后会在portRange范围内选择端口用于媒体流传输
     enable: true
     # [可选] 在此范围内选择端口用于媒体流传输, 必须提前在zlm上配置该属性，不然自动配置此属性可能不成功
-    port-range: 30000,30500 # 端口范围
+    port-range: 40000,40300 # 端口范围
     # [可选] 国标级联在此范围内选择端口发送媒体流,
-    send-port-range: 30000,30500 # 端口范围
+    send-port-range: 40000,40300 # 端口范围
 
 # [根据业务需求配置]
 user-settings:
@@ -195,24 +219,28 @@ user-settings:
   # [可选] 自动点播， 使用固定流地址进行播放时，如果未点播则自动进行点播, 需要rtp.enable=true
   auto-apply-play: true
   # 推流直播是否录制
-  record-push-live: true
+  record-push-live: false
   # 国标是否录制
-  record-sip: true
+  record-sip: false
   # 国标点播 按需拉流, true：有人观看拉流，无人观看释放， false：拉起后不自动释放
   stream-on-demand: true
   # 开启sip日志
   sip-log: true
 
-# ISUP win64配置
+# ISUP配置
 isup:
   #注册服务器监听地址(服务器本地地址)
   IP: 127.0.0.1
   route: Isup
-  cmsServer: # 中心管理服务
+  cmsServer:
     Port: 7660
-  smsServer: # 流媒体服务
+  # 取流服务器地址端口（公网对接填入公网地址和端口）
+  smsServer:
     Port: 7665
+    #取流服务器监听地址端口(服务器本地地址)
+    ListenIP: 127.0.0.1
     ListenPort: 7665
+  # 当前项目保留的ISUP服务配置
   ssService: # 报警管理服务
     Port: 7661
   alarmService: # 存储服务
@@ -228,6 +256,8 @@ isup:
 
 # ISUP linux64配置
 isup-linux64:
+  # Linux 原生 ISUP SDK 默认关闭；确认 SDK 运行时兼容后再开启
+  enabled: false
   # 海康服务的注册服务器 IP 地址
   cmsServerIP: 127.0.0.1
   # 海康服务的注册服务器监听的端口号
@@ -301,3 +331,26 @@ zlm-api:
   hk-rtsp-port: 7555
   hk-rtmp-port: 7936
 
+# 第三方登录配置
+just-auth:
+  gitee:
+    client-id:
+    secret:
+    redirect-uri: http://127.0.0.1:8080/gitee-callback
+    front-url: http://localhost/login
+
+# VLStream原生MQTT设备接入，与VLS使用相同Broker配置和消息处理行为。
+vlstream:
+  mqtt:
+    host: ${VLSTREAM_MQTT_HOST:127.0.0.1}
+    port: ${VLSTREAM_MQTT_PORT:1883}
+    username: ${VLSTREAM_MQTT_USERNAME:}
+    password: ${VLSTREAM_MQTT_PASSWORD:}
+    # 必须与VLS客户端ID不同，否则同一Broker会断开其中一个连接。
+    client-id: ${VLSTREAM_WVP_MQTT_CLIENT_ID:wvp-vlstream-backend}
+    qos: ${VLSTREAM_MQTT_QOS:1}
+    keep-alive-seconds: ${VLSTREAM_MQTT_KEEP_ALIVE_SECONDS:60}
+    connection-timeout-seconds: ${VLSTREAM_MQTT_CONNECTION_TIMEOUT_SECONDS:10}
+  device:
+    offline-timeout-seconds: ${VLSTREAM_DEVICE_OFFLINE_TIMEOUT_SECONDS:180}
+    message-retention-hours: ${VLSTREAM_MQTT_MESSAGE_RETENTION_HOURS:24}

@@ -1,250 +1,278 @@
 <template>
-   <div class="app-container">
-      <div class="toolbar-with-search">
-         <div class="toolbar-left">
-            <button-group :button-list="toolbarButtons" />
-         </div>
-         <div class="searchHeight_out flexRowAC">
-            <search-height-box keyword="jobName" placeholder="请输入任务名称等关键词" :data="searchData" @handle="searchResetFn" />
-            <export-excel-pdf :item="{ isDisabledExcel: false }" @handle="handleExportType" />
-         </div>
+  <div class="login">
+    <div class="login-box">
+      <!--      <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">-->
+      <!--        <h3 class="title">{{ title }}</h3>-->
+      <!--        <el-form-item v-if="giteeStar === 'true'">-->
+      <!--          <el-text class="mx-1">给本项目star后即可访问：</el-text><el-link type="primary" href="https://gitee.com/xiaochemgzi/RuoYi-Wvp" target="_blank">点我去star</el-link>-->
+      <!--        </el-form-item>-->
+      <!--        <el-form-item prop="username">-->
+      <!--          <el-input-->
+      <!--              v-model="loginForm.username"-->
+      <!--              type="text"-->
+      <!--              size="large"-->
+      <!--              auto-complete="off"-->
+      <!--              placeholder="账号"-->
+      <!--          >-->
+      <!--            <template #prefix>-->
+      <!--              <svg-icon icon-class="user" class="el-input__icon input-icon"/>-->
+      <!--            </template>-->
+      <!--          </el-input>-->
+      <!--        </el-form-item>-->
+      <!--        <el-form-item prop="password">-->
+      <!--          <el-input-->
+      <!--              v-model="loginForm.password"-->
+      <!--              type="password"-->
+      <!--              size="large"-->
+      <!--              auto-complete="off"-->
+      <!--              placeholder="密码"-->
+      <!--              @keyup.enter="handleLogin"-->
+      <!--          >-->
+      <!--            <template #prefix>-->
+      <!--              <svg-icon icon-class="password" class="el-input__icon input-icon"/>-->
+      <!--            </template>-->
+      <!--          </el-input>-->
+      <!--        </el-form-item>-->
+      <!--        <el-form-item prop="code" v-if="captchaEnabled">-->
+      <!--          <el-input-->
+      <!--              v-model="loginForm.code"-->
+      <!--              size="large"-->
+      <!--              auto-complete="off"-->
+      <!--              placeholder="验证码"-->
+      <!--              style="width: 63%"-->
+      <!--              @keyup.enter="handleLogin"-->
+      <!--          >-->
+      <!--            <template #prefix>-->
+      <!--              <svg-icon icon-class="validCode" class="el-input__icon input-icon"/>-->
+      <!--            </template>-->
+      <!--          </el-input>-->
+      <!--          <div class="login-code">-->
+      <!--            <img :src="codeUrl" @click="getCode" class="login-code-img"/>-->
+      <!--          </div>-->
+      <!--        </el-form-item>-->
+      <!--        <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>-->
+      <!--        <el-form-item style="width:100%;">-->
+      <!--          <el-button-->
+      <!--              :loading="loading"-->
+      <!--              size="large"-->
+      <!--              type="primary"-->
+      <!--              style="width:100%;"-->
+      <!--              @click.prevent="handleLogin"-->
+      <!--          >-->
+      <!--            <span v-if="!loading">登 录</span>-->
+      <!--            <span v-else>登 录 中...</span>-->
+      <!--          </el-button>-->
+      <!--          <div style="float: right;" v-if="register">-->
+      <!--            <router-link class="link-type" :to="'/register'">立即注册</router-link>-->
+      <!--          </div>-->
+      <!--        </el-form-item>-->
+      <!--      </el-form>-->
+      <div class="el-login-footer">
+        <span>Copyright © 2024-2025 视频监控平台 All Rights Reserved.</span>
       </div>
+    </div>
+    <!--  底部  -->
 
-      <table-self
-         class="new_table"
-         header-cell-class-name="header_tenant_cell"
-         stripe
-         v-loading="loading"
-         :data="jobLogList"
-         current-row-key="jobLogId"
-         @selection-change="handleSelectionChange"
-      >
-         <el-table-column type="selection" :width="clacPXToVW(55)" align="center" />
-         <el-table-column label="日志编号" :width="clacPXToVW(80)" align="center" prop="jobLogId" />
-         <el-table-column label="任务名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
-         <el-table-column label="任务组名" align="center" prop="jobGroup" :show-overflow-tooltip="true">
-            <template #default="scope">
-               <dict-tag :options="sys_job_group" :value="scope.row.jobGroup" />
-            </template>
-         </el-table-column>
-         <el-table-column label="调用目标字符串" align="center" prop="invokeTarget" :show-overflow-tooltip="true" />
-         <el-table-column label="日志信息" align="center" prop="jobMessage" :show-overflow-tooltip="true" />
-         <el-table-column label="执行状态" align="center" prop="status">
-            <template #default="scope">
-               <dict-tag :options="sys_common_status" :value="scope.row.status" />
-            </template>
-         </el-table-column>
-         <el-table-column label="执行时间" align="center" prop="createTime" :width="clacPXToVW(180)">
-            <template #default="scope">
-               <span>{{ parseTime(scope.row.createTime) }}</span>
-            </template>
-         </el-table-column>
-         <el-table-column label="操作" align="right" fixed="right" :width="clacPXToVW(100)">
-            <template #default="scope">
-               <div class="operateAppBox flexRowAC" style="justify-content: flex-end;">
-                  <div class="new_table_svg_group" @click.stop="handleView(scope.row)" v-hasPermi="['monitor:job:query']">
-                     <el-icon><View /></el-icon>
-                     <span>详细</span>
-                  </div>
-               </div>
-            </template>
-         </el-table-column>
-      </table-self>
-
-      <pagination
-         v-show="total > 0"
-         :total="total"
-         v-model:page="queryParams.pageNum"
-         v-model:limit="queryParams.pageSize"
-         @pagination="getList"
-      />
-
-      <!-- 调度日志详细 -->
-      <el-dialog title="调度日志详细" v-model="open" width="700px" append-to-body>
-         <el-form :model="form" label-width="100px">
-            <el-row>
-               <el-col :span="12">
-                  <el-form-item label="日志序号：">{{ form.jobLogId }}</el-form-item>
-                  <el-form-item label="任务名称：">{{ form.jobName }}</el-form-item>
-               </el-col>
-               <el-col :span="12">
-                  <el-form-item label="任务分组：">{{ form.jobGroup }}</el-form-item>
-                  <el-form-item label="执行时间：">{{ form.createTime }}</el-form-item>
-               </el-col>
-               <el-col :span="24">
-                  <el-form-item label="调用方法：">{{ form.invokeTarget }}</el-form-item>
-               </el-col>
-               <el-col :span="24">
-                  <el-form-item label="日志信息：">{{ form.jobMessage }}</el-form-item>
-               </el-col>
-               <el-col :span="24">
-                  <el-form-item label="执行状态：">
-                     <div v-if="form.status == 0">正常</div>
-                     <div v-else-if="form.status == 1">失败</div>
-                  </el-form-item>
-               </el-col>
-               <el-col :span="24">
-                  <el-form-item label="异常信息：" v-if="form.status == 1">{{ form.exceptionInfo }}</el-form-item>
-               </el-col>
-            </el-row>
-         </el-form>
-         <template #footer>
-            <div class="dialog-footer">
-               <el-button @click="open = false">关 闭</el-button>
-            </div>
-         </template>
-      </el-dialog>
-   </div>
+    <!--    <el-dialog title="关注公众号" v-model="open" width="500px" append-to-body>-->
+    <!--      <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" label-width="120px">-->
+    <!--        <el-form-item label="公众号二维码">-->
+    <!--          <el-image style="width: 150px" :src="gzhImage" :preview-src-list="[gzhImage]"></el-image>-->
+    <!--        </el-form-item>-->
+    <!--        <el-form-item label="公众号code" prop="publicCode">-->
+    <!--          <template #label>-->
+    <!--            <span>-->
+    <!--               <el-tooltip-->
+    <!--                   content="关注公众号获取"-->
+    <!--                   placement="top">-->
+    <!--                  <el-icon><question-filled/></el-icon>-->
+    <!--               </el-tooltip>-->
+    <!--               公众号code-->
+    <!--            </span>-->
+    <!--          </template>-->
+    <!--          <el-input-->
+    <!--              v-model="loginForm.publicCode"-->
+    <!--              type="text"-->
+    <!--              size="large"-->
+    <!--              placeholder="请输入公众号code"-->
+    <!--          >-->
+    <!--          </el-input>-->
+    <!--        </el-form-item>-->
+    <!--      </el-form>-->
+    <!--      <template #footer>-->
+    <!--        <div class="dialog-footer">-->
+    <!--          <el-button type="primary" @click="submitForm">确 定</el-button>-->
+    <!--          <el-button @click="open = false">取 消</el-button>-->
+    <!--        </div>-->
+    <!--      </template>-->
+    <!--    </el-dialog>-->
+  </div>
 </template>
 
-<script setup name="JobLog">
-import { getJob } from "@/api/monitor/job";
-import { listJobLog, delJobLog, cleanJobLog } from "@/api/monitor/jobLog";
-import { clacPXToVW } from "@/utils/index";
+<script setup>
+import useUserStore from '@/store/modules/user'
+import {isHttp} from "@/utils/validate.js";
+import {isRelogin} from "@/utils/request.js";
+import {setToken} from "@/utils/auth.js";
+import usePermissionStore from "@/store/modules/permission.js";
+import {useRoute, useRouter} from "vue-router";
 
-const { proxy } = getCurrentInstance();
-const { sys_common_status, sys_job_group } = proxy.useDict("sys_common_status", "sys_job_group");
-
-const jobLogList = ref([]);
-const open = ref(false);
-const loading = ref(true);
-const ids = ref([]);
-const multiple = ref(true);
-
-const toolbarButtons = computed(() => [
-  { name: '删除', svg: 'delete', disabled: multiple.value, permi: ['monitor:job:remove'], clickFn: () => handleDelete() },
-  { name: '清空', svg: 'delete', permi: ['monitor:job:remove'], clickFn: () => handleClean() },
-  { name: '关闭', svg: 'operate', clickFn: () => handleClose() }
-]);
-const total = ref(0);
-const dateRange = ref([]);
+const title = import.meta.env.VITE_APP_TITLE;
+const userStore = useUserStore();
 const route = useRoute();
+const router = useRouter();
+const {proxy} = getCurrentInstance();
 
-const data = reactive({
-  form: {},
-  queryParams: {
-    pageNum: 1,
-    pageSize: 10,
-    jobName: undefined,
-    jobGroup: undefined,
-    status: undefined
-  }
+const loginForm = ref({
+  username: "ry",
+  password: "123456",
+  rememberMe: false,
+  code: "",
+  uuid: "",
+  publicCode: ""
 });
 
-const { queryParams, form, rules } = toRefs(data);
+const codeUrl = ref("");
+const loading = ref(false);
+// 验证码开关
+const captchaEnabled = ref(true);
+// 注册开关
+const redirect = ref(undefined);
 
-const searchData = computed(() => [
-  {
-    label: '任务组名',
-    value: 'jobGroup',
-    type: 'select',
-    option: (sys_job_group.value || []).map(d => ({ label: d.label, value: d.value })),
-    default: undefined
-  },
-  {
-    label: '执行状态',
-    value: 'status',
-    type: 'select',
-    option: (sys_common_status.value || []).map(d => ({ label: d.label, value: d.value })),
-    default: undefined
-  },
-  {
-    label: '执行时间',
-    value: 'dateRange',
-    type: 'daterange',
-    startP: '开始日期',
-    endP: '结束日期',
-    format: 'YYYY-MM-DD',
-    default: []
-  }
-]);
+watch(route, (newRoute) => {
+  redirect.value = newRoute.query && newRoute.query.redirect;
+}, {immediate: true});
 
-/** 查询调度日志列表 */
-function getList() {
+function login() {
   loading.value = true;
-  listJobLog(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
-    jobLogList.value = response.rows;
-    total.value = response.total;
+  // 调用action的登录方法
+  userStore.login(loginForm.value).then(() => {
+    const query = route.query;
+    const otherQueryParams = Object.keys(query).reduce((acc, cur) => {
+      if (cur !== "redirect") {
+        acc[cur] = query[cur];
+      }
+      return acc;
+    }, {});
+    router.push({path: redirect.value || "/", query: query});
+  }).catch(() => {
     loading.value = false;
   });
 }
 
-// 返回按钮
-function handleClose() {
-  const obj = { path: "/monitor/job" };
-  proxy.$tab.closeOpenPage(obj);
+function submitForm(){
+  proxy.$refs.loginFormRef.validate(valid => {
+    if(valid){
+      login()
+    }
+  })
 }
 
-/** 搜索按钮操作 */
-function handleQuery() {
-  queryParams.value.pageNum = 1;
-  getList();
-}
-
-function searchResetFn(val) {
-  queryParams.value.pageNum = 1;
-  queryParams.value.jobName = val.jobName || undefined;
-  queryParams.value.jobGroup = val.jobGroup || undefined;
-  queryParams.value.status = val.status || undefined;
-  dateRange.value = val.dateRange && val.dateRange.length ? val.dateRange : [];
-  getList();
-}
-
-function handleExportType(type) {
-  if (type === 'Excel') {
-    handleExport();
+onMounted((()=>{
+  const accessToken = window.location.search.split("?accessToken=")[1].replace("&fromWhere=desktopHome", "").replace("&fromWhere=console_manage", "");
+  if (accessToken) {
+    setToken(accessToken);
+    console.log(accessToken);
+    useUserStore()
+        .getInfo()
+        .then(() => {
+          isRelogin.show = false;
+          usePermissionStore()
+              .generateRoutes()
+              .then((accessRoutes) => {
+                accessRoutes.forEach((route) => {
+                  if (!isHttp(route.path)) {
+                    router.addRoute(route);
+                  }
+                });
+                next({ ...to, replace: true });
+              });
+        })
+    router.push({ path: "/index" }).catch(() => { });
   }
-}
-
-// 多选框选中数据
-function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.jobLogId);
-  multiple.value = !selection.length;
-}
-
-/** 详细按钮操作 */
-function handleView(row) {
-  open.value = true;
-  form.value = row;
-}
-
-/** 删除按钮操作 */
-function handleDelete(row) {
-  proxy.$modal.confirm('是否确认删除调度日志编号为"' + ids.value + '"的数据项?').then(function () {
-    return delJobLog(ids.value);
-  }).then(() => {
-    getList();
-    proxy.$modal.msgSuccess("删除成功");
-  }).catch(() => {});
-}
-
-/** 清空按钮操作 */
-function handleClean() {
-  proxy.$modal.confirm("是否确认清空所有调度日志数据项?").then(function () {
-    return cleanJobLog();
-  }).then(() => {
-    getList();
-    proxy.$modal.msgSuccess("清空成功");
-  }).catch(() => {});
-}
-
-/** 导出按钮操作 */
-function handleExport() {
-  proxy.download("monitor/jobLog/export", {
-    ...queryParams.value,
-  }, `job_log_${new Date().getTime()}.xlsx`);
-}
-
-(() => {
-  const jobId = route.params && route.params.jobId;
-  if (jobId !== undefined && jobId != 0) {
-    getJob(jobId).then(response => {
-      queryParams.value.jobName = response.data.jobName;
-      queryParams.value.jobGroup = response.data.jobGroup;
-      getList();
-    });
-  } else {
-    getList();
-  }
-})();
+}))
 </script>
+
+<style lang='scss' scoped>
+.login {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+  background-image: url("../assets/images/bg-url.png");
+  background-size: cover;
+}
+
+.title {
+  margin: 0px auto 30px auto;
+  text-align: center;
+  font-size: 30px;
+  color: #707070;
+}
+
+.login-box {
+  width: 900px;
+  height: 100vh;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 25px 0px 0px 25px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.login-form {
+  border-radius: 6px;
+  background: #ffffff;
+  width: 500px;
+  padding: 20px 20px 5px 20px;
+
+  .el-input {
+    height: 40px;
+
+    input {
+      height: 40px;
+    }
+  }
+
+  .input-icon {
+    height: 39px;
+    width: 14px;
+    margin-left: 0px;
+  }
+}
+
+.login-tip {
+  font-size: 13px;
+  text-align: center;
+  color: #bfbfbf;
+}
+
+.login-code {
+  width: 33%;
+  height: 40px;
+  float: right;
+
+  img {
+    cursor: pointer;
+    vertical-align: middle;
+  }
+}
+
+.el-login-footer {
+  height: 40px;
+  line-height: 40px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  color: #000000;
+  font-family: Arial;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.login-code-img {
+  height: 40px;
+  padding-left: 12px;
+}
+</style>
