@@ -19,6 +19,7 @@ import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.framework.dto.PlatformLoginUser;
+import com.ruoyi.framework.config.properties.AuthModeProperties;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
@@ -96,6 +97,9 @@ public class TokenService
     private RedisCache redisCache;
 
     @Autowired
+    private AuthModeProperties authModeProperties;
+
+    @Autowired
     private SysUserMapper sysUserMapper;
 
     @Autowired
@@ -120,15 +124,18 @@ public class TokenService
         // 获取请求携带的令牌
         String accessToken = getToken(request);
         if (StringUtils.isBlank(accessToken)) {
-            log.error("accessToken为空：{}", request.getRequestURI());
-            throw new ServiceException("accessToken为空");
+            return null;
         }
 
         String userKey = getTokenKey(accessToken);
 
-        log.info("检查登录缓存：{}", userKey);
+        // VLStream 联邦鉴权独立于 WVP 的 SSO/local 模式。
         if (isVlstreamRequest(request)) {
             return createVlstreamLoginUser(getVlstreamLoginUser(request, accessToken), accessToken, userKey);
+        }
+
+        if (authModeProperties.isLocal()) {
+            return getLocalLoginUser(accessToken);
         }
 
         PlatformLoginUser platformLoginUser = getPlatformLoginUser(request, accessToken);
@@ -158,10 +165,29 @@ public class TokenService
 
         LoginUser loginUser = new LoginUser(sysUser.getUserId(), sysUser.getDeptId(), sysUser, permissionService.getMenuPermission(sysUser));
         loginUser.setToken(accessToken);
-        loginUser.setLoginTime(System.currentTimeMillis());
-        loginUser.setExpireTime(expireTime * MILLIS_MINUTE);
+        long loginTime = System.currentTimeMillis();
+        loginUser.setLoginTime(loginTime);
+        loginUser.setExpireTime(loginTime + expireTime * MILLIS_MINUTE);
         redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
         return loginUser;
+    }
+
+    /**
+     * 解析系统自身登录签发的 JWT，并从 Redis 恢复登录用户。
+     */
+    private LoginUser getLocalLoginUser(String token)
+    {
+        try {
+            Claims claims = parseToken(normalizeLocalToken(token));
+            String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
+            if (StringUtils.isBlank(uuid)) {
+                return null;
+            }
+            return redisCache.getCacheObject(getTokenKey(uuid));
+        } catch (Exception e) {
+            log.debug("本地登录令牌解析失败: {}", e.getClass().getSimpleName());
+            return null;
+        }
     }
 
     /**
@@ -332,6 +358,15 @@ public class TokenService
         return token;
     }
 
+    private String normalizeLocalToken(String token)
+    {
+        String normalized = token == null ? "" : token.trim();
+        if (normalized.regionMatches(true, 0, Constants.TOKEN_PREFIX, 0, Constants.TOKEN_PREFIX.length())) {
+            normalized = normalized.substring(Constants.TOKEN_PREFIX.length()).trim();
+        }
+        return normalized;
+    }
+
     private String firstNotBlank(String... values) {
         if (values == null) {
             return null;
@@ -489,7 +524,7 @@ public class TokenService
      */
     private String getToken(HttpServletRequest request)
     {
-        return request.getHeader(HEADER_ACCESS_TOKEN);
+        return request.getHeader(header);
     }
 
     private String getTokenKey(String uuid)

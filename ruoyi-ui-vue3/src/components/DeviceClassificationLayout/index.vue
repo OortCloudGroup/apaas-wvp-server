@@ -133,14 +133,7 @@ const treeCache = reactive({
 
 const normalizedDeviceKeys = computed(() => props.selectedDeviceKeys.filter(key => key !== null && key !== undefined && key !== '').map(key => String(key)))
 const activeLabel = computed(() => tabs.find(tab => tab.value === activeType.value)?.label || '')
-const displayTree = computed(() => {
-  const cache = treeCache[activeType.value]
-  return [
-    { id: `__all_${activeType.value}`, categoryName: '全部', deviceCount: cache.totalCount, virtualType: 'all', children: [] },
-    { id: `__unclassified_${activeType.value}`, categoryName: '未分类', deviceCount: cache.unclassifiedCount, virtualType: 'unclassified', children: [] },
-    ...cache.tree
-  ]
-})
+const displayTree = computed(() => treeCache[activeType.value].tree)
 
 async function loadTree(type = activeType.value) {
   const response = await getClassificationTree(type, props.protocolType)
@@ -157,19 +150,13 @@ async function loadAllTrees() {
 async function handleTabChange(type) {
   selectedCategory.value = null
   await loadTree(type)
-  emit('filter-change', { categoryType: type, categoryId: undefined, unclassified: false })
-  nextTick(() => treeRef.value?.setCurrentKey(`__all_${type}`))
+  emit('filter-change', { categoryType: undefined, categoryId: undefined, unclassified: undefined })
+  nextTick(() => treeRef.value?.setCurrentKey(null))
 }
 
 function handleNodeClick(node) {
-  selectedCategory.value = node.virtualType ? null : node
-  if (node.virtualType === 'all') {
-    emit('filter-change', { categoryType: activeType.value, categoryId: undefined, unclassified: false })
-  } else if (node.virtualType === 'unclassified') {
-    emit('filter-change', { categoryType: activeType.value, categoryId: undefined, unclassified: true })
-  } else {
-    emit('filter-change', { categoryType: activeType.value, categoryId: String(node.id), unclassified: false })
-  }
+  selectedCategory.value = node
+  emit('filter-change', { categoryType: activeType.value, categoryId: String(node.id), unclassified: false })
 }
 
 const categoryDialog = reactive({ visible: false, mode: 'add', saving: false })
@@ -263,7 +250,6 @@ async function submitAssignment() {
 
 onMounted(async () => {
   await loadTree('REGION')
-  nextTick(() => treeRef.value?.setCurrentKey('__all_REGION'))
 })
 </script>
 

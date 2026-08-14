@@ -1,5 +1,16 @@
 import request from '@/utils/request'
 
+// 查询后端当前生效的登录鉴权模式
+export function getAuthMode() {
+  return request({
+    url: '/auth/mode',
+    headers: {
+      isToken: false
+    },
+    method: 'get'
+  })
+}
+
 // 登录方法
 export function login(username, password, code, uuid,publicCode) {
   const data = {

@@ -1,7 +1,9 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -11,6 +13,7 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
+import com.ruoyi.framework.config.properties.AuthModeProperties;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,18 @@ public class SysLoginController {
     @Autowired
     private ISysConfigService configService;
 
+    @Autowired
+    private AuthModeProperties authModeProperties;
+
+    /**
+     * 前端读取后端实际生效的鉴权模式，避免两端配置不一致。
+     */
+    @Anonymous
+    @GetMapping("/auth/mode")
+    public AjaxResult getAuthMode() {
+        return AjaxResult.success().put("mode", authModeProperties.getModeValue());
+    }
+
     /**
      * 登录方法
      *
@@ -55,6 +70,10 @@ public class SysLoginController {
      */
     @PostMapping("/login")
     public AjaxResult login(@RequestBody LoginBody loginBody) {
+        if (!authModeProperties.isLocal()) {
+            return AjaxResult.error(HttpStatus.FORBIDDEN, "当前启用SSO登录，请从统一平台进入");
+        }
+
         if (Boolean.parseBoolean(configService.selectConfigByKey("sys_public_demonstrate")) && !Constants.SUPER_ADMIN.equals(loginBody.getUsername())) {
             if (!ruoYiConfig.getPublicCode().equals(loginBody.getPublicCode())) {
                 return AjaxResult.error("公众号code错误，请关注ruoyi-wvp公众号获取正确的公众号code");

@@ -261,10 +261,11 @@ public class ZLMMediaServerStatusManager {
 
         Map<String, Object> param = new HashMap<>();
         param.put("api.secret",mediaServerItem.getSecret()); // -profile:v Baseline
+        param.put("general.mediaServerId", mediaServerItem.getId());
         if (mediaServerItem.getRtspPort() != 0) {
             param.put("ffmpeg.snap", "%s -rtsp_transport tcp -i %s -y -f mjpeg -frames:v 1 %s");
         }
-        param.put("hook.enable","0");
+        param.put("hook.enable","1");
         param.put("hook.on_flow_report","");
         param.put("hook.on_play",String.format("%s/on_play", hookPrefix));
         param.put("hook.on_http_access","");
@@ -306,16 +307,14 @@ public class ZLMMediaServerStatusManager {
         JSONObject responseJSON = zlmresTfulUtils.setServerConfig(mediaServerItem, param);
 
         if (responseJSON != null && responseJSON.getInteger("code") == 0) {
-            log.info("[媒体服务节点] 设置成功 {} -> {}:{}",
-                    mediaServerItem.getId(), mediaServerItem.getIp(), mediaServerItem.getHttpPort());
-//            if (restart) {
-//                log.info("[媒体服务节点] 设置成功,开始重启以保证配置生效 {} -> {}:{}",
-//                        mediaServerItem.getId(), mediaServerItem.getIp(), mediaServerItem.getHttpPort());
-//                zlmresTfulUtils.restartServer(mediaServerItem);
-//            }else {
-//                log.info("[媒体服务节点] 设置成功 {} -> {}:{}",
-//                        mediaServerItem.getId(), mediaServerItem.getIp(), mediaServerItem.getHttpPort());
-//            }
+            if (restart) {
+                log.info("[媒体服务节点] 设置成功,开始重启以保证配置生效 {} -> {}:{}",
+                        mediaServerItem.getId(), mediaServerItem.getIp(), mediaServerItem.getHttpPort());
+                zlmresTfulUtils.restartServer(mediaServerItem);
+            }else {
+                log.info("[媒体服务节点] 设置成功 {} -> {}:{}",
+                        mediaServerItem.getId(), mediaServerItem.getIp(), mediaServerItem.getHttpPort());
+            }
         }else {
             log.info("[媒体服务节点] 设置媒体服务节点失败 {} -> {}:{}",
                     mediaServerItem.getId(), mediaServerItem.getIp(), mediaServerItem.getHttpPort());

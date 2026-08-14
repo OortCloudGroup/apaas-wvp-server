@@ -22,9 +22,14 @@ const service = axios.create({
 
 // request拦截器
 service.interceptors.request.use(config => {
+  // 是否需要设置 token
+  const isToken = (config.headers || {}).isToken !== false
   // 是否需要防止数据重复提交
   const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
-  config.headers['accessToken'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+  delete config.headers.isToken
+  if (getToken() && isToken) {
+    config.headers['accessToken'] = getToken()
+  }
   config.headers['requestType'] = "app";
   config.headers['appID'] = import.meta.env.VITE_APP_ID;
   config.headers['secretKey'] = import.meta.env.VITE_APP_SECRET;

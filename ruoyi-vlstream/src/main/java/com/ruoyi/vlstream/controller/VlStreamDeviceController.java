@@ -57,8 +57,8 @@ public class VlStreamDeviceController extends BaseController {
                 || !Boolean.TRUE.equals(stream.getAvailable())) return error("设备或视频流不存在");
 
         try {
-            MediaServer mediaServer = mediaServerService.getDefaultMediaServer();
-            if (mediaServer == null || !mediaServer.isStatus()) return error("没有可用的ZLM媒体服务器");
+            MediaServer mediaServer = getOnlineDefaultMediaServer();
+            if (mediaServer == null) return error("没有可用的ZLM媒体服务器");
             String app = "vlstream";
             String streamId = "device_" + deviceRowId + "_stream_" + stream.getId();
             WVPResult<String> proxy = mediaServerService.addStreamProxy(mediaServer, app, streamId,
@@ -81,11 +81,18 @@ public class VlStreamDeviceController extends BaseController {
 
     @GetMapping("/media/status")
     public AjaxResult mediaStatus() {
-        MediaServer mediaServer = mediaServerService.getDefaultMediaServer();
+        MediaServer mediaServer = getOnlineDefaultMediaServer();
         Map<String, Object> status = new LinkedHashMap<>();
-        status.put("available", mediaServer != null && mediaServer.isStatus());
+        status.put("available", mediaServer != null);
         status.put("mediaServerId", mediaServer == null ? null : mediaServer.getId());
         return success(status);
+    }
+
+    private MediaServer getOnlineDefaultMediaServer() {
+        MediaServer defaultMediaServer = mediaServerService.getDefaultMediaServer();
+        if (defaultMediaServer == null) return null;
+        MediaServer runtimeMediaServer = mediaServerService.getOne(defaultMediaServer.getId());
+        return runtimeMediaServer != null && runtimeMediaServer.isStatus() ? runtimeMediaServer : null;
     }
 
     public static class PreviewRequest {
