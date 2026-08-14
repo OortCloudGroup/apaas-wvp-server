@@ -24,7 +24,9 @@ RuoYi-Wvp 是基于 [RuoYi-Vue](https://ruoyi.vip/) 与 WVP 框架开发的全�
 ### 核心能力
 
 - **多协议接入**：支持 GB28181-2016/2022、ONVIF、RTSP、海康 ISUP、大华 SDK 等多种协议，轻松接入各类摄像头/NVR
+- **VLStream 原生设备接入**：通过 MQTT 接收 VLStream 2.2 设备状态与视频源全量快照，提供业务回执、在线状态管理和独立数据存储
 - **流媒体分发**：基于 ZLMediaKit 实现直播、回放、云台控制等功能
+- **统一 WebRTC 预览**：VLStream 设备上报 RTSP/RTMP 源地址后，由 ZLMediaKit 按需拉流并转换为浏览器可播放的 WebRTC 地址
 - **大屏可视化**：内置数据大屏看板，设备状态、告警等信息一目了然
 - **代码生成**：整合 RuoYi 代码生成器，一键生成前后端 CRUD 代码
 - **权限管理**：动态权限菜单，多终端认证，Spring Security + JWT 安全体系
@@ -43,12 +45,26 @@ RuoYi-Wvp
 ├── ruoyi-onvif          # ONVIF 模块 - ONVIF 协议设备接入
 ├── ruoyi-rtsp           # RTSP 模块 - RTSP 协议设备接入
 ├── ruoyi-dahua          # 大华模块 - 大华 SDK 集成（云台/报警/门禁/热成像等 15+ 功能）
+├── ruoyi-vlstream       # VLStream 模块 - MQTT 原生设备、状态快照、业务回执和 ZLM 预览
 ├── ruoyi-common         # 公共模块 - 工具类、ZLM 服务、编解码等
 ├── ruoyi-quartz         # 定时任务 - 设备状态巡检等周期性任务
 ├── ruoyi-generator      # 代码生成 - Velocity 模板，一键生成前后端代码
 ├── ruoyi-ui-vue3        # 管理前端 - Vue 3 + Element Plus + Vite
 └── ruoyi-ui-large       # 大屏前端 - Vue 3 + TypeScript + TailwindCSS + ECharts
 ```
+
+---
+
+## 近期新增功能（`73f5f6ab` ～ `f5330c54`）
+
+- 完善国标、ISUP、RTSP、ONVIF 和大华 SDK 等协议设备的接入与管理。
+- 优化工作台、导航菜单、列表、搜索、弹窗等管理端界面，并补充地图、告警、收藏、标记和云端录像等能力。
+- 新增跨协议设备的区域、分组、标签统一分类管理。
+- 新增 VLStream MQTT 原生设备模块，支持状态及视频源上报、业务回执、离线管理、独立存储和 ZLM 转 WebRTC 预览。
+- 支持本地账号与 SSO 鉴权切换、`accessToken` 直达及外部平台联邦鉴权。
+- 完善 ZLMediaKit 接入、数据库脚本、环境配置和构建信息展示。
+
+VLStream 模块的部署与配置说明见 [`ruoyi-vlstream/README.md`](ruoyi-vlstream/README.md)。
 
 ---
 
@@ -86,8 +102,11 @@ RuoYi-Wvp
 
 ## 在线体验
 
-- 文档地址：[http://119.29.185.101:85/](http://119.29.185.101:85/)
-- 商业版演示地址：[http://119.29.185.101/device/gbDevice](http://119.29.185.101/device/gbDevice)
+- 访问地址：`待补充`
+- 默认用户：`admin`
+- 默认密码：`123456`
+
+> 一键部署完成后可使用以上默认账号登录；正式环境请及时修改默认密码。
 
 ---
 
