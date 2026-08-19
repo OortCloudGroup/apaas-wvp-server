@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.custom.mapper.CustomDeviceMapper">
+    <resultMap id="DeviceResult" type="com.ruoyi.custom.domain.CustomDevice">
+        <id property="id" column="id"/><result property="deviceName" column="device_name"/>
+        <result property="deviceCode" column="device_code"/><result property="streamUrl" column="stream_url"/>
+        <result property="deviceType" column="device_type"/><result property="status" column="status"/>
+        <result property="longitude" column="longitude"/><result property="latitude" column="latitude"/>
+        <result property="address" column="address"/><result property="remark" column="remark"/>
+        <result property="regionName" column="region_name"/><result property="groupName" column="group_name"/><result property="tagNames" column="tag_names"/>
+        <result property="createBy" column="create_by"/><result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/><result property="updateTime" column="update_time"/>
+    </resultMap>
+    <sql id="deviceColumns">id,device_name,device_code,stream_url,device_type,status,longitude,latitude,address,remark,create_by,create_time,update_by,update_time</sql>
+    <select id="selectDeviceList" resultMap="DeviceResult">
+        select d.*,
+          (select c.category_name from wvp_device_category_relation r join wvp_device_category c on c.id=r.category_id where r.protocol_type='CUSTOM' and r.device_key=cast(d.id as char) and r.category_type='REGION' limit 1) region_name,
+          (select c.category_name from wvp_device_category_relation r join wvp_device_category c on c.id=r.category_id where r.protocol_type='CUSTOM' and r.device_key=cast(d.id as char) and r.category_type='GROUP' limit 1) group_name,
+          (select group_concat(c.category_name order by c.sort_num,c.id separator ',') from wvp_device_category_relation r join wvp_device_category c on c.id=r.category_id where r.protocol_type='CUSTOM' and r.device_key=cast(d.id as char) and r.category_type='TAG') tag_names
+        from wvp_custom_device d
+        <where>
+            <if test="deviceName != null and deviceName != ''">and d.device_name like concat('%',#{deviceName},'%')</if>
+            <if test="deviceCode != null and deviceCode != ''">and d.device_code like concat('%',#{deviceCode},'%')</if>
+            <if test="status != null and status != ''">and d.status=#{status}</if>
+            <if test="categoryType != null and categoryType != ''">
+                <choose>
+                    <when test="unclassified != null and unclassified">
+                        and not exists (select 1 from wvp_device_category_relation cr where cr.protocol_type='CUSTOM'
+                            and cr.device_key=cast(d.id as char) and cr.category_type=#{categoryType})
+                    </when>
+                    <when test="categoryId != null">
+                        and exists (select 1 from wvp_device_category_relation cr
+                            inner join wvp_device_category cc on cc.id=cr.category_id where cr.protocol_type='CUSTOM'
+                            and cr.device_key=cast(d.id as char) and cr.category_type=#{categoryType}
+                            and (cc.id=#{categoryId} or find_in_set(#{categoryId},cc.ancestors)))
+                    </when>
+                </choose>
+            </if>
+        </where>
+        order by d.id desc
+    </select>
+    <select id="selectDeviceById" resultMap="DeviceResult">select <include refid="deviceColumns"/> from wvp_custom_device where id=#{id}</select>
+    <select id="countByDeviceCode" resultType="int">select count(1) from wvp_custom_device where device_code=#{deviceCode}<if test="excludeId != null"> and id&lt;&gt;#{excludeId}</if></select>
+    <insert id="insertDevice" useGeneratedKeys="true" keyProperty="id">
+        insert into wvp_custom_device(device_name,device_code,stream_url,device_type,status,longitude,latitude,address,remark,create_by,create_time)
+        values(#{deviceName},#{deviceCode},#{streamUrl},#{deviceType},#{status},#{longitude},#{latitude},#{address},#{remark},#{createBy},now())
+    </insert>
+    <update id="updateDevice">
+        update wvp_custom_device set device_name=#{deviceName},device_code=#{deviceCode},stream_url=#{streamUrl},device_type=#{deviceType},
+        status=#{status},longitude=#{longitude},latitude=#{latitude},address=#{address},remark=#{remark},update_by=#{updateBy},update_time=now() where id=#{id}
+    </update>
+    <delete id="deleteDevices">delete from wvp_custom_device where id in <foreach collection="array" item="id" open="(" separator="," close=")">#{id}</foreach></delete>
+
+    <resultMap id="PlanResult" type="com.ruoyi.custom.domain.CustomRecordingPlan">
+        <id property="id" column="id"/><result property="deviceId" column="device_id"/><result property="enabled" column="enabled"/>
+        <result property="weekDays" column="week_days"/><result property="startTime" column="start_time"/><result property="endTime" column="end_time"/>
+        <result property="createBy" column="create_by"/><result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/><result property="updateTime" column="update_time"/>
+    </resultMap>
+    <select id="selectPlanByDeviceId" resultMap="PlanResult">select * from wvp_custom_record_plan where device_id=#{deviceId}</select>
+    <select id="selectEnabledPlans" resultMap="PlanResult">select * from wvp_custom_record_plan where enabled=1</select>
+    <insert id="insertPlan" useGeneratedKeys="true" keyProperty="id">insert into wvp_custom_record_plan(device_id,enabled,week_days,start_time,end_time,create_by,create_time) values(#{deviceId},#{enabled},#{weekDays},#{startTime},#{endTime},#{createBy},now())</insert>
+    <update id="updatePlan">update wvp_custom_record_plan set enabled=#{enabled},week_days=#{weekDays},start_time=#{startTime},end_time=#{endTime},update_by=#{updateBy},update_time=now() where device_id=#{deviceId}</update>
+    <delete id="deletePlansByDeviceIds">delete from wvp_custom_record_plan where device_id in <foreach collection="array" item="id" open="(" separator="," close=")">#{id}</foreach></delete>
+
+    <resultMap id="SessionResult" type="com.ruoyi.custom.domain.CustomRecordingSession">
+        <id property="id" column="id"/><result property="deviceId" column="device_id"/><result property="mediaServerId" column="media_server_id"/>
+        <result property="app" column="app"/><result property="stream" column="stream"/><result property="proxyKey" column="proxy_key"/>
+        <result property="status" column="status"/><result property="startTime" column="start_time"/><result property="stopTime" column="stop_time"/><result property="stopReason" column="stop_reason"/>
+    </resultMap>
+    <select id="selectActiveSession" resultMap="SessionResult">select * from wvp_custom_record_session where device_id=#{deviceId} and status='RUNNING' order by id desc limit 1</select>
+    <insert id="insertSession" useGeneratedKeys="true" keyProperty="id">insert into wvp_custom_record_session(device_id,media_server_id,app,stream,proxy_key,status,start_time) values(#{deviceId},#{mediaServerId},#{app},#{stream},#{proxyKey},'RUNNING',now())</insert>
+    <update id="stopSession">update wvp_custom_record_session set status='STOPPED',stop_time=now(),stop_reason=#{stopReason} where id=#{id} and status='RUNNING'</update>
+</mapper>

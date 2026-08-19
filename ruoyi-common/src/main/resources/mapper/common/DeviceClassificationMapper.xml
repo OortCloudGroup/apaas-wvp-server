@@ -80,6 +80,7 @@
             <when test="protocolType == 'GB28181'">select count(1) from wvp_device</when>
             <when test="protocolType == 'DAHUA'">select count(1) from dahua_device</when>
             <when test="protocolType == 'VLSTREAM'">select count(1) from wvp_vlstream_device</when>
+            <when test="protocolType == 'CUSTOM'">select count(1) from wvp_custom_device</when>
             <otherwise>select 0</otherwise>
         </choose>
     </select>

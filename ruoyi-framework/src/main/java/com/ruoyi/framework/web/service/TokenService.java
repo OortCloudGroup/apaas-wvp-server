@@ -60,7 +60,7 @@ public class TokenService
     private static final String AUTH_SOURCE_VLSTREAM = "vlstream";
 
     private static final Set<String> VLSTREAM_PROTOCOL_PERMISSIONS = new HashSet<>(Arrays.asList(
-            "isup:*", "rtsp:*", "onvif:*", "dahua:*", "wvp:*", "gb:*"
+            "isup:*", "rtsp:*", "onvif:*", "dahua:*", "wvp:*", "gb:*", "custom:*"
     ));
 
     // 令牌自定义标识

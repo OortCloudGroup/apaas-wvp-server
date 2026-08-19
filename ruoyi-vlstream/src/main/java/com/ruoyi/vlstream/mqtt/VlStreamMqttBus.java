@@ -78,15 +78,22 @@ public class VlStreamMqttBus {
         }
         JSONObject reply;
         try {
-            reply = VlStreamProtocol.isDeviceState(source)
-                    ? stateService.handle(source)
-                    : VlStreamProtocol.reply(source, 400, "暂不支持该业务类型");
+            reply = dispatchBusinessMessage(source);
         } catch (RuntimeException ex) {
             log.error("VLStream MQTT handling failed: deviceId={}, messageId={}, reason={}",
                     deviceId, source.getString("messageId"), ex.getMessage(), ex);
             reply = VlStreamProtocol.reply(source, 500, "平台处理失败");
         }
         publishReply(topic, reply);
+    }
+
+    JSONObject dispatchBusinessMessage(JSONObject source) {
+        if (VlStreamProtocol.isDeviceState(source)) {
+            return stateService.handle(source);
+        }
+        log.debug("Ignoring VLStream MQTT business owned by another consumer: mainBizType={}, subBizType={}",
+                source.getString("mainBizType"), source.getString("subBizType"));
+        return null;
     }
 
     private void publishReply(String topic, JSONObject reply) {

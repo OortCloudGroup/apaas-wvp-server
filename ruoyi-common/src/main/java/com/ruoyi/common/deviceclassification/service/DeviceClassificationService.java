@@ -27,7 +27,7 @@ public class DeviceClassificationService {
     public static final String GROUP = "GROUP";
     public static final String TAG = "TAG";
     private static final Set<String> TYPES = new HashSet<>(Arrays.asList(REGION, GROUP, TAG));
-    private static final Set<String> PROTOCOLS = new HashSet<>(Arrays.asList("ISUP", "RTSP", "ONVIF", "GB28181", "DAHUA", "VLSTREAM"));
+    private static final Set<String> PROTOCOLS = new HashSet<>(Arrays.asList("ISUP", "RTSP", "ONVIF", "GB28181", "DAHUA", "VLSTREAM", "CUSTOM"));
 
     private final DeviceClassificationMapper mapper;
 
