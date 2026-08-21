@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.vlstream.config.VlStreamMqttProperties;
 import com.ruoyi.vlstream.service.VlStreamDeviceStateService;
+import com.ruoyi.vlstream.service.VlStreamFirmwareReplyHandler;
+import com.ruoyi.common.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -22,12 +24,15 @@ public class VlStreamMqttBus {
     private static final Logger log = LoggerFactory.getLogger(VlStreamMqttBus.class);
     private final VlStreamMqttProperties properties;
     private final VlStreamDeviceStateService stateService;
+    private final VlStreamFirmwareReplyHandler firmwareReplyHandler;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "wvp-vlstream-mqtt"));
     private volatile MqttClient client;
 
-    public VlStreamMqttBus(VlStreamMqttProperties properties, VlStreamDeviceStateService stateService) {
+    public VlStreamMqttBus(VlStreamMqttProperties properties, VlStreamDeviceStateService stateService,
+                           VlStreamFirmwareReplyHandler firmwareReplyHandler) {
         this.properties = properties;
         this.stateService = stateService;
+        this.firmwareReplyHandler = firmwareReplyHandler;
     }
 
     @Scheduled(initialDelay = 1000L, fixedDelay = 10000L)
@@ -91,9 +96,28 @@ public class VlStreamMqttBus {
         if (VlStreamProtocol.isDeviceState(source)) {
             return stateService.handle(source);
         }
+        if (VlStreamProtocol.isFirmwareReply(source)) {
+            firmwareReplyHandler.handle(source);
+            return null;
+        }
         log.debug("Ignoring VLStream MQTT business owned by another consumer: mainBizType={}, subBizType={}",
                 source.getString("mainBizType"), source.getString("subBizType"));
         return null;
+    }
+
+    public void publish(String topic, JSONObject payload) {
+        try {
+            MqttClient current = client;
+            if (current == null || !current.isConnected()) {
+                throw new MqttException(MqttException.REASON_CODE_CLIENT_NOT_CONNECTED);
+            }
+            MqttMessage message = new MqttMessage(payload.toJSONString().getBytes(StandardCharsets.UTF_8));
+            message.setQos(qos());
+            message.setRetained(false);
+            current.publish(topic, message);
+        } catch (Exception ex) {
+            throw new ServiceException("VLStream MQTT 固件指令发布失败：" + ex.getMessage());
+        }
     }
 
     private void publishReply(String topic, JSONObject reply) {
@@ -111,9 +135,11 @@ public class VlStreamMqttBus {
         }
     }
 
-    private MqttConnectOptions connectOptions() {
+    MqttConnectOptions connectOptions() {
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setAutomaticReconnect(true);
+        // The @Scheduled task is the single reconnect owner. Combining it with
+        // Paho automatic reconnect creates competing clients with the same ID.
+        options.setAutomaticReconnect(false);
         options.setCleanSession(false);
         options.setConnectionTimeout(Math.max(1, properties.getConnectionTimeoutSeconds()));
         options.setKeepAliveInterval(Math.max(5, properties.getKeepAliveSeconds()));

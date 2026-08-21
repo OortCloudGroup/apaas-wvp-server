@@ -12,6 +12,7 @@ public class VlStreamDevice extends BaseEntity {
     private String deviceId;
     private String deviceName;
     private String deviceSerial;
+    private String deviceModel;
     private String firmwareVersion;
     private String faceVersion;
     private String ipAddr;
@@ -37,6 +38,8 @@ public class VlStreamDevice extends BaseEntity {
     public void setDeviceName(String deviceName) { this.deviceName = deviceName; }
     public String getDeviceSerial() { return deviceSerial; }
     public void setDeviceSerial(String deviceSerial) { this.deviceSerial = deviceSerial; }
+    public String getDeviceModel() { return deviceModel; }
+    public void setDeviceModel(String deviceModel) { this.deviceModel = deviceModel; }
     public String getFirmwareVersion() { return firmwareVersion; }
     public void setFirmwareVersion(String firmwareVersion) { this.firmwareVersion = firmwareVersion; }
     public String getFaceVersion() { return faceVersion; }

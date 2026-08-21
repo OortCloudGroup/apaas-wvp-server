@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.vlstream.mapper.VlStreamFirmwareTaskMapper">
+    <resultMap id="task" type="com.ruoyi.vlstream.domain.VlStreamFirmwareTask">
+        <id property="id" column="id"/><result property="requestId" column="request_id"/>
+        <result property="mqttMessageId" column="mqtt_message_id"/><result property="deviceRowId" column="device_row_id"/>
+        <result property="deviceId" column="device_id"/><result property="deviceModel" column="device_model"/>
+        <result property="target" column="target"/><result property="currentVersion" column="current_version"/>
+        <result property="targetVersion" column="target_version"/><result property="firmwareId" column="firmware_id"/>
+        <result property="fileName" column="file_name"/><result property="fileSize" column="file_size"/>
+        <result property="sha256" column="sha256"/><result property="rollbackEnable" column="rollback_enable"/>
+        <result property="rebootAfter" column="reboot_after"/><result property="deployStatus" column="deploy_status"/>
+        <result property="mqttTopic" column="mqtt_topic"/><result property="downloadExpiresAt" column="download_expires_at"/>
+        <result property="publishedAt" column="published_at"/><result property="lastReplyAt" column="last_reply_at"/>
+        <result property="completedAt" column="completed_at"/><result property="failureReason" column="failure_reason"/>
+        <result property="replyPayload" column="reply_payload"/><result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/><result property="updateTime" column="update_time"/>
+    </resultMap>
+    <sql id="columns">id,request_id,mqtt_message_id,device_row_id,device_id,device_model,target,current_version,target_version,firmware_id,file_name,file_size,sha256,rollback_enable,reboot_after,deploy_status,mqtt_topic,download_expires_at,published_at,last_reply_at,completed_at,failure_reason,reply_payload,create_by,create_time,update_time</sql>
+    <select id="selectByRequestId" resultMap="task">select <include refid="columns"/> from wvp_vlstream_firmware_task where request_id=#{requestId} limit 1</select>
+    <select id="selectByMessageId" resultMap="task">select <include refid="columns"/> from wvp_vlstream_firmware_task where mqtt_message_id=#{mqttMessageId} limit 1</select>
+    <select id="selectLatestByDevice" resultMap="task">select <include refid="columns"/> from wvp_vlstream_firmware_task where device_row_id=#{deviceRowId} order by create_time desc,id desc limit 1</select>
+    <select id="countActive" resultType="int">
+        select count(*) from wvp_vlstream_firmware_task where device_row_id=#{deviceRowId} and target=#{target}
+        and deploy_status in ('CREATED','PUBLISHED','ACCEPTED','DOWNLOADING','VERIFYING','INSTALLING','REBOOTING')
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into wvp_vlstream_firmware_task(request_id,mqtt_message_id,device_row_id,device_id,device_model,target,current_version,target_version,firmware_id,file_name,file_size,sha256,rollback_enable,reboot_after,deploy_status,mqtt_topic,download_expires_at,create_by,create_time,update_time)
+        values(#{requestId},#{mqttMessageId},#{deviceRowId},#{deviceId},#{deviceModel},#{target},#{currentVersion},#{targetVersion},#{firmwareId},#{fileName},#{fileSize},#{sha256},#{rollbackEnable},#{rebootAfter},#{deployStatus},#{mqttTopic},#{downloadExpiresAt},#{createBy},#{createTime},#{updateTime})
+    </insert>
+    <update id="markPublished">update wvp_vlstream_firmware_task set deploy_status='PUBLISHED',published_at=#{publishedAt},update_time=#{publishedAt} where id=#{id} and deploy_status='CREATED'</update>
+    <update id="markPublishFailed">update wvp_vlstream_firmware_task set deploy_status='FAILED',failure_reason=#{failureReason},completed_at=#{completedAt},update_time=#{completedAt} where id=#{id} and deploy_status='CREATED'</update>
+    <update id="updateReply">
+        update wvp_vlstream_firmware_task set deploy_status=#{deployStatus},last_reply_at=#{lastReplyAt},completed_at=#{completedAt},failure_reason=#{failureReason},reply_payload=#{replyPayload},update_time=#{lastReplyAt}
+        where id=#{id} and deploy_status in ('CREATED','PUBLISHED','ACCEPTED','DOWNLOADING','VERIFYING','INSTALLING','REBOOTING')
+    </update>
+    <update id="cancelActive">
+        update wvp_vlstream_firmware_task set deploy_status='CANCELLED',completed_at=#{completedAt},failure_reason=#{failureReason},update_time=#{completedAt}
+        where device_row_id=#{deviceRowId} and request_id=#{requestId}
+        and deploy_status in ('CREATED','PUBLISHED','ACCEPTED','DOWNLOADING','VERIFYING','INSTALLING','REBOOTING')
+    </update>
+    <update id="expireDownloadTasks">
+        update wvp_vlstream_firmware_task set deploy_status='TIMED_OUT',completed_at=#{now},update_time=#{now},failure_reason='OTA 下载阶段超过下载地址有效期'
+        where deploy_status in ('CREATED','PUBLISHED','ACCEPTED','DOWNLOADING') and download_expires_at &lt; #{nowEpoch}
+    </update>
+    <update id="expireExecutionTasks">
+        update wvp_vlstream_firmware_task set deploy_status='TIMED_OUT',completed_at=#{now},update_time=#{now},failure_reason='OTA 安装阶段长时间没有设备进度回执'
+        where deploy_status in ('VERIFYING','INSTALLING','REBOOTING') and update_time &lt; #{deadline}
+    </update>
+</mapper>

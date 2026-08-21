@@ -5,7 +5,7 @@ import java.util.Locale;
 /**
  * Permission boundaries for the stateless VLStream federation.
  *
- * Federated requests are allowed to use the five protocol domains only. The
+ * Federated requests are allowed to use the protocol device domains only. The
  * WVP system, monitor, and tool domains continue to use the normal permission checks.
  */
 public final class FederatedPermissionUtils
@@ -27,6 +27,8 @@ public final class FederatedPermissionUtils
                 || normalized.startsWith("onvif:")
                 || normalized.startsWith("dahua:")
                 || normalized.startsWith("wvp:")
-                || normalized.startsWith("gb:");
+                || normalized.startsWith("gb:")
+                || normalized.startsWith("vlstream:")
+                || normalized.startsWith("custom:");
     }
 }

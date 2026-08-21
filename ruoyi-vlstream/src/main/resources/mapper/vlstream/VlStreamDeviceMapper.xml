@@ -4,7 +4,7 @@
     <resultMap id="DeviceResult" type="com.ruoyi.vlstream.domain.VlStreamDevice">
         <id property="id" column="id"/>
         <result property="deviceId" column="device_id"/><result property="deviceName" column="device_name"/>
-        <result property="deviceSerial" column="device_serial"/><result property="firmwareVersion" column="firmware_version"/>
+        <result property="deviceSerial" column="device_serial"/><result property="deviceModel" column="device_model"/><result property="firmwareVersion" column="firmware_version"/>
         <result property="faceVersion" column="face_version"/><result property="ipAddr" column="ip_addr"/>
         <result property="mac" column="mac"/><result property="online" column="online"/>
         <result property="onlineReason" column="online_reason"/><result property="heartbeatIndex" column="heartbeat_index"/>
@@ -13,7 +13,7 @@
         <result property="serviceStatusJson" column="service_status_json"/><result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
-    <sql id="columns">id,device_id,device_name,device_serial,firmware_version,face_version,ip_addr,mac,online,
+    <sql id="columns">id,device_id,device_name,device_serial,device_model,firmware_version,face_version,ip_addr,mac,online,
         online_reason,heartbeat_index,last_message_id,last_reported_at,last_heartbeat_time,telemetry_json,
         service_status_json,create_time,update_time</sql>
     <select id="selectById" resultMap="DeviceResult">select <include refid="columns"/> from wvp_vlstream_device where id=#{id}</select>
@@ -43,13 +43,13 @@
         order by last_heartbeat_time desc
     </select>
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into wvp_vlstream_device(device_id,device_name,device_serial,firmware_version,face_version,ip_addr,mac,online,
+        insert into wvp_vlstream_device(device_id,device_name,device_serial,device_model,firmware_version,face_version,ip_addr,mac,online,
           online_reason,heartbeat_index,last_message_id,last_reported_at,last_heartbeat_time,telemetry_json,service_status_json,create_time,update_time)
-        values(#{deviceId},#{deviceName},#{deviceSerial},#{firmwareVersion},#{faceVersion},#{ipAddr},#{mac},#{online},
+        values(#{deviceId},#{deviceName},#{deviceSerial},#{deviceModel},#{firmwareVersion},#{faceVersion},#{ipAddr},#{mac},#{online},
           #{onlineReason},#{heartbeatIndex},#{lastMessageId},#{lastReportedAt},#{lastHeartbeatTime},#{telemetryJson},#{serviceStatusJson},#{createTime},#{updateTime})
     </insert>
     <update id="update">
-        update wvp_vlstream_device set device_name=#{deviceName},device_serial=#{deviceSerial},firmware_version=#{firmwareVersion},
+        update wvp_vlstream_device set device_name=#{deviceName},device_serial=#{deviceSerial},device_model=#{deviceModel},firmware_version=#{firmwareVersion},
           face_version=#{faceVersion},ip_addr=#{ipAddr},mac=#{mac},online=#{online},online_reason=#{onlineReason},
           heartbeat_index=#{heartbeatIndex},last_message_id=#{lastMessageId},last_reported_at=#{lastReportedAt},
           last_heartbeat_time=#{lastHeartbeatTime},telemetry_json=#{telemetryJson},service_status_json=#{serviceStatusJson},update_time=#{updateTime}

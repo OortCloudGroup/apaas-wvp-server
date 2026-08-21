@@ -129,9 +129,15 @@ ZLM 必须启用 Hook，并将 `on_server_started`、`on_server_keepalive` 及�
 
 ## VLS 与 WVP 同时运行
 
-普通 MQTT 订阅会向每个不同 Client ID 的订阅者各分发一份消息。因此 VLS 与 WVP 可以同时连接同一个 Broker、订阅同一个 Topic，并分别写入自己的数据表、发布自己的协议业务回执。
+普通 MQTT 订阅会向每个不同 Client ID 的订阅者各分发一份消息。当前职责按业务类型拆分：
+
+- WVP 是唯一的 VLStream 设备中心，消费 `device/state` 和 `device/firmwareDeploy`，负责设备、心跳、视频流、固件任务及对应回执。
+- VLS 消费 `aiBiz/struct`、`aiBiz/faceEvent`、模型下发回执，负责事件图片、AI 事件和模型业务。
+- VLS 保持硬件接口不变，通过 `GET /internal/vlstream/device/{deviceId}` 向 WVP 校验设备；该最小只读接口仅供后端服务网络访问，不使用用户鉴权或额外共享密钥，硬件无需调用。
+- WVP 已登记但离线的设备仍允许 VLS 接收补报事件；未登记设备会被拒绝。
 
 两套系统的 MQTT Client ID 不能相同。若相同，Broker 会在新客户端连接时断开旧客户端。WVP 默认使用 `wvp-vlstream-backend`。
+VLS 的 `VLSTREAM_NATIVE_DEVICE_LEGACY_ENABLED` 正常部署必须保持 `false`，避免两套服务同时消费心跳、固件回执并返回重复业务回执。
 
 ## 页面与权限
 

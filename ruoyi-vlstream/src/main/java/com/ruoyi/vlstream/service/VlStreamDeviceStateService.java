@@ -61,6 +61,7 @@ public class VlStreamDeviceStateService {
         }
         device.setDeviceName(payload.getString("deviceName"));
         device.setDeviceSerial(payload.getString("deviceSerial"));
+        device.setDeviceModel(payload.getString("deviceModel"));
         device.setFirmwareVersion(payload.getString("version"));
         device.setFaceVersion(payload.getString("deviceFaceVer"));
         device.setIpAddr(payload.getString("ipAddr"));

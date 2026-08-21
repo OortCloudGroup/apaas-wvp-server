@@ -22,6 +22,11 @@ public final class VlStreamProtocol {
                 && "state".equals(message.getString("subBizType"));
     }
 
+    public static boolean isFirmwareReply(JSONObject message) {
+        return "device".equals(message.getString("mainBizType"))
+                && "firmwareDeploy".equals(message.getString("subBizType"));
+    }
+
     public static JSONObject reply(JSONObject source, int code, String msg) {
         JSONObject payload = new JSONObject();
         payload.put("sourceMsgId", source.getString("messageId"));

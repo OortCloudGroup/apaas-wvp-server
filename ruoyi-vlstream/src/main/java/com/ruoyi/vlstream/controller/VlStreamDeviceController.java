@@ -7,6 +7,8 @@ import com.ruoyi.vlstream.domain.VlStreamDevice;
 import com.ruoyi.vlstream.domain.VlStreamDeviceStream;
 import com.ruoyi.vlstream.mapper.VlStreamDeviceMapper;
 import com.ruoyi.vlstream.mapper.VlStreamDeviceStreamMapper;
+import com.ruoyi.vlstream.domain.dto.FirmwareDeployRequest;
+import com.ruoyi.vlstream.service.VlStreamFirmwareDeploymentService;
 import com.ruoyi.wvp.common.StreamInfo;
 import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
@@ -26,13 +28,16 @@ public class VlStreamDeviceController extends BaseController {
     private final VlStreamDeviceMapper deviceMapper;
     private final VlStreamDeviceStreamMapper streamMapper;
     private final IMediaServerService mediaServerService;
+    private final VlStreamFirmwareDeploymentService firmwareDeploymentService;
 
     public VlStreamDeviceController(VlStreamDeviceMapper deviceMapper,
                                     VlStreamDeviceStreamMapper streamMapper,
-                                    IMediaServerService mediaServerService) {
+                                    IMediaServerService mediaServerService,
+                                    VlStreamFirmwareDeploymentService firmwareDeploymentService) {
         this.deviceMapper = deviceMapper;
         this.streamMapper = streamMapper;
         this.mediaServerService = mediaServerService;
+        this.firmwareDeploymentService = firmwareDeploymentService;
     }
 
     @PreAuthorize("@ss.hasPermi('vlstream:device:list')")
@@ -46,6 +51,24 @@ public class VlStreamDeviceController extends BaseController {
     @GetMapping("/{deviceRowId}/streams")
     public AjaxResult streams(@PathVariable Long deviceRowId) {
         return success(streamMapper.selectAvailableByDeviceId(deviceRowId));
+    }
+
+    @PreAuthorize("@ss.hasPermi('vlstream:device:list')")
+    @GetMapping("/{deviceRowId}/detail")
+    public AjaxResult detail(@PathVariable Long deviceRowId) {
+        return success(firmwareDeploymentService.detail(deviceRowId));
+    }
+
+    @PreAuthorize("@ss.hasPermi('vlstream:firmware:deploy')")
+    @PostMapping("/{deviceRowId}/firmware-upgrades")
+    public AjaxResult deployFirmware(@PathVariable Long deviceRowId, @RequestBody FirmwareDeployRequest request) {
+        return success(firmwareDeploymentService.deploy(deviceRowId, request == null ? null : request.getFirmwareId()));
+    }
+
+    @PreAuthorize("@ss.hasPermi('vlstream:firmware:deploy')")
+    @PostMapping("/{deviceRowId}/firmware-upgrades/{requestId}/cancel")
+    public AjaxResult cancelFirmware(@PathVariable Long deviceRowId, @PathVariable String requestId) {
+        return success(firmwareDeploymentService.cancel(deviceRowId, requestId));
     }
 
     @PreAuthorize("@ss.hasPermi('vlstream:device:play')")
