@@ -17,20 +17,20 @@ Open `http://localhost:8080`. The initial account is `admin`; its password is
 `123456`, verified against the administrator BCrypt hash in the source SQL.
 Change it immediately after login.
 
-The default Compose file starts four independent services: MySQL, Redis,
-ZLMediaKit, and the WVP Java backend. No service is combined with another
+The default Compose file starts five independent services: MySQL, Redis, EMQX
+5.4 MQTT, ZLMediaKit, and the WVP Java backend. No service is combined with another
 service image. The WVP image
 also contains the compiled browser UI, so no separate frontend service is
 needed. The backend image is
-`ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.1`.
+`ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.2`.
 
-Use an existing MySQL, Redis, and ZLMediaKit installation with:
+Use an existing MySQL, Redis, ZLMediaKit, and MQTT Broker installation with:
 
 ```powershell
 docker compose -f compose.external.yaml up -d
 ```
 
-Set `DB_HOST`, `REDIS_HOST`, `ZLM_HOST`, `ZLM_HOOK_IP`, and
+Set `DB_HOST`, `REDIS_HOST`, `VLSTREAM_MQTT_HOST`, `ZLM_HOST`, `ZLM_HOOK_IP`, and
 `ZLM_PUBLIC_HOST` in `.env` first. The ZLMediaKit hook address must be reachable
 from ZLMediaKit; when both services use the same Compose network it is normally
 `wvp-backend`.
@@ -51,6 +51,7 @@ account instead of reusing a production root account where possible.
 | Purpose | Default |
 | --- | --- |
 | WVP UI and HTTP API | `8080/tcp` |
+| EMQX MQTT | `1883/tcp` |
 | ZLMediaKit HTTP / WebSocket | `8081/tcp` |
 | ZLMediaKit HTTPS | `8443/tcp` |
 | GB28181 SIP | `8116/udp` |
@@ -65,6 +66,14 @@ The packaged ZLMediaKit image is configured with the same `ZLM_SECRET` passed
 to WVP. `ZLM_PUBLIC_HOST` must be the DNS name or public IP devices and browsers
 can reach, not necessarily the Docker service name.
 
+The default package uses `emqx/emqx:5.4`, matching the tested EMQX 5.4.1
+runtime. WVP connects to it through the internal service name `mqtt` and does
+not require the host MQTT port for container-to-container traffic. Set
+`VLSTREAM_MQTT_USERNAME`, `VLSTREAM_MQTT_PASSWORD`, and a unique
+`VLSTREAM_WVP_MQTT_CLIENT_ID` when the broker requires authentication. Do not
+expose `MQTT_PORT` to an untrusted network without configuring EMQX
+authentication and authorization.
+
 ## Operations, data, and upgrades
 
 View status and logs:
@@ -76,7 +85,7 @@ docker compose logs -f zlmediakit
 ```
 
 Stop or restart with `docker compose stop` and `docker compose up -d`.
-Named volumes retain MySQL, Redis, ZLMediaKit, uploads, and logs. Back up MySQL
+Named volumes retain MySQL, Redis, EMQX, ZLMediaKit, uploads, and logs. Back up MySQL
 with `docker compose exec mysql mysqldump -uroot -p ry-wvp > ry-wvp-backup.sql`
 (supply the root password interactively or securely through your shell).
 
@@ -92,7 +101,7 @@ migrations must never be edited, deleted, or renamed.
 
 ## Protocols and native SDKs
 
-GB28181, ONVIF, RTSP, and ZLMediaKit are the supported v1.0.1 base deployment.
+GB28181, ONVIF, RTSP, ZLMediaKit, and the bundled EMQX Broker are the supported v1.0.2 base deployment.
 ISUP and Dahua integrations are optional/experimental: their native SDK shared
 libraries, dependency completeness, and redistribution terms have not been
 verified for this public Linux image. They are not enabled by the default
@@ -104,6 +113,8 @@ deployment and must be separately reviewed before use.
   that this is a new MySQL volume.
 - If WVP cannot reach ZLMediaKit, compare `ZLM_SECRET`, `ZLM_HOST`, and
   `ZLM_HOOK_IP` on both sides.
+- If VLStream MQTT devices are offline, check `docker compose logs mqtt`, then
+  verify `VLSTREAM_MQTT_HOST`, credentials, and the WVP MQTT client ID.
 - If devices cannot register or media has no video, open SIP and every port in
   the RTP UDP range on the host firewall/NAT/security group and set
   `ZLM_PUBLIC_HOST` to an externally reachable address.

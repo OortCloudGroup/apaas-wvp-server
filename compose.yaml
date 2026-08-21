@@ -35,8 +35,24 @@ services:
       timeout: 5s
       retries: 20
 
+  mqtt:
+    image: ${MQTT_IMAGE:-emqx/emqx:5.4}
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "${MQTT_PORT:-1883}:1883"
+    volumes:
+      - mqtt-data:/opt/emqx/data
+      - mqtt-logs:/opt/emqx/log
+    healthcheck:
+      test: ["CMD-SHELL", "emqx ctl status"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
   zlmediakit:
-    image: ${ZLM_RELEASE_IMAGE:-apaas-wvp-zlmediakit:1.0.1}
+    image: ${ZLM_RELEASE_IMAGE:-apaas-wvp-zlmediakit:1.0.2}
     build:
       context: ./deploy/release/zlm
       args:
@@ -61,12 +77,13 @@ services:
       retries: 30
 
   wvp-backend:
-    image: ${WVP_IMAGE:-ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.1}
+    image: ${WVP_IMAGE:-ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.2}
     restart: unless-stopped
     extra_hosts: ["host.docker.internal:host-gateway"]
     depends_on:
       mysql: { condition: service_healthy }
       redis: { condition: service_healthy }
+      mqtt: { condition: service_healthy }
       zlmediakit: { condition: service_healthy }
     environment:
       TZ: ${TZ:-Asia/Shanghai}
@@ -81,6 +98,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      VLSTREAM_MQTT_HOST: mqtt
+      VLSTREAM_MQTT_PORT: 1883
+      VLSTREAM_MQTT_USERNAME: ${VLSTREAM_MQTT_USERNAME:-}
+      VLSTREAM_MQTT_PASSWORD: ${VLSTREAM_MQTT_PASSWORD:-}
+      VLSTREAM_WVP_MQTT_CLIENT_ID: ${VLSTREAM_WVP_MQTT_CLIENT_ID:-wvp-vlstream-backend}
       TOKEN_SECRET: ${TOKEN_SECRET}
       SIP_PORT: ${SIP_PORT:-8116}
       SIP_PASSWORD: ${SIP_PASSWORD}
@@ -111,6 +133,8 @@ services:
 volumes:
   mysql-data:
   redis-data:
+  mqtt-data:
+  mqtt-logs:
   zlm-data:
   wvp-data:
   wvp-logs:

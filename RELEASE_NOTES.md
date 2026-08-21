@@ -1,8 +1,9 @@
-# APaaS WVP Server v1.0.1
+# APaaS WVP Server v1.0.2
 
-First public container release of APaaS WVP Server.
+Patch release for the public container deployment.
 
-- One-command deployment package for MySQL, Redis, ZLMediaKit, and WVP.
+- One-command deployment package for MySQL, Redis, EMQX 5.4, ZLMediaKit, and WVP.
+- The WVP VLStream MQTT extension now connects to the bundled MQTT Broker by default.
 - Public database bootstrap script with operational data and secrets removed.
 - Flyway baseline and upgrade policy for future database changes.
 - GB28181, ONVIF, RTSP, and ZLMediaKit base deployment support.
