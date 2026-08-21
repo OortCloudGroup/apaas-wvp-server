@@ -26,6 +26,7 @@ public class DeviceClassificationService {
     public static final String REGION = "REGION";
     public static final String GROUP = "GROUP";
     public static final String TAG = "TAG";
+    public static final String ALL_PROTOCOLS = "ALL";
     private static final Set<String> TYPES = new HashSet<>(Arrays.asList(REGION, GROUP, TAG));
     private static final Set<String> PROTOCOLS = new HashSet<>(Arrays.asList("ISUP", "RTSP", "ONVIF", "GB28181", "DAHUA", "VLSTREAM", "CUSTOM"));
 
@@ -37,9 +38,11 @@ public class DeviceClassificationService {
 
     public Map<String, Object> tree(String categoryType, String protocolType) {
         String type = normalizeType(categoryType);
-        String protocol = normalizeProtocol(protocolType);
+        String protocol = normalizeTreeProtocol(protocolType);
         List<DeviceCategory> categories = mapper.selectCategoriesByType(type);
-        List<DeviceCategoryRelation> relations = mapper.selectRelations(protocol, type);
+        List<DeviceCategoryRelation> relations = ALL_PROTOCOLS.equals(protocol)
+            ? mapper.selectLogicalRelations(type)
+            : mapper.selectRelations(protocol, type);
 
         Map<Long, Set<String>> directDevices = new HashMap<>();
         Set<String> classifiedDevices = new HashSet<>();
@@ -65,12 +68,21 @@ public class DeviceClassificationService {
         }
         for (DeviceCategoryTreeNode root : roots) collectDevices(root, directDevices);
 
-        int total = mapper.countProtocolDevices(protocol);
+        int total = ALL_PROTOCOLS.equals(protocol)
+            ? mapper.countLogicalDevices()
+            : mapper.countProtocolDevices(protocol);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("tree", roots);
         result.put("totalCount", total);
         result.put("unclassifiedCount", Math.max(0, total - classifiedDevices.size()));
         return result;
+    }
+
+    public List<String> logicalDeviceIds(String categoryType, Long categoryId) {
+        String type = normalizeType(categoryType);
+        DeviceCategory category = requiredCategory(categoryId);
+        if (!type.equals(category.getCategoryType())) throw new ServiceException("分类类型不匹配");
+        return mapper.selectLogicalDeviceIds(type, categoryId);
     }
 
     private Set<String> collectDevices(DeviceCategoryTreeNode node, Map<Long, Set<String>> directDevices) {
@@ -210,6 +222,11 @@ public class DeviceClassificationService {
         String normalized = value == null ? "" : value.trim().toUpperCase(Locale.ROOT);
         if (!PROTOCOLS.contains(normalized)) throw new ServiceException("不支持的协议类型");
         return normalized;
+    }
+
+    private String normalizeTreeProtocol(String value) {
+        String normalized = value == null ? "" : value.trim().toUpperCase(Locale.ROOT);
+        return ALL_PROTOCOLS.equals(normalized) ? normalized : normalizeProtocol(normalized);
     }
 
     private String currentUsername() {

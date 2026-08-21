@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/device/classification")
 public class DeviceClassificationController extends BaseController {
-    private static final String LIST_PERMISSIONS = "isup:lsupDevice:list,rtsp:RtspDevice:list,onvif:device:list,dahua:device:list,wvp:device:list,vlstream:device:list";
-    private static final String EDIT_PERMISSIONS = "isup:lsupDevice:edit,rtsp:RtspDevice:edit,onvif:device:edit,dahua:device:edit,wvp:device:edit,vlstream:device:edit";
+    private static final String LIST_PERMISSIONS = "isup:lsupDevice:list,rtsp:RtspDevice:list,onvif:device:list,dahua:device:list,wvp:device:list,vlstream:device:list,custom:device:list";
+    private static final String EDIT_PERMISSIONS = "isup:lsupDevice:edit,rtsp:RtspDevice:edit,onvif:device:edit,dahua:device:edit,wvp:device:edit,vlstream:device:edit,custom:device:edit";
 
     private final DeviceClassificationService service;
 
@@ -34,6 +34,12 @@ public class DeviceClassificationController extends BaseController {
     @GetMapping("/tree")
     public AjaxResult tree(@RequestParam String categoryType, @RequestParam String protocolType) {
         return success(service.tree(categoryType, protocolType));
+    }
+
+    @PreAuthorize("@ss.hasAnyPermi('" + LIST_PERMISSIONS + "')")
+    @GetMapping("/device-ids")
+    public AjaxResult deviceIds(@RequestParam String categoryType, @RequestParam Long categoryId) {
+        return success(service.logicalDeviceIds(categoryType, categoryId));
     }
 
     @PreAuthorize("@ss.hasAnyPermi('" + EDIT_PERMISSIONS + "')")
