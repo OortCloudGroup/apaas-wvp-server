@@ -1,4 +1,4 @@
-# APaaS WVP Server v1.0.0
+# APaaS WVP Server v1.0.1
 
 First public container release of APaaS WVP Server.
 

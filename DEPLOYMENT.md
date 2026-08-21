@@ -22,7 +22,7 @@ ZLMediaKit, and the WVP Java backend. No service is combined with another
 service image. The WVP image
 also contains the compiled browser UI, so no separate frontend service is
 needed. The backend image is
-`ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.0`.
+`ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.1`.
 
 Use an existing MySQL, Redis, and ZLMediaKit installation with:
 
@@ -92,7 +92,7 @@ migrations must never be edited, deleted, or renamed.
 
 ## Protocols and native SDKs
 
-GB28181, ONVIF, RTSP, and ZLMediaKit are the supported v1.0.0 base deployment.
+GB28181, ONVIF, RTSP, and ZLMediaKit are the supported v1.0.1 base deployment.
 ISUP and Dahua integrations are optional/experimental: their native SDK shared
 libraries, dependency completeness, and redistribution terms have not been
 verified for this public Linux image. They are not enabled by the default

@@ -132,7 +132,8 @@ token:
   secret: ${TOKEN_SECRET:change-me-before-production}
   # 令牌有效期（默认30分钟）
   expireTime: 720
-  verifyTokenAddress: ${VLSTREAM_VERIFY_TOKEN:}
+  verifyTokenAddress: ${SSO_VERIFY_TOKEN:}
+  vlstreamVerifyTokenAddress: ${VLSTREAM_VERIFY_TOKEN:}
 
 wvp:
   auth:

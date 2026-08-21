@@ -36,7 +36,7 @@ services:
       retries: 20
 
   zlmediakit:
-    image: ${ZLM_RELEASE_IMAGE:-apaas-wvp-zlmediakit:1.0.0}
+    image: ${ZLM_RELEASE_IMAGE:-apaas-wvp-zlmediakit:1.0.1}
     build:
       context: ./deploy/release/zlm
       args:
@@ -61,7 +61,7 @@ services:
       retries: 30
 
   wvp-backend:
-    image: ${WVP_IMAGE:-ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.0}
+    image: ${WVP_IMAGE:-ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.1}
     restart: unless-stopped
     extra_hosts: ["host.docker.internal:host-gateway"]
     depends_on:
@@ -92,6 +92,7 @@ services:
       ZLM_RTP_PORT_RANGE: ${RTP_PORT_START:-40000},${RTP_PORT_END:-40300}
       ZLM_RTP_SEND_PORT_RANGE: ${RTP_PORT_START:-40000},${RTP_PORT_END:-40300}
       VLSTREAM_VERIFY_TOKEN: ${VLSTREAM_VERIFY_TOKEN:-}
+      SSO_VERIFY_TOKEN: ${SSO_VERIFY_TOKEN:-}
       WVP_AUTH_MODE: ${WVP_AUTH_MODE:-LOCAL}
       DAHUA_ENABLED: ${DAHUA_ENABLED:-false}
       JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx1024m -Dfile.encoding=UTF-8}
