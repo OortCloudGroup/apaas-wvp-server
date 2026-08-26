@@ -65,6 +65,7 @@ public class VlStreamFirmwareDeploymentService {
         if (StringUtils.isBlank(device.getDeviceModel())) blockedReason = "设备尚未上报型号";
         else if (!FirmwareVersion.isValid(device.getFirmwareVersion())) blockedReason = "设备尚未上报有效的 RootFS 版本";
         else if (active) blockedReason = "设备存在进行中的 OTA 任务，请等待完成或先终止任务";
+        else if (!Boolean.TRUE.equals(device.getOnline())) blockedReason = "设备离线，无法下发 OTA 指令";
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("device", device);
         result.put("hasNewFirmware", !upgrades.isEmpty());

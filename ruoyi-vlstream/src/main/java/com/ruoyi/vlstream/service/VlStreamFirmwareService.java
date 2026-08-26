@@ -51,6 +51,7 @@ public class VlStreamFirmwareService {
         Date now = new Date();
         String objectKey = "rootfs/" + safeSegment(upload.cameraModel) + "/" + upload.version + "/"
                 + UUID.randomUUID() + ".ota";
+        String uploadUrl = storage.presignedPut(objectKey, ttl);
         VlStreamFirmware firmware = new VlStreamFirmware();
         firmware.setCameraModel(upload.cameraModel);
         firmware.setTarget("rootfs");
@@ -68,7 +69,7 @@ public class VlStreamFirmwareService {
         if (mapper.insert(firmware) != 1) throw new ServiceException("创建固件上传记录失败");
         Map<String, Object> grant = new LinkedHashMap<>();
         grant.put("firmwareId", firmware.getId());
-        grant.put("uploadUrl", storage.presignedPut(objectKey, ttl));
+        grant.put("uploadUrl", uploadUrl);
         grant.put("contentType", upload.contentType);
         grant.put("expiresAt", firmware.getUploadExpiresAt());
         return grant;
@@ -96,7 +97,7 @@ public class VlStreamFirmwareService {
 
     public void remove(Long id) {
         VlStreamFirmware firmware = required(id);
-        storage.delete(firmware.getObjectKey());
+        storage.deleteIfExists(firmware.getObjectKey());
         if (mapper.deleteById(id) != 1) throw new ServiceException("固件记录删除失败");
     }
 

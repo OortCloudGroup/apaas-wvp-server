@@ -6,6 +6,8 @@ import com.ruoyi.vlstream.service.VlStreamDeviceStateService;
 import com.ruoyi.vlstream.service.VlStreamFirmwareReplyHandler;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -21,6 +23,20 @@ public class VlStreamMqttBusTest {
                 mock(VlStreamDeviceStateService.class), mock(VlStreamFirmwareReplyHandler.class));
 
         assertFalse(bus.connectOptions().isAutomaticReconnect());
+    }
+
+    @Test
+    public void disabledMqttDoesNotCreateClient() throws Exception {
+        VlStreamMqttProperties properties = new VlStreamMqttProperties();
+        properties.setEnabled(false);
+        VlStreamMqttBus bus = new VlStreamMqttBus(properties,
+                mock(VlStreamDeviceStateService.class), mock(VlStreamFirmwareReplyHandler.class));
+
+        bus.ensureConnected();
+
+        Field clientField = VlStreamMqttBus.class.getDeclaredField("client");
+        clientField.setAccessible(true);
+        assertNull(clientField.get(bus));
     }
 
     @Test

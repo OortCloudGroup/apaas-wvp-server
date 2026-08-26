@@ -5,12 +5,19 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.framework.config.properties.AuthModeProperties;
+import com.ruoyi.framework.dto.PlatformLoginUser;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpServer;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -84,6 +91,71 @@ public class TokenServiceAuthModeTest
         authModeProperties.setMode(AuthModeProperties.Mode.SSO);
         assertNull(tokenService.getLoginUser(request));
         verifyNoInteractions(redisCache);
+    }
+
+    @Test
+    public void vlstreamRequestPrefersDedicatedFederatedToken()
+    {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(TOKEN_HEADER, "platform-token");
+        request.addHeader("X-WVP-Auth-Source", "vlstream");
+        request.addHeader("X-VLStream-Token", "Bearer local-vlstream-token");
+
+        assertEquals("local-vlstream-token", tokenService.resolveAccessToken(request));
+    }
+
+    @Test
+    public void nonVlstreamRequestKeepsPlatformAccessToken()
+    {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(TOKEN_HEADER, "platform-token");
+        request.addHeader("X-VLStream-Token", "local-vlstream-token");
+
+        assertEquals("platform-token", tokenService.resolveAccessToken(request));
+    }
+
+    @Test
+    public void vlstreamVerificationForwardsGatewayIdentityWithSplitTokens() throws Exception
+    {
+        AtomicReference<Headers> capturedHeaders = new AtomicReference<>();
+        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        server.createContext("/blade-system/user/info", exchange -> {
+            capturedHeaders.set(exchange.getRequestHeaders());
+            byte[] body = ("{\"code\":200,\"success\":true,\"data\":{"
+                    + "\"user\":{\"userId\":\"user-1\",\"userName\":\"tester\","
+                    + "\"tenantId\":\"tenant-1\"}}}").getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, body.length);
+            exchange.getResponseBody().write(body);
+            exchange.close();
+        });
+        server.start();
+
+        try {
+            ReflectionTestUtils.setField(tokenService, "vlstreamVerifyTokenAddress",
+                    "http://127.0.0.1:" + server.getAddress().getPort() + "/blade-system/user/info");
+            MockHttpServletRequest request = new MockHttpServletRequest();
+            request.addHeader("accesstoken", "platform-token");
+            request.addHeader("requesttype", "app");
+            request.addHeader("appid", "app-id");
+            request.addHeader("secretkey", "secret-key");
+            request.addHeader("tenantid", "tenant-1");
+
+            PlatformLoginUser user = ReflectionTestUtils.invokeMethod(tokenService,
+                    "getVlstreamLoginUser", request, "local-vlstream-token");
+
+            Headers headers = capturedHeaders.get();
+            assertEquals("user-1", user.getUserId());
+            assertEquals("Bearer local-vlstream-token", headers.getFirst("Authorization"));
+            assertEquals("Bearer local-vlstream-token", headers.getFirst("blade-auth"));
+            assertEquals("platform-token", headers.getFirst("accesstoken"));
+            assertEquals("app", headers.getFirst("requesttype"));
+            assertEquals("app-id", headers.getFirst("appid"));
+            assertEquals("secret-key", headers.getFirst("secretkey"));
+            assertEquals("tenant-1", headers.getFirst("tenantid"));
+        } finally {
+            server.stop(0);
+        }
     }
 
     private String createJwt(String uuid)

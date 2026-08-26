@@ -101,6 +101,7 @@ WVP 在收到并处理设备消息后，会在原 Topic 发布 `msgDir=platform2
 
 | 环境变量 | 默认值 | 用途 |
 | --- | --- | --- |
+| `VLSTREAM_MQTT_ENABLED` | `false` | 是否启用 WVP 的 VLStream MQTT 消费；设备中心部署必须显式设置为 `true` |
 | `VLSTREAM_MQTT_HOST` | `127.0.0.1` | MQTT Broker 主机名或 IP |
 | `VLSTREAM_MQTT_PORT` | `1883` | MQTT Broker TCP 端口 |
 | `VLSTREAM_MQTT_USERNAME` | 空 | Broker 用户名 |
@@ -138,6 +139,7 @@ ZLM 必须启用 Hook，并将 `on_server_started`、`on_server_keepalive` 及�
 
 两套系统的 MQTT Client ID 不能相同。若相同，Broker 会在新客户端连接时断开旧客户端。WVP 默认使用 `wvp-vlstream-backend`。
 VLS 的 `VLSTREAM_NATIVE_DEVICE_LEGACY_ENABLED` 正常部署必须保持 `false`，避免两套服务同时消费心跳、固件回执并返回重复业务回执。
+不同环境连接同一个普通 Topic 时，即使 Client ID 不同也会分别收到消息；非设备中心环境应设置 `VLSTREAM_MQTT_ENABLED=false`。
 
 ## 页面与权限
 

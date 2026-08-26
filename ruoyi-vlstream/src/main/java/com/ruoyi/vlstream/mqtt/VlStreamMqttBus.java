@@ -37,6 +37,7 @@ public class VlStreamMqttBus {
 
     @Scheduled(initialDelay = 1000L, fixedDelay = 10000L)
     public void ensureConnected() {
+        if (!properties.isEnabled()) return;
         if (client != null && client.isConnected()) return;
         synchronized (this) {
             if (client != null && client.isConnected()) return;

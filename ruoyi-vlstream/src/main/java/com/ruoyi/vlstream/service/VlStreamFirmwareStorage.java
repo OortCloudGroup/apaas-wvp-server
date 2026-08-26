@@ -10,6 +10,7 @@ import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
+import io.minio.errors.ErrorResponseException;
 import io.minio.http.Method;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -63,9 +64,15 @@ public class VlStreamFirmwareStorage {
         }
     }
 
-    public void delete(String objectKey) {
+    public void deleteIfExists(String objectKey) {
         try {
-            internalClient().removeObject(RemoveObjectArgs.builder().bucket(bucket()).object(objectKey).build());
+            MinioClient client = internalClient();
+            if (!client.bucketExists(BucketExistsArgs.builder().bucket(bucket()).build())) return;
+            client.removeObject(RemoveObjectArgs.builder().bucket(bucket()).object(objectKey).build());
+        } catch (ErrorResponseException ex) {
+            String code = ex.errorResponse() == null ? null : ex.errorResponse().code();
+            if ("NoSuchBucket".equals(code) || "NoSuchKey".equals(code)) return;
+            throw new ServiceException("删除 MinIO 固件包失败：" + rootMessage(ex));
         } catch (Exception ex) {
             throw new ServiceException("删除 MinIO 固件包失败：" + rootMessage(ex));
         }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "vlstream.mqtt")
 public class VlStreamMqttProperties {
+    private boolean enabled = true;
     private String host = "127.0.0.1";
     private int port = 1883;
     private String username;
@@ -15,6 +16,8 @@ public class VlStreamMqttProperties {
     private int keepAliveSeconds = 60;
     private int connectionTimeoutSeconds = 10;
 
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
     public String getHost() { return host; }
     public void setHost(String host) { this.host = host; }
     public int getPort() { return port; }

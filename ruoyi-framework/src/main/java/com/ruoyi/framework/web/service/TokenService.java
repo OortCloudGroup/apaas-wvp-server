@@ -57,6 +57,8 @@ public class TokenService
 
     private static final String HEADER_AUTH_SOURCE = "X-WVP-Auth-Source";
 
+    private static final String HEADER_VLSTREAM_TOKEN = "X-VLStream-Token";
+
     private static final String AUTH_SOURCE_VLSTREAM = "vlstream";
 
     private static final Set<String> VLSTREAM_PROTOCOL_PERMISSIONS = new HashSet<>(Arrays.asList(
@@ -122,7 +124,7 @@ public class TokenService
     public LoginUser getLoginUser(HttpServletRequest request)
     {
         // 获取请求携带的令牌
-        String accessToken = getToken(request);
+        String accessToken = resolveAccessToken(request);
         if (StringUtils.isBlank(accessToken)) {
             return null;
         }
@@ -286,14 +288,16 @@ public class TokenService
         String bearerToken = "Bearer " + token;
         HttpResponse response;
         try {
-            response = HttpRequest.get(vlstreamVerifyTokenAddress)
+            HttpRequest verifyRequest = HttpRequest.get(vlstreamVerifyTokenAddress)
                     .header(HttpHeaders.AUTHORIZATION, bearerToken)
-                    .header("blade-auth", token)
-                    .header("AccessToken", token)
-                    .header(HEADER_ACCESS_TOKEN, token)
-                    .header(HEADER_REQUEST_TYPE, request.getHeader(HEADER_REQUEST_TYPE))
-                    .timeout(1500)
-                    .execute();
+                    .header("blade-auth", bearerToken);
+            // VLS 本地会话 token 负责业务鉴权；平台 token 和应用身份继续供平台网关校验。
+            forwardHeader(verifyRequest, request, HEADER_ACCESS_TOKEN);
+            forwardHeader(verifyRequest, request, HEADER_REQUEST_TYPE);
+            forwardHeader(verifyRequest, request, HEADER_APP_ID);
+            forwardHeader(verifyRequest, request, HEADER_SERVER_KEY);
+            forwardHeader(verifyRequest, request, HEADER_TENANT_ID);
+            response = verifyRequest.timeout(1500).execute();
         } catch (Exception e) {
             log.warn("VLStream令牌校验服务调用失败: {}", e.getClass().getSimpleName());
             throw new ServiceException("VLStream令牌校验服务不可用");
@@ -344,6 +348,14 @@ public class TokenService
         platformLoginUser.setTenantId(firstNotBlank(data.getStr("tenantId"), user.getStr("tenantId")));
         platformLoginUser.setAccessToken(accessToken);
         return platformLoginUser;
+    }
+
+    private void forwardHeader(HttpRequest target, HttpServletRequest source, String headerName)
+    {
+        String value = source.getHeader(headerName);
+        if (StringUtils.isNotBlank(value)) {
+            target.header(headerName, value.trim());
+        }
     }
 
     private boolean isVlstreamRequest(HttpServletRequest request) {
@@ -525,6 +537,20 @@ public class TokenService
     private String getToken(HttpServletRequest request)
     {
         return request.getHeader(header);
+    }
+
+    /**
+     * VLStream 联邦请求使用独立的本地会话令牌，避免与平台网关 AccessToken 混用。
+     */
+    String resolveAccessToken(HttpServletRequest request)
+    {
+        if (isVlstreamRequest(request)) {
+            String federatedToken = normalizeFederatedToken(request.getHeader(HEADER_VLSTREAM_TOKEN));
+            if (StringUtils.isNotBlank(federatedToken)) {
+                return federatedToken;
+            }
+        }
+        return getToken(request);
     }
 
     private String getTokenKey(String uuid)
