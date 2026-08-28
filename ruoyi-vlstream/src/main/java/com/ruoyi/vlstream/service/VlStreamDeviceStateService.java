@@ -9,6 +9,7 @@ import com.ruoyi.vlstream.mapper.VlStreamDeviceMapper;
 import com.ruoyi.vlstream.mapper.VlStreamDeviceStreamMapper;
 import com.ruoyi.vlstream.mapper.VlStreamMessageMapper;
 import com.ruoyi.vlstream.mqtt.VlStreamProtocol;
+import com.ruoyi.vlstream.util.VlStreamPlaybackUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +93,9 @@ public class VlStreamDeviceStateService {
             String streamType = StringUtils.defaultIfBlank(source.getString("streamType"), "main");
             String protocol = StringUtils.lowerCase(StringUtils.trimToEmpty(source.getString("protocol")));
             String url = StringUtils.trimToEmpty(source.getString("url"));
-            if (StringUtils.isAnyBlank(channelId, url) || !("rtsp".equals(protocol) || "rtmp".equals(protocol))) continue;
+            boolean proxyStream = "rtsp".equals(protocol) || "rtmp".equals(protocol);
+            if (StringUtils.isAnyBlank(channelId, url)
+                    || !(proxyStream || VlStreamPlaybackUtils.isCameraRtc(protocol, url))) continue;
             if (!keys.add(channelId + "\n" + streamType)) continue;
 
             VlStreamDeviceStream stream = streamMapper.selectByKey(deviceRowId, channelId, streamType);

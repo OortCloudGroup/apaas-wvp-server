@@ -9,6 +9,7 @@ import com.ruoyi.vlstream.mapper.VlStreamDeviceMapper;
 import com.ruoyi.vlstream.mapper.VlStreamDeviceStreamMapper;
 import com.ruoyi.vlstream.domain.dto.FirmwareDeployRequest;
 import com.ruoyi.vlstream.service.VlStreamFirmwareDeploymentService;
+import com.ruoyi.vlstream.util.VlStreamPlaybackUtils;
 import com.ruoyi.wvp.common.StreamInfo;
 import com.ruoyi.wvp.media.bean.MediaServer;
 import com.ruoyi.wvp.media.service.IMediaServerService;
@@ -80,6 +81,12 @@ public class VlStreamDeviceController extends BaseController {
                 || !Boolean.TRUE.equals(stream.getAvailable())) return error("设备或视频流不存在");
 
         try {
+            if (VlStreamPlaybackUtils.isCameraRtc(stream.getProtocol(), stream.getSourceUrl())) {
+                Map<String, Object> playback = new LinkedHashMap<>();
+                playback.put("playMode", "cameraRTC");
+                playback.put("url", stream.getSourceUrl());
+                return success(playback);
+            }
             MediaServer mediaServer = getOnlineDefaultMediaServer();
             if (mediaServer == null) return error("没有可用的ZLM媒体服务器");
             String app = "vlstream";
