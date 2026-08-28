@@ -67,6 +67,16 @@ user:
 spring:
   main:
     allow-circular-references: true
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    url: jdbc:mysql://${DB_HOST:192.168.60.77}:${DB_PORT:32443}/${DB_NAME:ry-wvp}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    user: ${DB_MIGRATION_USERNAME:${DB_USERNAME:root}}
+    password: ${DB_MIGRATION_PASSWORD:${DB_PASSWORD:mysql@pass}}
+    # 当前 WVP 数据库在接入 Flyway 前已经由初始化 SQL 建表；首次启动只登记基线，随后执行更高版本迁移。
+    baseline-on-migrate: true
+    baseline-version: 1.2.0
+    baseline-description: wvp-existing-schema
   application:
     name: viid-server-api
   mvc:
@@ -125,7 +135,7 @@ token:
   expireTime: 30
   #校验token地址 http://apaas-sso.p-lvgemgroup/sso/v1/verifyToken
   verifyTokenAddress: ${SSO_VERIFY_TOKEN:http://oort.oortcloudsmart.com:21410/bus/apaas-sso/sso/v1/verifyToken}
-  # VLStream/SpringBlade token校验地址，仅X-WVP-Auth-Source=vlstream时使用
+  # VLStream/SpringBlade token校验地址，仅X-WVP-Auth-Source=vlstream时使用；部署环境必须显式配置，避免127.0.0.1误指向WVP自身
   vlstreamVerifyTokenAddress: ${VLSTREAM_VERIFY_TOKEN:http://127.0.0.1:8080/blade-system/user/info}
   # 可选的协议设备默认部门；留空时新增设备不写入 dept_id
   vlstreamDefaultDeptId: ${VLSTREAM_DEFAULT_DEPT_ID:}
@@ -342,15 +352,32 @@ just-auth:
 # VLStream原生MQTT设备接入，与VLS使用相同Broker配置和消息处理行为。
 vlstream:
   mqtt:
-    host: ${VLSTREAM_MQTT_HOST:127.0.0.1}
-    port: ${VLSTREAM_MQTT_PORT:1883}
-    username: ${VLSTREAM_MQTT_USERNAME:}
-    password: ${VLSTREAM_MQTT_PASSWORD:}
+    # 本地默认不消费测试环境设备消息；设备中心部署必须显式设置为 true。
+    enabled: ${VLSTREAM_MQTT_ENABLED:false}
+    host: ${VLSTREAM_MQTT_HOST:192.168.60.79}
+    port: ${VLSTREAM_MQTT_PORT:32570}
+    username: ${VLSTREAM_MQTT_USERNAME:VLStream}
+    password: ${VLSTREAM_MQTT_PASSWORD:oort@123}
     # 必须与VLS客户端ID不同，否则同一Broker会断开其中一个连接。
-    client-id: ${VLSTREAM_WVP_MQTT_CLIENT_ID:wvp-vlstream-backend}
+    client-id: ${VLSTREAM_WVP_MQTT_CLIENT_ID:wvp-vlstream-backend-oort-local}
     qos: ${VLSTREAM_MQTT_QOS:1}
     keep-alive-seconds: ${VLSTREAM_MQTT_KEEP_ALIVE_SECONDS:60}
     connection-timeout-seconds: ${VLSTREAM_MQTT_CONNECTION_TIMEOUT_SECONDS:10}
   device:
     offline-timeout-seconds: ${VLSTREAM_DEVICE_OFFLINE_TIMEOUT_SECONDS:180}
     message-retention-hours: ${VLSTREAM_MQTT_MESSAGE_RETENTION_HOURS:24}
+  firmware:
+    # WVP now owns the VLS RootFS firmware repository and OTA workflow.
+    # 复用 VLS 已联调通过的本机 MinIO；容器/生产环境仍可通过环境变量覆盖。
+    endpoint: ${VLSTREAM_FIRMWARE_MINIO_ENDPOINT:http://192.168.88.31:9000}
+    public-endpoint: ${VLSTREAM_FIRMWARE_PUBLIC_ENDPOINT:http://192.168.88.31:9000}
+    access-key: ${VLSTREAM_FIRMWARE_MINIO_ACCESS_KEY:admin}
+    secret-key: ${VLSTREAM_FIRMWARE_MINIO_SECRET_KEY:MinioLocal123}
+    bucket: ${VLSTREAM_FIRMWARE_MINIO_BUCKET:vls-firmware}
+    # 摄像头可访问的 WVP 根地址；本地源码默认端口为 9080。
+    platform-base-url: ${VLSTREAM_WVP_PUBLIC_URL:http://192.168.88.31:9080}
+    upload-url-ttl-seconds: ${VLSTREAM_FIRMWARE_UPLOAD_TTL_SECONDS:600}
+    download-url-ttl-seconds: ${VLSTREAM_FIRMWARE_DOWNLOAD_TTL_SECONDS:1800}
+    ota-download-url-ttl-seconds: ${VLSTREAM_FIRMWARE_OTA_TTL_SECONDS:7200}
+    ota-task-inactivity-timeout-minutes: ${VLSTREAM_FIRMWARE_OTA_INACTIVITY_MINUTES:30}
+    max-package-bytes: ${VLSTREAM_FIRMWARE_MAX_PACKAGE_BYTES:167772160}
