@@ -1,5 +1,5 @@
 #!/bin/sh
-# This file is intentionally LF-only; it is executed directly by the Linux container.
+# This file must remain LF-only because it is executed directly by the Linux container.
 set -eu
 
 secret=$(printf '%s' "${ZLM_SECRET:?ZLM_SECRET is required}" | sed 's/[&|]/\\&/g')

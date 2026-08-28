@@ -16,6 +16,7 @@ import com.ruoyi.dahua.runner.DahuaCommandLineRunnerImpl;
 import com.ruoyi.dahua.service.IDahuaDeviceScreenshotService;
 import com.ruoyi.dahua.service.IDahuaDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
  * @date 2025-06-06
  */
 @RestController
+@ConditionalOnProperty(name = "dahua.enabled", havingValue = "true")
 @RequestMapping("/dahua/device")
 public class DahuaDeviceController extends BaseController {
     @Autowired

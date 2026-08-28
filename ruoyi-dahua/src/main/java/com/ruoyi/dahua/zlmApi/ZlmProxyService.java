@@ -7,6 +7,7 @@ import com.ruoyi.common.config.ZlmApiProperties;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.ruoyi.common.service.ZlmService.ZLM_API;
 
 @Service
+@ConditionalOnProperty(name = "dahua.enabled", havingValue = "true")
 public class ZlmProxyService {
 
     @Autowired

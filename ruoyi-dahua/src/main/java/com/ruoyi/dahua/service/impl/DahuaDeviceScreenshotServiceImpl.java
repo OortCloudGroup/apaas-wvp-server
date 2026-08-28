@@ -5,6 +5,7 @@ import com.ruoyi.dahua.domain.DahuaDeviceScreenshot;
 import com.ruoyi.dahua.mapper.DahuaDeviceScreenshotMapper;
 import com.ruoyi.dahua.service.IDahuaDeviceScreenshotService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * @date 2025-06-12
  */
 @Service
+@ConditionalOnProperty(name = "dahua.enabled", havingValue = "true")
 public class DahuaDeviceScreenshotServiceImpl implements IDahuaDeviceScreenshotService {
     @Autowired
     private DahuaDeviceScreenshotMapper dahuaDeviceScreenshotMapper;

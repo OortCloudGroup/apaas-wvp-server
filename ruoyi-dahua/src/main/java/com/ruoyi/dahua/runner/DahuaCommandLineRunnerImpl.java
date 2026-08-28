@@ -7,6 +7,7 @@ import com.ruoyi.dahua.module.AutoRegisterModule;
 import com.ruoyi.dahua.module.LoginModule;
 import com.sun.jna.Pointer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,7 @@ import java.util.Map;
  * @date 2025-06-07
  **/
 @Component
+@ConditionalOnProperty(name = "dahua.enabled", havingValue = "true")
 public class DahuaCommandLineRunnerImpl implements CommandLineRunner {
 
     @Value("${dahua.ip}")
