@@ -323,6 +323,7 @@ isup-linux64:
 
 # dahua配置
 dahua:
+  enabled: ${DAHUA_ENABLED:false}
   # [必须修改] dahua服务器的可以是内网IP也可以是公网IP
   ip: 127.0.0.1
   # [必须修改] dahua服务器的端口

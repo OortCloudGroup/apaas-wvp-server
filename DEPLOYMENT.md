@@ -22,7 +22,7 @@ The default Compose file starts five independent services: MySQL, Redis, EMQX
 service image. The WVP image
 also contains the compiled browser UI, so no separate frontend service is
 needed. The backend image is
-`ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.2`.
+`ghcr.io/oortcloudgroup/apaas-wvp-server:1.0.3`.
 
 Use an existing MySQL, Redis, ZLMediaKit, and MQTT Broker installation with:
 
@@ -67,8 +67,9 @@ to WVP. `ZLM_PUBLIC_HOST` must be the DNS name or public IP devices and browsers
 can reach, not necessarily the Docker service name.
 
 The default package uses `emqx/emqx:5.4`, matching the tested EMQX 5.4.1
-runtime. WVP connects to it through the internal service name `mqtt` and does
-not require the host MQTT port for container-to-container traffic. Set
+runtime. `VLSTREAM_MQTT_ENABLED` defaults to `true` in both Compose files so
+WVP connects through the internal service name `mqtt` by default and does not
+require the host MQTT port for container-to-container traffic. Set
 `VLSTREAM_MQTT_USERNAME`, `VLSTREAM_MQTT_PASSWORD`, and a unique
 `VLSTREAM_WVP_MQTT_CLIENT_ID` when the broker requires authentication. Do not
 expose `MQTT_PORT` to an untrusted network without configuring EMQX
@@ -101,7 +102,7 @@ migrations must never be edited, deleted, or renamed.
 
 ## Protocols and native SDKs
 
-GB28181, ONVIF, RTSP, ZLMediaKit, and the bundled EMQX Broker are the supported v1.0.2 base deployment.
+GB28181, ONVIF, RTSP, ZLMediaKit, and the bundled EMQX Broker are the supported v1.0.3 base deployment.
 ISUP and Dahua integrations are optional/experimental: their native SDK shared
 libraries, dependency completeness, and redistribution terms have not been
 verified for this public Linux image. They are not enabled by the default

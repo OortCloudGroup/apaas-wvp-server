@@ -28,6 +28,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +53,7 @@ import static com.ruoyi.common.service.ZlmService.ZLM_API;
  * @date 2025-06-06
  */
 @Service
+@ConditionalOnProperty(name = "dahua.enabled", havingValue = "true")
 public class DahuaDeviceServiceImpl implements IDahuaDeviceService {
     @Autowired
     private DahuaDeviceMapper dahuaDeviceMapper;

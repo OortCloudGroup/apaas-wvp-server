@@ -4,10 +4,12 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.dahua.domain.bo.ProxyPlayBo;
 import com.ruoyi.dahua.zlmApi.ZlmProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@ConditionalOnProperty(name = "dahua.enabled", havingValue = "true")
 @RequestMapping("/dahua/zlmApi")
 public class ZlmApiDaHuaController {
 
