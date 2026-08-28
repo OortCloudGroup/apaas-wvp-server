@@ -102,7 +102,7 @@ VLStream 模块的部署与配置说明见 [`ruoyi-vlstream/README.md`](ruoyi-vl
 
 ## 在线体验
 
-- 访问地址：`待补充`
+- 访问地址：`https://vls-lite.oortcloudsmart.com:2443/ `
 - 默认用户：`admin`
 - 默认密码：`123456`
 
