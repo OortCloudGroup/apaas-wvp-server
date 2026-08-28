@@ -49,3 +49,4 @@ node_modules/
 !*/build/*.xml
 /opencode
 /codex
+/AGENTS.md
