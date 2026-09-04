@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="./ruoyi-ui-vue3/src/assets/logo/logo.png" alt="VLStream-wvp-lite" width="160">
+  <img src="./ruoyi-ui-vue3/src/assets/logo/logo.png" alt="VLStream-Cloud-Lite" width="160">
 
-  <h1>VLStream-wvp-lite</h1>
+  <h1>VLStream-Cloud-Lite</h1>
 
   <p><strong>基于 RuoYi-Vue、WVP 与 ZLMediaKit 的开源视频接入与流媒体管理平台</strong></p>
 
@@ -26,11 +26,11 @@
 ---
 
 > [!IMPORTANT]
-> 新部署包的初始账号为 `admin` / `123456`，首次登录后必须立即修改密码。ISUP 和大华原生 SDK 默认关闭，启用前请阅读[部署说明](./DEPLOYMENT.md)并单独验证运行库、端口及第三方授权。
-
+> [VLStream-Cloud-Lite 在线访问入口](https://vls-lite.oortcloudsmart.com:2443/#/login?redirect=/index)
+ 默认账号： admin / 123456
 ## 📖 项目介绍
 
-VLStream-wvp-lite 是一个面向视频设备接入、流媒体分发和设备运维的开源平台。项目代码和模块名中仍保留 `RuoYi`/`ruoyi-*` 技术标识；后端由 Java 8 + Spring Boot 多模块工程组成，管理端使用 Vue 3 + Element Plus，媒体处理依托 WVP 与 ZLMediaKit。
+VLStream-Cloud-Lite 是一个面向视频设备接入、流媒体分发和设备运维的开源平台。项目代码和模块名中仍保留 `RuoYi`/`ruoyi-*` 技术标识；后端由 Java 8 + Spring Boot 多模块工程组成，管理端使用 Vue 3 + Element Plus，媒体处理依托 WVP 与 ZLMediaKit。
 
 平台将国标设备、网络摄像机、RTSP 推流设备、VLStream 原生 MQTT 设备及可选的厂商 SDK 设备统一纳入管理，提供设备状态、通道、预览、回放、云台、录像计划、告警、级联和系统权限等能力。
 
@@ -39,7 +39,6 @@ VLStream-wvp-lite 是一个面向视频设备接入、流媒体分发和设备�
 
 ## 🌐 在线访问
 
-[VLStream-wvp-lite 在线访问入口](https://vls-lite.oortcloudsmart.com:2443/#/login?redirect=/index)
 
 ## ✨ 核心能力
 
